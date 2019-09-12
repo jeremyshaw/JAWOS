@@ -46,4 +46,9 @@ void Bzero(char *start, unsigned int bytes){
 code a MemCpy() function to copy a memory region located at a given
 character pointer 'dst,' from the starting location at a given character
 pointer 'src,' the size will also be given as an unsigned integer 'max'
+MemCpy *dst, *src, un int bytes
+for i = 0;;;
+*dst = *src
+dst++;
+src++;
 
