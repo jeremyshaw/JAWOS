@@ -34,6 +34,13 @@ characters), the beginning of the memory location will be given via a
 character pointer, and the size of the memory will be given by an unsigned
 int 'max'
 
+void Bzero(char *start, unsigned int bytes){
+	for(int i ={
+		*start = '\0';
+		start++;
+	}
+};
+
 code a MemCpy() function to copy a memory region located at a given
 character pointer 'dst,' from the starting location at a given character
 pointer 'src,' the size will also be given as an unsigned integer 'max'

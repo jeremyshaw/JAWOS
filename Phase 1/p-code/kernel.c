@@ -32,11 +32,11 @@ void BootStrap(void) {         // set up kernel!
     //set sys time count to zero
 	sys_time_count = 0;
 	
-   call tool Bzero() to clear avail queue
+   call tool Bzero(char *)&avail_que, sizeof(que_t)) to clear avail queue
    call tool Bzero() to clear ready queue
    enqueue all the available PID numbers to avail queue
 
-   get IDT location
+   get IDT location//lot of the following and this line done in prep4
    addr of TimerEntry is placed into proper IDT entry //32?
    send PIC control register the mask value for timer handling
 }
@@ -70,10 +70,12 @@ void Scheduler(void) {              // choose a run_pid to run
 
 void Kernel(tf_t *tf_p) {       // kernel runs
    copy tf_p to the trapframe ptr (in PCB) of the process in run
+   pdb[prunp_id].tf_p = tf_p;
 
-   call the timer service routine
+   //call the timer service routine
+   TimerSR(); //incomplete?
 
-   if 'b' key on target PC is pressed, goto the GDB prompt
+   if 'b' key on target PC is pressed, goto the GDB prompt -->breakpoint()?
 
    call Scheduler() to change run_pid if needed
    call Loader() to load the trapframe of the selected process
