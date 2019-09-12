@@ -8,15 +8,18 @@
 #include "tools.h"    // small handy functions
 #include "ksr.h"      // kernel service routines
 #include "proc.h"     // all user process code here
+//need to include ext-data.h?
 
 // declare kernel data
 
 
 //declare an integer: run_pid;                        // current running PID; if -1, none selected
 int run_pid;
+//extern int run_pid;?
 
 //declare 2 queues: avail_que and ready_que;  // avail PID and those created/ready to run
-que_t avail_que, ready_que;
+que_t avail_que;
+que_t ready_que;
 
 //declare an array of PCB type: pcb[PROC_MAX];                // Process Control Blocks
 pcb_t pcb[PROC_MAX];

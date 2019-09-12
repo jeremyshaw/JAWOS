@@ -1,9 +1,9 @@
 // tools.c, 159
 
 //this .c code needs to include spede.h, const-type.h, and ext-data.h
-#include"spede.h";
-#include"const-type.h";
-#include"ext-data.h";
+#include "spede.h";
+#include "const-type.h";
+#include "ext-data.h";
 
 
 QueEmpty(pointer*){

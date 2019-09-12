@@ -1,7 +1,7 @@
 // const-type.h, 159, needed constants & types
 
-#ifndef _CONST_TYPE_           // to prevent name mangling recursion
-#define _CONST_TYPE_           // to prevent name redefinition
+#ifndef _CONST_TYPE_           // to prevent name mangling recursion //"if not define, define"
+#define _CONST_TYPE_           // to prevent name redefinition //(continued...) uses the end if at the very end. Sometime about recursive stuff.
 
 #define TIMER_EVENT 32         // timer interrupt signal code
 #define PIC_MASK_REG 0x21      // I/O loc # of PIC mask
@@ -22,12 +22,21 @@
 typedef void (*func_p_t)(void); // void-return function pointer type
 
 typedef enum {AVAIL, READY, RUN} state_t;
+#define AVAIL 0
+#define READY 1
+#define RUN 2
+//state type
 
 // define a trapframe type (tf_t) that has these 'unsigned int'
       // eax, ecx, edx, ebx, esp, ebp, esi, edi, eip, cs, efl
-trypedef unsigned int tf_t;
+typedef unsigned int tf_t;
 tf_t eax, ecx, edx, ebx, esp, ebp, esi, edi, eip, cs, efl;
 
+//W-C seems to want this format
+//typedef struct {
+//	unsigned int eax...
+//}tf_t;
+// used tf_t *tf_p;
 
 // define a PCB type (pcb_t) that has 
    // state_t state
@@ -46,7 +55,7 @@ typedef struct{
 
 typedef struct {
 	int tail;
-	int[QUE_MAX] que;
+	int que[QUE_MAX];
 } que_t;
 
 #endif                          // to prevent name mangling

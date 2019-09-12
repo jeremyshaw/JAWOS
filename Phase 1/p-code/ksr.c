@@ -1,10 +1,10 @@
 // ksr.c, 159 Kernal Service Routines
 
 //need to include spede.h, const-type.h, ext-data.h, tools.h
-#include"spede.h";
-#include"const-type.h";
-#include"ext-data.h";
-#include"tools.h";
+#include "spede.h";
+#include "const-type.h";
+#include "ext-data.h";
+#include "tools.h";
 
 // to create a process: alloc PID, PCB, and process stack
 // build trapframe, initialize PCB, record PID to ready_que
