@@ -6,8 +6,9 @@
 #include "ext-data.h";
 
 
-QueEmpty(pointer*){
+QueEmpty(que_t *p){
 // code a QueEmpty() function that checks whether a queue (located by a
+if(p->tail ==0) return 1;
 // given pointer) is emptyr; returns 1 if yes, or 0 if not
 
 return 0;//not empty
@@ -38,6 +39,7 @@ void Bzero(char *start, unsigned int bytes){
 	for(int i ={
 		*start = '\0';
 		start++;
+		//(*start)++
 	}
 };
 

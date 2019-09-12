@@ -21,13 +21,19 @@
           // b. alternate the flag
 
 void Idle(void){
-	
-	if(sys_time_count == 100){
-		
+	int flag = 0; //flat = 1 = display
+	if(sys_time_count % 100 == 0){
+		flag = 1;
+		if(flag==1){
+			display '.';
+			flag = 1;
+		}
+		else
+			
 	}
-	else if(sys_time_count == 200){
+	else if(sys_time_count %200 == 0){
 		
-		sys_time_count = 0; //make sure this doesn't cause issues outside of here!
+		//sys_time_count = 0; //make sure this doesn't cause issues outside of here!
 	}
 	
 	
