@@ -1,4 +1,6 @@
-##JAWOS (Jeremy, Alex, & Will Operating System)##
+---
+
+## JAWOS (Jeremy, Alex, & Will Operating System)
 
 
 **Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
