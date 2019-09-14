@@ -36,8 +36,8 @@ character pointer, and the size of the memory will be given by an unsigned
 int 'max'
 
 void Bzero(char *start, unsigned int bytes){
-	for(int i ={
-		*start = '\0';
+	for(int i = 0, i < bytes, i++){
+		*start = '\0'; // *start = (char) 0; in class
 		start++;
 		//(*start)++
 	}
