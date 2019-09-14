@@ -1,4 +1,5 @@
 // tools.h, 159
+// prototypes tools in tools.c
 
 #ifndef _TOOLS_
 #define _TOOLS_
@@ -9,6 +10,8 @@
 void EnQUe(int data, que_t *p);
 
 int deque (que_t *p);
+
+void Bzero(char *start, unsigned int bytes);
 
 #endif
 
