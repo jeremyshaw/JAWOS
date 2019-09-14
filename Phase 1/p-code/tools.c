@@ -24,9 +24,15 @@ return 0;//not full
 code a DeQue() function that dequeues the 1st number in the queue (given
 by a pointer); if empty, return constant NONE (-1)
 
+//tests if empty, dequeues and pushes elements forward
+
 code an EnQue() function given a number and a queue (by a pointer), it
 appends the number to the tail of the queue, or shows an error message
 and go into the GDB:
+
+//If index QUE_MAX is not null, cons_printf("Panic... ,
+//otherwise searches from 0 to find empty spot, adds to queue.
+
       cons_printf("Panic: queue is full, cannot EnQue!\n");
       breakpoint();
 
