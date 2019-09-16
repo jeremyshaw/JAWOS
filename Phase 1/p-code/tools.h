@@ -7,9 +7,9 @@
 #include "..." // need definition of 'que_t' below
 
 ...
-void EnQUe(int data, que_t *p);
+void EnQue(int data, que_t *p);
 
-int deque (que_t *p);
+int DeQue (que_t *p);
 
 void Bzero(char *start, unsigned int bytes);
 

@@ -28,8 +28,10 @@ void Idle(void){
 			display '.';
 			flag = 1;
 		}
-		else
-			
+		else{
+			display ' ';
+			flag = 0;
+		}
 	}
 	else if(sys_time_count %200 == 0){
 		
