@@ -8,25 +8,25 @@
 #include "tools.h"    // small handy functions
 #include "ksr.h"      // kernel service routines
 #include "proc.h"     // all user process code here
-//need to include ext-data.h?
+#include "ext-data.h"
 
 // declare kernel data
 
 
 //declare an integer: run_pid;                        // current running PID; if -1, none selected
-int run_pid;
+extern int run_pid;
 //extern int run_pid;?
 
 //declare 2 queues: avail_que and ready_que;  // avail PID and those created/ready to run
-que_t avail_que;
-que_t ready_que;
+extern que_t avail_que;
+extern que_t ready_que;
 
 //declare an array of PCB type: pcb[PROC_MAX];                // Process Control Blocks
-pcb_t pcb[PROC_MAX];
+extern pcb_t pcb[PROC_MAX];
 
 //declare an unsigned integer: sys_time_count
-unsigned int sys_time_count;
-struct i386_gate *idt;         // interrupt descriptor table
+extern unsigned int sys_time_count;
+extern struct i386_gate *idt;         // interrupt descriptor table
 
 void BootStrap(void) {         // set up kernel!
     //set sys time count to zero
