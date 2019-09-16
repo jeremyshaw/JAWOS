@@ -13,5 +13,7 @@ int deque (que_t *p);
 
 void Bzero(char *start, unsigned int bytes);
 
+void MemCpy(*dst, *src, unsigned int bytes);
+
 #endif
 
