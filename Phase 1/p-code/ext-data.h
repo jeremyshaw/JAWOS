@@ -9,5 +9,8 @@
 
 extern int run_pid;                 // PID of current selected running process
 //and other extern ...
+
+extern int sys_time_count;
+
 extern //... all from main?
 #endif
