@@ -14,15 +14,21 @@ else return 0;
 
 }
 
-QueFull(pointer*){
+QueFull(que_t *p){ //pointer*?
 //similarly, code a QueFull() function to check for being full or not
-
-return 0;//not full
+if(p->tail == QUE_MAX) return 1;
+else return 0;//not full
 }
 
 
 code a DeQue() function that dequeues the 1st number in the queue (given
 by a pointer); if empty, return constant NONE (-1)
+
+DeQue(que_t *p, ){
+	
+	
+	
+}
 
 //tests if empty, dequeues and pushes elements forward
 
