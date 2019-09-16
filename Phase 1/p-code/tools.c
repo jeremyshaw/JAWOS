@@ -6,7 +6,7 @@
 #include "ext-data.h";
 
 
-QueEmpty(que_t *p){
+int QueEmpty(que_t *p){
 // code a QueEmpty() function that checks whether a queue (located by a
 if(p->tail == 0) return 1;
 else return 0;
@@ -14,8 +14,9 @@ else return 0;
 
 }
 
-QueFull(pointer*){
+int QueFull(pointer*){
 //similarly, code a QueFull() function to check for being full or not
+if(p->tail == QUE_MAX) return 1; //full
 
 return 0;//not full
 }
