@@ -9,12 +9,12 @@
 int QueEmpty(que_t *p){
 // code a QueEmpty() function that checks whether a queue (located by a
 if(p->tail == 0) return 1;
-else return -1;
+else return 0;
 // given pointer) is emptyr; returns 1 if yes, or 0 if not
 }
 
 
-QueFull(que_t *p){ //pointer*?
+int QueFull(que_t *p){ //pointer*?
 //similarly, code a QueFull() function to check for being full or not
 if(p->tail == QUE_MAX) return 1;
 else return 0;//not full
@@ -24,10 +24,18 @@ else return 0;//not full
 code a DeQue() function that dequeues the 1st number in the queue (given
 by a pointer); if empty, return constant NONE (-1)
 
-DeQue(que_t *p, ){
-	
-	
-	
+int DeQue(que_t *p){
+	if(QueEmpty(*p) == 1){
+		return -1;
+	}
+	else{
+		int head =  p->que[0];
+		for(int i = 0; i<p->tail; i++){
+			que[i] = que[i+1];
+		}
+		que[tail] = '\0';
+		return head;
+	}
 }
 
 //tests if empty, dequeues and pushes elements forward
@@ -54,27 +62,28 @@ EnQue(que_t *p, int num){
       //cons_printf("Panic: queue is full, cannot EnQue!\n");
      // breakpoint();
 
-code a Bzero() function to clear a memory region (by filling with NUL
-characters), the beginning of the memory location will be given via a
-character pointer, and the size of the memory will be given by an unsigned
-int 'max'
+// code a Bzero() function to clear a memory region (by filling with NUL
+// characters), the beginning of the memory location will be given via a
+// character pointer, and the size of the memory will be given by an unsigned
+// int 'max'
 
-void Bzero(char *start, unsigned int bytes){
-	for(int i = 0, i < bytes, i++){
+void Bzero(char *start, unsigned int max){
+	for(int i = 0, i < max, i++){
 		*start = '\0'; // *start = (char) 0; in class
 		start++;
 		//(*start)++
 	}
 };
 
-code a MemCpy() function to copy a memory region located at a given
-character pointer 'dst,' from the starting location at a given character
-pointer 'src,' the size will also be given as an unsigned integer 'max'
+// code a MemCpy() function to copy a memory region located at a given
+// character pointer 'dst,' from the starting location at a given character
+// pointer 'src,' the size will also be given as an unsigned integer 'max'
 
-void MemCpy(*dst, *src, unsigned int bytes){
-   for i = 0;;;
-   *dst = *src
-   dst++;
-   src++;
+void MemCpy(*dst, *src, unsigned int max){
+	for(int i = 0, i<max, i++){
+	   *dst = *src
+		dst++;
+		src++;
+	}
 }
 
