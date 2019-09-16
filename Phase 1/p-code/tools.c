@@ -11,21 +11,13 @@ int QueEmpty(que_t *p){
 if(p->tail == 0) return 1;
 else return -1;
 // given pointer) is emptyr; returns 1 if yes, or 0 if not
-
 }
 
-<<<<<<< HEAD
+
 QueFull(que_t *p){ //pointer*?
 //similarly, code a QueFull() function to check for being full or not
 if(p->tail == QUE_MAX) return 1;
 else return 0;//not full
-=======
-int QueFull(pointer*){
-//similarly, code a QueFull() function to check for being full or not
-if(p->tail == QUE_MAX) return 1; //full
-
-return 0;//not full
->>>>>>> da4db8c2e83c44f0a02a190fa815f8281b203b27
 }
 
 
@@ -40,15 +32,27 @@ DeQue(que_t *p, ){
 
 //tests if empty, dequeues and pushes elements forward
 
-code an EnQue() function given a number and a queue (by a pointer), it
+/* code an EnQue() function given a number and a queue (by a pointer), it
 appends the number to the tail of the queue, or shows an error message
 and go into the GDB:
+      cons_printf("Panic: queue is full, cannot EnQue!\n");
+      breakpoint(); */
+      
+EnQue(que_t *p, int num){
+   if(QueFull(*p) == 1){
+      cons_printf("Panic: queue is full, cannot EnQue!\n");
+      breakpoint();
+   } else {
+      p-> *tail = num;
+      tail++;  //empty space at end of queue
+   }
+}
 
 //If index QUE_MAX is not null, cons_printf("Panic... ,
 //otherwise searches from 0 to find empty spot, adds to queue.
 
-      cons_printf("Panic: queue is full, cannot EnQue!\n");
-      breakpoint();
+      //cons_printf("Panic: queue is full, cannot EnQue!\n");
+     // breakpoint();
 
 code a Bzero() function to clear a memory region (by filling with NUL
 characters), the beginning of the memory location will be given via a
