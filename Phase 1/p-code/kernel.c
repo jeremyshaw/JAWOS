@@ -49,7 +49,8 @@ int main(void) {               // OS starts
    //set run_pid to IDLE (defined constant)
    run_pid = IDLE;
    
-   call Loader() to load the trapframe of Idle
+   //call Loader() to load the trapframe of Idle
+   Loader(Idle);
 
    return 0; // never would actually reach here
 }
