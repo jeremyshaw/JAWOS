@@ -17,7 +17,7 @@ void MemCpy(*dst, *src, unsigned int bytes);
 
 int QueEmpty(que_t *p);
 
-int QueFull(pointer*);
+int QueFull(que_t *p);
 
 #endif
 
