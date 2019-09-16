@@ -6,18 +6,26 @@
 #include "ext-data.h";
 
 
-QueEmpty(que_t *p){
+int QueEmpty(que_t *p){
 // code a QueEmpty() function that checks whether a queue (located by a
 if(p->tail == 0) return 1;
-else return 0;
+else return -1;
 // given pointer) is emptyr; returns 1 if yes, or 0 if not
 
 }
 
+<<<<<<< HEAD
 QueFull(que_t *p){ //pointer*?
 //similarly, code a QueFull() function to check for being full or not
 if(p->tail == QUE_MAX) return 1;
 else return 0;//not full
+=======
+int QueFull(pointer*){
+//similarly, code a QueFull() function to check for being full or not
+if(p->tail == QUE_MAX) return 1; //full
+
+return 0;//not full
+>>>>>>> da4db8c2e83c44f0a02a190fa815f8281b203b27
 }
 
 
@@ -58,9 +66,11 @@ void Bzero(char *start, unsigned int bytes){
 code a MemCpy() function to copy a memory region located at a given
 character pointer 'dst,' from the starting location at a given character
 pointer 'src,' the size will also be given as an unsigned integer 'max'
-MemCpy *dst, *src, un int bytes
-for i = 0;;;
-*dst = *src
-dst++;
-src++;
+
+void MemCpy(*dst, *src, unsigned int bytes){
+   for i = 0;;;
+   *dst = *src
+   dst++;
+   src++;
+}
 

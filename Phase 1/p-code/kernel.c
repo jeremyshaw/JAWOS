@@ -32,8 +32,12 @@ void BootStrap(void) {         // set up kernel!
     //set sys time count to zero
 	sys_time_count = 0;
 	
-   call tool Bzero(char *)&avail_que, sizeof(que_t)) to clear avail queue
-   call tool Bzero() to clear ready queue
+   // call tool Bzero(char *)&avail_que, sizeof(que_t)) to clear avail queue
+   Bzero((char *) &avail_que, sizeof(que_t));
+   
+   // call tool Bzero() to clear ready queue
+   Bzero((char *) &ready_que, sizeof(que_t));
+   
    enqueue all the available PID numbers to avail queue
 
    get IDT location//lot of the following and this line done in prep4
@@ -49,7 +53,8 @@ int main(void) {               // OS starts
    //set run_pid to IDLE (defined constant)
    run_pid = IDLE;
    
-   call Loader() to load the trapframe of Idle
+   //call Loader() to load the trapframe of Idle
+   Loader(Idle);
 
    return 0; // never would actually reach here
 }

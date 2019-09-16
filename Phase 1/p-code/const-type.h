@@ -29,8 +29,9 @@ typedef enum {AVAIL, READY, RUN} state_t;
 
 // define a trapframe type (tf_t) that has these 'unsigned int'
       // eax, ecx, edx, ebx, esp, ebp, esi, edi, eip, cs, efl
-typedef unsigned int tf_t;
-tf_t eax, ecx, edx, ebx, esp, ebp, esi, edi, eip, cs, efl;
+typedef struct {
+   unsigned int eax, ecx, edx, ebx, esp, ebp, esi, edi, eip, cs, efl;
+} tf_t;
 
 //W-C seems to want this format
 //typedef struct {

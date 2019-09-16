@@ -13,5 +13,11 @@ int deque (que_t *p);
 
 void Bzero(char *start, unsigned int bytes);
 
+void MemCpy(*dst, *src, unsigned int bytes);
+
+int QueEmpty(que_t *p);
+
+int QueFull(pointer*);
+
 #endif
 
