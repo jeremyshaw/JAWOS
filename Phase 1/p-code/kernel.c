@@ -43,18 +43,14 @@ void BootStrap(void){         // set up kernel!
 	Bzero((char *) &ready_que, sizeof(que_t));
 
 	//enqueue all the available PID numbers to avail queue
-	
 	for(i = 0; i < QUE_MAX; i++){
 		EnQue(&avail_que, i);
 	}
-	cons_printf("avail_que.tail = %d\n", avail_que.tail);
-	for(i = 0; i < QUE_MAX; i++){
-		cons_printf("avail_que.que[%d] %d\n", i, avail_que.que[i]);
-		
-	}
-	breakpoint();
-	
-
+	// cons_printf("avail_que.tail = %d\n", avail_que.tail);
+	// for(i = 0; i < QUE_MAX; i++){
+		// cons_printf("avail_que.que[%d] %d\n", i, avail_que.que[i]);
+	// }
+	// breakpoint();
 
 	//get IDT location//lot of the following and this line done in prep4
 	//addr of TimerEntry is placed into proper IDT entry //32?
@@ -78,9 +74,13 @@ int main(void) {               // OS starts
 
 	//set run_pid to IDLE (defined constant)
 	run_pid = IDLE;
-
+	
+	cons_printf("run_pid is now IDLE\n");
+	breakpoint();
 	//call Loader() to load the trapframe of Idle
-	Loader(IDLE);
+	Loader(pcb[IDLE].tf_p);
+	cons_printf("rLoaded trapframe of Idle\n");
+	breakpoint();
 
 	return 0; // never would actually reach here
 }

@@ -12,9 +12,9 @@
 // build trapframe, initialize PCB, record PID to ready_que
 void SpawnSR(func_p_t p) {     // arg: where process code starts
     int pid;
-	cons_printf("SpawnSR\n");
+	//cons_printf("SpawnSR\n");
 	
-	cons_printf("&avail_que %d, (char *)&avail_que %d\n", &avail_que, (char *) &avail_que);
+	//cons_printf("&avail_que %d, (char *)&avail_que %d\n", &avail_que, (char *) &avail_que);
 	
     //use a tool function to check if available queue is empty:
     //  a. cons_printf("Panic: out of PID!\n");
@@ -23,19 +23,16 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 		cons_printf("Panic: out of PID!\n");
 		breakpoint();
 	}
-	cons_printf("Past SpawnSR QueEmpty\n");
+	//cons_printf("Past SpawnSR QueEmpty\n");
     //??get 'pid' initialized by dequeuing the available queue
     //??use a tool function to clear the content of PCB of process 'pid' (Bzero)
     //??set the state of the process 'pid' to READY pcb[pid].state = READY;
     pid = DeQue(&avail_que);
-	cons_printf("pid = %d\n", pid);
-	breakpoint();
+	//cons_printf("pid = %d\n", pid);
+	//breakpoint();
 	//we are supposed to clear the pid's PCB here, not the pid...
-	//fix this!!
-	Bzero((char *)&pid, STACK_MAX);
-	breakpoint();
+	Bzero((char *)&pcb[pid], STACK_MAX);
 	pcb[pid].state = READY;
-	breakpoint();
    
    
     //if 'pid' is not IDLE, use a tool function to enqueue it to the ready queue 
@@ -43,7 +40,7 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	
     //??use a tool function to copy from 'p' to DRAM_START, for STACK_MAX bytes
 	MemCpy((char*)DRAM_START, (char *)IDLE, STACK_MAX);
-	
+	breakpoint();
     //?create trapframe for process 'pid:'
     //1st position trapframe pointer in its PCB to the end of the stack
     //set efl in trapframe to EF_DEFAULT_VALUE|EF_INTR  // handle intr
@@ -53,8 +50,8 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
     pcb[pid].tf_p -> efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
     pcb[pid].tf_p -> cs = get_cs();
     pcb[pid].tf_p -> eip = DRAM_START;
-   
-
+	//cons_printf("end of SpawnSR\n");
+    //breakpoint();
 }
 
 

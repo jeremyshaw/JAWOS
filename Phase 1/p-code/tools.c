@@ -87,9 +87,9 @@ void Bzero(char *start, unsigned int max){
 
 void MemCpy(char *dst, char *src, unsigned int max){
 	for(l = 0; l < max; l++){
-	   *dst = *src;
-		dst++;
-		src++;
+	    dst = src;
+		*dst++;
+		*src++;
 	}
 }
 
