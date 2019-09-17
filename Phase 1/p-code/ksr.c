@@ -53,7 +53,7 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 // count run time and switch if hitting time limit
 void TimerSR(void) { //also prep4?
     1st notify PIC control register that timer event is now served
-	??pcb[pid].tf_p->
+	outportb(PIC_MASK_REG, PIC_MASK_VAL);//what do we put in source?
    
 
     //increment system time count by 1
