@@ -2,10 +2,10 @@
 
 // Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
-#ifndef ...
-#define ...
+#ifndef _KSR_
+#define _KSR_
 
-#include "...
+//??#include "..."
 
 void SpawnSR(func_p_t p);
 void TimerSR(void);

@@ -59,10 +59,17 @@ void TimerSR(void) { //also prep4?
     //increment system time count by 1
     sys_time_count++;
    
+    //increment the time count of the process currently running by 1
+	// typedef struct{
+		// state_t state;
+		// tf_t *tf_p;
+		// unsigned int time_count;
+		// unsigned int total_time;
+	// } pcb_t;
+	pcb[pid].time_count++;
    
-    increment the time count of the process currently running by 1
-   
-    increment the life span count of the process currently running by 1
+    //increment the life span count of the process currently running by 1
+	pcb[pid].total_time++;
 
     if the time count of the process is reaching maximum allowed runtime
       move the process back to the ready queue
