@@ -11,8 +11,9 @@
 
 extern int run_pid;                 // PID of current selected running process
 //and other extern ...
+extern int pid;
 
-//extern int sys_time_count;
+extern unsigned int sys_time_count;
 
 extern que_t avail_que;
 extern que_t ready_que;

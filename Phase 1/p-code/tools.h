@@ -8,7 +8,7 @@
 
 #include "const-type.h" // need definition of 'que_t' below
 
-void EnQue(int data, que_t *p);
+void EnQue(que_t *p, int data);
 
 int DeQue (que_t *p);
 

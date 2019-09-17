@@ -30,6 +30,8 @@ struct i386_gate *idt;         // interrupt descriptor table
 
 char ch;//for kb capture breakpoint
 
+int i;//for loops
+
 void BootStrap(void){         // set up kernel!
     //set sys time count to zero
 	sys_time_count = 0;
@@ -40,7 +42,11 @@ void BootStrap(void){         // set up kernel!
 	// call tool Bzero() to clear ready queue
 	Bzero((char *) &ready_que, sizeof(que_t));
 
-	enqueue all the available PID numbers to avail queue
+	//enqueue all the available PID numbers to avail queue
+	
+	for(i = 0; i < QUE_MAX; i++){
+		EnQue(&avail_que, i);
+	}
 	
 
 
@@ -50,7 +56,7 @@ void BootStrap(void){         // set up kernel!
 	
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
-	outportb(PIC_MASK_REG, PIC_MASK_VAL);
+	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);
 		
 	//from prep4
 	// idt = get_idt_base();
@@ -62,13 +68,13 @@ int main(void) {               // OS starts
 	//do the boot strap things 1st
 	BootStrap();
 
-	SpawnSR(Idle);              // create Idle thread
+	SpawnSR(IDLE);              // create Idle thread
 
 	//set run_pid to IDLE (defined constant)
 	run_pid = IDLE;
 
 	//call Loader() to load the trapframe of Idle
-	Loader(Idle);
+	Loader(IDLE);
 
 	return 0; // never would actually reach here
 }
@@ -77,9 +83,9 @@ void Scheduler(void) {              // choose a run_pid to run
 	if(run_pid > IDLE) return;       // a user PID is already picked
 
 	if(QueEmpty(&ready_que)) {
-	  run_pid = Idle;               // use the Idle thread
+	  run_pid = IDLE;               // use the Idle thread
 	} else {
-	  pcb[Idle].state = READY;
+	  pcb[IDLE].state = READY;
 	  run_pid = DeQue(&ready_que);  // pick a different proc
 	}
 

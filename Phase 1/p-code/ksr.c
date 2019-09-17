@@ -16,8 +16,7 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
     //use a tool function to check if available queue is empty:
     //  a. cons_printf("Panic: out of PID!\n");
     //  b. and go into GDB
-	if(QueEmpty(*avail_que)==1)continue;
-	else{
+	if(QueEmpty(&avail_que)==0){
 		cons_printf("Panic: out of PID!\n");
 		breakpoint();
 	}
@@ -25,16 +24,16 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
     //??get 'pid' initialized by dequeuing the available queue
     //??use a tool function to clear the content of PCB of process 'pid' (Bzero)
     //??set the state of the process 'pid' to READY pcb[pid].state = READY;
-    pid = DeQue();
-	Bzero(pid, STACK_MAX);
+    pid = DeQue(&avail_que);
+	Bzero((char *)&pid, STACK_MAX);
 	pcb[pid].state = READY;
    
    
     //if 'pid' is not IDLE, use a tool function to enqueue it to the ready queue 
-    if(pid != IDLE) EnQue(pid, &read_que);
+    if(pid != IDLE) EnQue(&ready_que, pid);
 	
     //??use a tool function to copy from 'p' to DRAM_START, for STACK_MAX bytes
-	MemCpy((char*)DRAM_START, (char *)Idle, STACK_MAX);
+	MemCpy((char*)DRAM_START, (char *)IDLE, STACK_MAX);
 	
     //?create trapframe for process 'pid:'
     //1st position trapframe pointer in its PCB to the end of the stack
@@ -43,7 +42,7 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
     //set eip in trapframe to DRAM_START                // where code copied
     pcb[pid].tf_p = (tf_t *)(DRAM_START + STACK_MAX - sizeof(tf_t));
     pcb[pid].tf_p -> efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
-    pcb[pid].tf_p -> cd = get_cs();
+    pcb[pid].tf_p -> cs = get_cs();
     pcb[pid].tf_p -> eip = DRAM_START;
    
 
@@ -53,7 +52,7 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 // count run time and switch if hitting time limit
 void TimerSR(void) { //also prep4?
     //1st notify PIC control register that timer event is now served
-	outportb(PIC_CONTROL_REG, TIMER_SERVED_VAL);//what do we put in source?
+	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);//what do we put in source?
     
     //increment system time count by 1
     sys_time_count++;
@@ -75,7 +74,7 @@ void TimerSR(void) { //also prep4?
     //  alter its state to indicate it is not running but ...
     //  reset the PID of the process in run to NONE	  
 	if(pcb[pid].total_time == TIME_MAX){
-		EnQue(ready_que, pid);
+		EnQue(&ready_que, pid);
 		pcb[pid].state = READY;
 		run_pid = NONE;
     }
