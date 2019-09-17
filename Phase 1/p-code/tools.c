@@ -34,9 +34,9 @@ int DeQue(que_t *p){
 	else{
 		head =  p->que[0];
 		for(i = 0; i < p->tail; i++){
-			que[i] = que[i+1];
+			p->que[i] = p->que[i+1];
 		}
-		que[tail] = '\0';
+		p->que[p->tail] = '\0';
 		return head;
 	}
 }
@@ -54,8 +54,8 @@ void EnQue(que_t *p, int num){
       cons_printf("Panic: queue is full, cannot EnQue!\n");
       breakpoint();
    }else{
-      p->*tail = num;
-      p.tail++;  //empty space at end of queue
+      p->que[p->tail] = num;
+      p->tail++;  //empty space at end of queue
    }
 }
 
@@ -71,7 +71,7 @@ void EnQue(que_t *p, int num){
 // int 'max'
 
 void Bzero(char *start, unsigned int max){
-	for(i = 0, i < max, i++){
+	for(i = 0; i < max; i++){
 		*start = '\0'; // *start = (char) 0; in class
 		start++;
 		//(*start)++
@@ -83,8 +83,8 @@ void Bzero(char *start, unsigned int max){
 // pointer 'src,' the size will also be given as an unsigned integer 'max'
 
 void MemCpy(char *dst, char *src, unsigned int max){
-	for(i = 0, i<max, i++){
-	   *dst = *src
+	for(i = 0; i < max; i++){
+	   *dst = *src;
 		dst++;
 		src++;
 	}
