@@ -1,6 +1,7 @@
 // proc.c, 159
 // processes are coded here
 
+// Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
 
 //need to include const-type.h and ext-data.h

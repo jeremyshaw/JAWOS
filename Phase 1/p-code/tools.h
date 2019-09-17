@@ -1,6 +1,8 @@
 // tools.h, 159
 // prototypes tools in tools.c
 
+// Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
+
 #ifndef _TOOLS_
 #define _TOOLS_
 

@@ -1,5 +1,7 @@
 // const-type.h, 159, needed constants & types
 
+// Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
+
 #ifndef _CONST_TYPE_           // to prevent name mangling recursion //"if not define, define"
 #define _CONST_TYPE_           // to prevent name redefinition //(continued...) uses the end if at the very end. Sometime about recursive stuff.
 

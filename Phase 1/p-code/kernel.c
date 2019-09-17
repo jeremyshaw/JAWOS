@@ -1,6 +1,6 @@
 // kernel.c, 159, phase 1
 //
-// Team Name: ??????? (Members: Alex Leones, Jeremy Shaw, William Guo)
+// Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
 #include "spede.h"
 #include "const-type.h"
@@ -75,7 +75,7 @@ void Scheduler(void) {              // choose a run_pid to run
 
 void Kernel(tf_t *tf_p) {       // kernel runs
    copy tf_p to the trapframe ptr (in PCB) of the process in run
-   pdb[prunp_id].tf_p = tf_p;
+   pcb[prunp_id].tf_p = tf_p;
 
    //call the timer service routine
    TimerSR(); //incomplete?

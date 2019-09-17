@@ -2,6 +2,8 @@
 // kernel data are all declared in kernel.c during bootstrap
 // .c code, if needed these, include this
 
+// Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
+
 #ifndef _EXT_DATA_
 #define _EXT_DATA_
 
