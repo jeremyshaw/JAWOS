@@ -22,4 +22,10 @@ extern pcb_t pcb[PROC_MAX];
 extern struct i386_gate *idt;   
 
 //extern //... all from main?
+
+
+void Kernel(tf_t *tf_p);
+void Scheduler(void);
+void BootStrap(void)
+int main(void);
 #endif

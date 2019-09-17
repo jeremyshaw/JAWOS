@@ -73,9 +73,9 @@ void Scheduler(void) {              // choose a run_pid to run
 	if(run_pid > IDLE) return;       // a user PID is already picked
 
 	if(QueEmpty(&ready_que)) {
-	  run_pid = IDLE;               // use the Idle thread
+	  run_pid = Idle;               // use the Idle thread
 	} else {
-	  pcb[IDLE].state = READY;
+	  pcb[Idle].state = READY;
 	  run_pid = DeQue(&ready_que);  // pick a different proc
 	}
 
@@ -102,8 +102,8 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 		
 	}
 
-	call Scheduler() to change run_pid if needed
-	//if(??needed)Scheduler();
+	//call Scheduler() to change run_pid if needed
+	Scheduler();
    
 	//call Loader() to load the trapframe of the selected process
 	Loader(*tf_p);
