@@ -26,15 +26,15 @@ else return 0;//not full
 // code a DeQue() function that dequeues the 1st number in the queue (given
 // by a pointer); if empty, return constant NONE (-1)
 int head;
-int i;
+int j, k, l;
 int DeQue(que_t *p){
 	if(QueEmpty(p) == 1){
 		return -1;
 	}
 	else{
 		head =  p->que[0];
-		for(i = 0; i < p->tail; i++){
-			p->que[i] = p->que[i+1];
+		for(j = 0; j < p->tail; j++){
+			p->que[j] = p->que[j+1];
 		}
 		p->que[p->tail] = '\0';
 		return head;
@@ -71,7 +71,7 @@ void EnQue(que_t *p, int num){
 // int 'max'
 
 void Bzero(char *start, unsigned int max){
-	for(i = 0; i < max; i++){
+	for(k = 0; k < max; k++){
 		*start = '\0'; // *start = (char) 0; in class
 		start++;
 		//(*start)++
@@ -83,7 +83,7 @@ void Bzero(char *start, unsigned int max){
 // pointer 'src,' the size will also be given as an unsigned integer 'max'
 
 void MemCpy(char *dst, char *src, unsigned int max){
-	for(i = 0; i < max; i++){
+	for(l = 0; l < max; l++){
 	   *dst = *src;
 		dst++;
 		src++;

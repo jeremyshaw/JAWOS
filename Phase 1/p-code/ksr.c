@@ -64,18 +64,18 @@ void TimerSR(void) { //also prep4?
 		// unsigned int time_count;
 		// unsigned int total_time;
 	// } pcb_t;
-	pcb[pid].time_count++;
+	pcb[run_pid].time_count++;
    
     //increment the life span count of the process currently running by 1
-	pcb[pid].total_time++;
+	pcb[run_pid].total_time++;
 	
     //if the time count of the process is reaching maximum allowed runtime [TIME_MAX]
     //  move the process back to the ready queue
     //  alter its state to indicate it is not running but ...
     //  reset the PID of the process in run to NONE	  
-	if(pcb[pid].total_time == TIME_MAX){
-		EnQue(&ready_que, pid);
-		pcb[pid].state = READY;
+	if(pcb[run_pid].total_time == TIME_MAX){
+		EnQue(&ready_que, run_pid);
+		pcb[run_pid].state = READY;
 		run_pid = NONE;
     }
 }
