@@ -47,6 +47,12 @@ void BootStrap(void){         // set up kernel!
 	for(i = 0; i < QUE_MAX; i++){
 		EnQue(&avail_que, i);
 	}
+	cons_printf("avail_que.tail = %d\n", avail_que.tail);
+	for(i = 0; i < QUE_MAX; i++){
+		cons_printf("avail_que.que[%d] %d\n", i, avail_que.que[i]);
+		
+	}
+	breakpoint();
 	
 
 

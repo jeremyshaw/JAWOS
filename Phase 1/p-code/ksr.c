@@ -12,21 +12,28 @@
 // build trapframe, initialize PCB, record PID to ready_que
 void SpawnSR(func_p_t p) {     // arg: where process code starts
     int pid;
+	cons_printf("SpawnSR\n");
+	
+	cons_printf("&avail_que %d, (char *)&avail_que %d\n", &avail_que, (char *) &avail_que);
 	
     //use a tool function to check if available queue is empty:
     //  a. cons_printf("Panic: out of PID!\n");
     //  b. and go into GDB
-	if(QueEmpty(&avail_que)==0){
+	if(QueEmpty(&avail_que)==1){
 		cons_printf("Panic: out of PID!\n");
 		breakpoint();
 	}
-
+	cons_printf("Past SpawnSR QueEmpty\n");
     //??get 'pid' initialized by dequeuing the available queue
     //??use a tool function to clear the content of PCB of process 'pid' (Bzero)
     //??set the state of the process 'pid' to READY pcb[pid].state = READY;
     pid = DeQue(&avail_que);
+	cons_printf("pid = %d\n", pid);
+	breakpoint();
 	Bzero((char *)&pid, STACK_MAX);
+	breakpoint();
 	pcb[pid].state = READY;
+	breakpoint();
    
    
     //if 'pid' is not IDLE, use a tool function to enqueue it to the ready queue 
