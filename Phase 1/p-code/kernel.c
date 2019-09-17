@@ -41,9 +41,17 @@ void BootStrap(void) {         // set up kernel!
 	enqueue all the available PID numbers to avail queue
 
 
-	get IDT location//lot of the following and this line done in prep4
+	//get IDT location//lot of the following and this line done in prep4
 	addr of TimerEntry is placed into proper IDT entry //32?
 	send PIC control register the mask value for timer handling
+	
+	idt = get_idt_base();
+	
+	
+	//from prep4
+	// idt = get_idt_base();
+	// fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
+	// outportb(PIC_MASK_REG, PIC_MASK_VAL);
 }
 
 int main(void) {               // OS starts

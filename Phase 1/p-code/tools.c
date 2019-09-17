@@ -23,8 +23,8 @@ else return 0;//not full
 }
 
 
-code a DeQue() function that dequeues the 1st number in the queue (given
-by a pointer); if empty, return constant NONE (-1)
+// code a DeQue() function that dequeues the 1st number in the queue (given
+// by a pointer); if empty, return constant NONE (-1)
 
 int DeQue(que_t *p){
 	if(QueEmpty(*p) == 1){

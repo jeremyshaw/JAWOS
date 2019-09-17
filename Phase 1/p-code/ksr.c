@@ -52,7 +52,7 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 
 // count run time and switch if hitting time limit
 void TimerSR(void) { //also prep4?
-   1st notify PIC control register that timer event is now served
+    1st notify PIC control register that timer event is now served
 	??pcb[pid].tf_p->
    
 
@@ -71,7 +71,7 @@ void TimerSR(void) { //also prep4?
     //increment the life span count of the process currently running by 1
 	pcb[pid].total_time++;
 
-    if the time count of the process is reaching maximum allowed runtime
+    if the time count of the process is reaching maximum allowed runtime [TIME_MAX]
       move the process back to the ready queue
       alter its state to indicate it is not running but ...
       reset the PID of the process in run to NONE

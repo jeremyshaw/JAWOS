@@ -5,7 +5,7 @@
 #ifndef _KSR_
 #define _KSR_
 
-//??#include "..."
+#include "const-type.h"//for func_p_t
 
 void SpawnSR(func_p_t p);
 void TimerSR(void);

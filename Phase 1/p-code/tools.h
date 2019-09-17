@@ -6,7 +6,7 @@
 #ifndef _TOOLS_
 #define _TOOLS_
 
-#include "..." // need definition of 'que_t' below
+#include "const-type.h" // need definition of 'que_t' below
 
 void EnQue(int data, que_t *p);
 
