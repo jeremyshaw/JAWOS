@@ -21,5 +21,5 @@ extern pcb_t pcb[PROC_MAX];
 
 extern struct i386_gate *idt;   
 
-extern //... all from main?
+//extern //... all from main?
 #endif

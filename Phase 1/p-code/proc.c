@@ -27,11 +27,11 @@ void Idle(void){
 		flag = 1;
 		if(flag==1){
 			display '.';
-			flag = 1;
+			flag = 0;
 		}
 		else{
 			display ' ';
-			flag = 0;
+			flag = 1;
 		}
 	}
 	else if(sys_time_count %200 == 0){
