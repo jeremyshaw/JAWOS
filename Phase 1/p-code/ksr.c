@@ -30,6 +30,8 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
     pid = DeQue(&avail_que);
 	cons_printf("pid = %d\n", pid);
 	breakpoint();
+	//we are supposed to clear the pid's PCB here, not the pid...
+	//fix this!!
 	Bzero((char *)&pid, STACK_MAX);
 	breakpoint();
 	pcb[pid].state = READY;

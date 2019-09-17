@@ -27,6 +27,9 @@ else return 0;//not full
 // by a pointer); if empty, return constant NONE (-1)
 int head;
 int j, k, l;
+
+
+
 int DeQue(que_t *p){
 	if(QueEmpty(p) == 1){
 		return -1;
