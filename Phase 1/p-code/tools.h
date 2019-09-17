@@ -14,7 +14,7 @@ int DeQue (que_t *p);
 
 void Bzero(char *start, unsigned int bytes);
 
-void MemCpy(*dst, *src, unsigned int bytes);
+void MemCpy(char *dst, char *src, unsigned int bytes);
 
 int QueEmpty(que_t *p);
 

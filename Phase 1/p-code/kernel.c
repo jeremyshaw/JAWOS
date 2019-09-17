@@ -14,21 +14,23 @@
 
 
 //declare an integer: run_pid;                        // current running PID; if -1, none selected
-extern int run_pid;
+int run_pid;
 //extern int run_pid;?
 
 //declare 2 queues: avail_que and ready_que;  // avail PID and those created/ready to run
-extern que_t avail_que;
-extern que_t ready_que;
+que_t avail_que;
+que_t ready_que;
 
 //declare an array of PCB type: pcb[PROC_MAX];                // Process Control Blocks
-extern pcb_t pcb[PROC_MAX];
+pcb_t pcb[PROC_MAX];
 
 //declare an unsigned integer: sys_time_count
-extern unsigned int sys_time_count;
-extern struct i386_gate *idt;         // interrupt descriptor table
+unsigned int sys_time_count;
+struct i386_gate *idt;         // interrupt descriptor table
 
-void BootStrap(void) {         // set up kernel!
+char ch;//for kb capture breakpoint
+
+void BootStrap(void){         // set up kernel!
     //set sys time count to zero
 	sys_time_count = 0;
 	
@@ -39,6 +41,7 @@ void BootStrap(void) {         // set up kernel!
 	Bzero((char *) &ready_que, sizeof(que_t));
 
 	enqueue all the available PID numbers to avail queue
+	
 
 
 	//get IDT location//lot of the following and this line done in prep4
@@ -56,7 +59,8 @@ void BootStrap(void) {         // set up kernel!
 }
 
 int main(void) {               // OS starts
-	do the boot strap things 1st
+	//do the boot strap things 1st
+	BootStrap();
 
 	SpawnSR(Idle);              // create Idle thread
 
@@ -91,13 +95,15 @@ void Kernel(tf_t *tf_p) {       // kernel runs
     TimerSR(); //incomplete?
 
     //if 'b' key on target PC is pressed, goto the GDB prompt -->breakpoint()?
+	
+	
    	asm("sti"); //set to be ready for ints, from Phase0
-	char ch;
+	
 	while(1){
 		if(cons_kbhit()){
 			ch = cons_getchar();
 			cons_printf(" pressed");
-			if(ch=='b')breakpount();
+			if(ch=='b')breakpoint();
 		}
 		
 	}
@@ -106,7 +112,7 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 	Scheduler();
    
 	//call Loader() to load the trapframe of the selected process
-	Loader(*tf_p);
+	Loader(tf_p);
 	//Loader(pcb[run_pid], tf_p);
 }
 
