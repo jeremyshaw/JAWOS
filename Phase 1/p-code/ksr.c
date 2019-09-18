@@ -39,7 +39,8 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
     if(pid != IDLE) EnQue(&ready_que, pid);
 	
     //??use a tool function to copy from 'p' to DRAM_START, for STACK_MAX bytes
-	MemCpy((char*)DRAM_START, (char *)IDLE, STACK_MAX);
+	MemCpy((char*)DRAM_START, (char *)p, STACK_MAX);
+	//MemCpy((char*)DRAM_START, (char *)IDLE, STACK_MAX);
 	breakpoint();
     //?create trapframe for process 'pid:'
     //1st position trapframe pointer in its PCB to the end of the stack

@@ -80,7 +80,7 @@ int main(void) {               // OS starts
 	breakpoint();
 	//call Loader() to load the trapframe of Idle
 	
-	Loader(&pcb[IDLE].tf_p);
+	Loader(pcb[IDLE].tf_p);
 	cons_printf("Loaded trapframe of Idle\n");
 	breakpoint();
 
@@ -127,7 +127,8 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 	Scheduler();
    
 	//call Loader() to load the trapframe of the selected process
-	Loader(tf_p);
+	Loader(pcb[run_pid].tf_p);
+	//Loader(tf_p);
 	//Loader(pcb[run_pid], tf_p);
 }
 
