@@ -42,15 +42,17 @@ void BootStrap(void){         // set up kernel!
 	// call tool Bzero() to clear ready queue
 	Bzero((char *) &ready_que, sizeof(que_t));
 
-	//enqueue all the available PID numbers to avail queue
-	for(i = 0; i < QUE_MAX; i++){
-		EnQue(&avail_que, i);
-	}
 	// cons_printf("avail_que.tail = %d\n", avail_que.tail);
 	// for(i = 0; i < QUE_MAX; i++){
 		// cons_printf("avail_que.que[%d] %d\n", i, avail_que.que[i]);
 	// }
 	// breakpoint();
+	
+	//enqueue all the available PID numbers to avail queue
+	for(i = 0; i < QUE_MAX; i++){
+		EnQue(&avail_que, i);
+	}
+	
 
 	//get IDT location//lot of the following and this line done in prep4
 	//addr of TimerEntry is placed into proper IDT entry //32?
@@ -77,7 +79,7 @@ int main(void) {               // OS starts
 	//do the boot strap things 1st
 	BootStrap();
 
-	SpawnSR(Idle);              // create Idle thread
+	SpawnSR(&Idle);              // create Idle thread
 
 	//set run_pid to IDLE (defined constant)
 	run_pid = IDLE;
@@ -93,6 +95,11 @@ int main(void) {               // OS starts
 	cons_printf("ebx %u\n", pcb[run_pid].tf_p->ebx);
 	cons_printf("esp %u\n", pcb[run_pid].tf_p->esp);
 	cons_printf("ebp %u\n", pcb[run_pid].tf_p->ebp);
+	cons_printf("esi %u\n", pcb[run_pid].tf_p->esi);
+	cons_printf("edi %u\n", pcb[run_pid].tf_p->edi);
+	cons_printf("eip %u\n", pcb[run_pid].tf_p->eip);
+	cons_printf("cs %u\n", pcb[run_pid].tf_p->cs);
+	cons_printf("efl %u\n", pcb[run_pid].tf_p->efl);
 	breakpoint();
 	
 	Loader(pcb[run_pid].tf_p);

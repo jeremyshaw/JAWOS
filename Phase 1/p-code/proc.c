@@ -28,7 +28,7 @@ void Idle(void){
 	unsigned short *start_pos = (unsigned short *)0xb8000;
 	int flag = 0; //flat = 1 = display
 	
-	outportb(PIC_CONT_REG, PIC_MASK_VAL);
+	//outportb(PIC_CONT_REG, PIC_MASK_VAL);
 	while(1){
 			
 		if(sys_time_count % 100 == 0){
