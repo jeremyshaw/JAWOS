@@ -89,13 +89,13 @@ void Bzero(char *start, unsigned int max){
 
 void MemCpy(char *dst, char *src, unsigned int max){
 	for(l = 0; l < max; l++){
-		cons_printf("%x", *dst, *src);
+		//cons_printf("%x", *dst, *src);
 	    *dst = *src;
 		dst++;
 		src++;
 		
 		//cons_printf(" dst %c src %c\n", *dst, *src);
-		if(l%1024==0) breakpoint();
+		//if(l%1024==0) breakpoint();
 	}
 }
 

@@ -64,10 +64,10 @@ void BootStrap(void){         // set up kernel!
 	// #define PIC_CONT_REG 0x20      // I/O loc # of PIc control
 	// #define TIMER_SERVED_VAL 0x60  // control code sent to PIC
 	// #define VGA_MASK_VAL 0x0f00    // bold face, white on black
-	
+	breakpoint();
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
-	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);
+	outportb(PIC_CONT_REG, PIC_MASK_VAL);
 		
 	//from prep4
 	// idt = get_idt_base();
@@ -84,27 +84,26 @@ int main(void) {               // OS starts
 	//set run_pid to IDLE (defined constant)
 	run_pid = IDLE;
 	
-	cons_printf("&pcb[IDLE] = %d &pcb[IDLE].tf_p %p\n", &pcb[IDLE], &pcb[IDLE].tf_p);
-	breakpoint();
+	// cons_printf("&pcb[IDLE] = %d &pcb[IDLE].tf_p %p\n", &pcb[IDLE], &pcb[IDLE].tf_p);
+	// breakpoint();
 	//call Loader() to load the trapframe of Idle
 	
 	//eax, ecx, edx, ebx, esp, ebp, esi, edi, eip, cs, efl
-	cons_printf("eax %u\n", pcb[run_pid].tf_p->eax);
-	cons_printf("ecx %u\n", pcb[run_pid].tf_p->ecx);
-	cons_printf("edx %u\n", pcb[run_pid].tf_p->edx);
-	cons_printf("ebx %u\n", pcb[run_pid].tf_p->ebx);
-	cons_printf("esp %u\n", pcb[run_pid].tf_p->esp);
-	cons_printf("ebp %u\n", pcb[run_pid].tf_p->ebp);
-	cons_printf("esi %u\n", pcb[run_pid].tf_p->esi);
-	cons_printf("edi %u\n", pcb[run_pid].tf_p->edi);
-	cons_printf("eip %u\n", pcb[run_pid].tf_p->eip);
-	cons_printf("cs %u\n", pcb[run_pid].tf_p->cs);
-	cons_printf("efl %u\n", pcb[run_pid].tf_p->efl);
-	breakpoint();
+	// cons_printf("eax %u\n", pcb[run_pid].tf_p->eax);
+	// cons_printf("ecx %u\n", pcb[run_pid].tf_p->ecx);
+	// cons_printf("edx %u\n", pcb[run_pid].tf_p->edx);
+	// cons_printf("ebx %u\n", pcb[run_pid].tf_p->ebx);
+	// cons_printf("esp %u\n", pcb[run_pid].tf_p->esp);
+	// cons_printf("ebp %u\n", pcb[run_pid].tf_p->ebp);
+	// cons_printf("esi %u\n", pcb[run_pid].tf_p->esi);
+	// cons_printf("edi %u\n", pcb[run_pid].tf_p->edi);
+	// cons_printf("eip %u\n", pcb[run_pid].tf_p->eip);
+	// cons_printf("cs %u\n", pcb[run_pid].tf_p->cs);
+	// cons_printf("efl %u\n", pcb[run_pid].tf_p->efl);
+	// breakpoint();
 	
 	Loader(pcb[run_pid].tf_p);
-	cons_printf("Loaded trapframe of Idle\n");
-	breakpoint();
+
 
 	return 0; // never would actually reach here
 }

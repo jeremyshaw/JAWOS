@@ -39,7 +39,7 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
     //??use a tool function to clear the content of PCB of process 'pid' (Bzero)
     //??set the state of the process 'pid' to READY pcb[pid].state = READY;
     pid = DeQue(&avail_que);
-	cons_printf("pid = %d, p = %d\n", pid, p);
+	// cons_printf("pid = %d, p = %d\n", pid, p);
 	//breakpoint();
 	//we are supposed to clear the pid's PCB here, not the pid...
 	Bzero((char *)&pcb[pid], STACK_MAX);
@@ -71,12 +71,12 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
     pcb[pid].tf_p -> efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
     pcb[pid].tf_p -> cs = get_cs();
     pcb[pid].tf_p -> eip = DRAM_START;
-	cons_printf("efdv|efi %u\n",EF_DEFAULT_VALUE|EF_INTR);
-	cons_printf("tf_p %p\n",pcb[pid].tf_p);
-	cons_printf("efl %u\n",pcb[pid].tf_p->efl);
-	cons_printf("cs %u\n",pcb[pid].tf_p->cs);
-	cons_printf("eip %u\n",pcb[pid].tf_p->eip);
-	cons_printf("esp %u\n",pcb[pid].tf_p->esp);
+	// cons_printf("efdv|efi %u\n",EF_DEFAULT_VALUE|EF_INTR);
+	// cons_printf("tf_p %p\n",pcb[pid].tf_p);
+	// cons_printf("efl %u\n",pcb[pid].tf_p->efl);
+	// cons_printf("cs %u\n",pcb[pid].tf_p->cs);
+	// cons_printf("eip %u\n",pcb[pid].tf_p->eip);
+	// cons_printf("esp %u\n",pcb[pid].tf_p->esp);
 	//pcb[pid].tf_p->esp = 14684160;
 	//cons_printf("end of SpawnSR\n");
     //breakpoint();
@@ -90,6 +90,7 @@ void TimerSR(void) { //also prep4?
     
     //increment system time count by 1
     sys_time_count++;
+	//if(sys_time_count%100 == 0)cons_printf("howdy!");
    
     //increment the time count of the process currently running by 1
 	// typedef struct{
@@ -107,7 +108,7 @@ void TimerSR(void) { //also prep4?
     //  move the process back to the ready queue
     //  alter its state to indicate it is not running but ...
     //  reset the PID of the process in run to NONE	  
-	if(pcb[run_pid].time_count == TIME_MAX){
+	if(pcb[run_pid].time_count >= TIME_MAX){
 		EnQue(&ready_que, run_pid);
 		pcb[run_pid].state = READY;
 		run_pid = NONE;
