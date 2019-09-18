@@ -37,10 +37,11 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
    
     //if 'pid' is not IDLE, use a tool function to enqueue it to the ready queue 
     if(pid != IDLE) EnQue(&ready_que, pid);
-	
+	cons_printf("right before SpawnSR MemCpy\n");
+	breakpoint();
     //??use a tool function to copy from 'p' to DRAM_START, for STACK_MAX bytes
 	MemCpy((char*)DRAM_START, (char *)p, STACK_MAX);
-	//MemCpy((char*)DRAM_START, (char *)IDLE, STACK_MAX);
+	//MemCpy((char*)DRAM_START, (char *)Idle, STACK_MAX);
 	breakpoint();
     //?create trapframe for process 'pid:'
     //1st position trapframe pointer in its PCB to the end of the stack

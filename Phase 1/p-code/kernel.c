@@ -70,7 +70,7 @@ int main(void) {               // OS starts
 	//do the boot strap things 1st
 	BootStrap();
 
-	SpawnSR(IDLE);              // create Idle thread
+	SpawnSR(Idle);              // create Idle thread
 
 	//set run_pid to IDLE (defined constant)
 	run_pid = IDLE;
@@ -120,7 +120,6 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 			cons_printf(" pressed");
 			if(ch=='b')breakpoint();
 		}
-		
 	}
 
 	//call Scheduler() to change run_pid if needed
