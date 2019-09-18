@@ -56,9 +56,16 @@ void BootStrap(void){         // set up kernel!
 	//addr of TimerEntry is placed into proper IDT entry //32?
 	//send PIC control register the mask value for timer handling
 	
+	// #define TIMER_EVENT 32         // timer interrupt signal code
+	// #define PIC_MASK_REG 0x21      // I/O loc # of PIC mask
+	// #define PIC_MASK_VAL ~0x01     // mask code for PIC
+	// #define PIC_CONT_REG 0x20      // I/O loc # of PIc control
+	// #define TIMER_SERVED_VAL 0x60  // control code sent to PIC
+	// #define VGA_MASK_VAL 0x0f00    // bold face, white on black
+	
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
-	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);
+	outportb(PIC_CONT_REG, PIC_MASK_VAL);
 		
 	//from prep4
 	// idt = get_idt_base();
@@ -70,17 +77,16 @@ int main(void) {               // OS starts
 	//do the boot strap things 1st
 	BootStrap();
 
-	SpawnSR(Idle);              // create Idle thread
+	SpawnSR(IDLE);              // create Idle thread
 
 	//set run_pid to IDLE (defined constant)
 	run_pid = IDLE;
 	
-	cons_printf("run_pid is now IDLE\n");
 	cons_printf("&pcb[IDLE] = %d &pcb[pid].tf_p %d\n", &pcb[IDLE], &pcb[IDLE].tf_p);
 	breakpoint();
 	//call Loader() to load the trapframe of Idle
 	
-	Loader(pcb[IDLE].tf_p);
+	Loader(pcb[run_pid].tf_p);
 	cons_printf("Loaded trapframe of Idle\n");
 	breakpoint();
 
@@ -94,7 +100,7 @@ void Scheduler(void) {              // choose a run_pid to run
 	  run_pid = IDLE;               // use the Idle thread
 	} else {
 	  pcb[IDLE].state = READY;
-	  EnQue((char *)&ready_que, IDLE);
+	  EnQue(&ready_que, IDLE);
 	  run_pid = DeQue(&ready_que);  // pick a different proc
 	}
 
