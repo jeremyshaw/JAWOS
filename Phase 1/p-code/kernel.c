@@ -76,10 +76,12 @@ int main(void) {               // OS starts
 	run_pid = IDLE;
 	
 	cons_printf("run_pid is now IDLE\n");
+	cons_printf("&pcb[IDLE] = %d &pcb[pid].tf_p %d\n", &pcb[IDLE], &pcb[IDLE].tf_p);
 	breakpoint();
 	//call Loader() to load the trapframe of Idle
-	Loader(pcb[IDLE].tf_p);
-	cons_printf("rLoaded trapframe of Idle\n");
+	
+	Loader(&pcb[IDLE].tf_p);
+	cons_printf("Loaded trapframe of Idle\n");
 	breakpoint();
 
 	return 0; // never would actually reach here
@@ -92,6 +94,7 @@ void Scheduler(void) {              // choose a run_pid to run
 	  run_pid = IDLE;               // use the Idle thread
 	} else {
 	  pcb[IDLE].state = READY;
+	  EnQue((char *)&ready_que, IDLE);
 	  run_pid = DeQue(&ready_que);  // pick a different proc
 	}
 
