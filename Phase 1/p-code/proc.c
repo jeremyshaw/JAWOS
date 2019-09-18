@@ -22,21 +22,25 @@
           // a. judging from the flag and show either the dot or space
           // b. alternate the flag
 
-unsigned short *start_pos = (unsigned short *)0xb8000;
-int flag = 0; //flat = 1 = display
+
 
 void Idle(void){
+	unsigned short *start_pos = (unsigned short *)0xb8000;
+	int flag = 0; //flat = 1 = display
 	
-	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);
-	if(sys_time_count % 100 == 0){
-		// flag = 1;
-		if(flag == 1){
-			*start_pos = '.';
-			flag = 0;
-		}
-		else{
-			*start_pos = ' ';
-			flag = 1;
+	outportb(PIC_CONT_REG, PIC_MASK_VAL);
+	while(1){
+			
+		if(sys_time_count % 100 == 0){
+			// flag = 1;
+			if(flag == 1){
+				*start_pos = '.' + VGA_MASK_VAL;
+				flag = 0;
+			}
+			else{
+				*start_pos = ' ' + VGA_MASK_VAL;
+				flag = 1;
+			}
 		}
 	}
 	// else if(sys_time_count %200 == 0){

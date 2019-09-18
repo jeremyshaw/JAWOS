@@ -87,13 +87,13 @@ int main(void) {               // OS starts
 	//call Loader() to load the trapframe of Idle
 	
 	//eax, ecx, edx, ebx, esp, ebp, esi, edi, eip, cs, efl
-	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->eax);
-	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->ecx);
-	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->edx);
-	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->ebx);
-	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->esp);
-	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->ebp);
-	
+	cons_printf("eax %u\n", pcb[run_pid].tf_p->eax);
+	cons_printf("ecx %u\n", pcb[run_pid].tf_p->ecx);
+	cons_printf("edx %u\n", pcb[run_pid].tf_p->edx);
+	cons_printf("ebx %u\n", pcb[run_pid].tf_p->ebx);
+	cons_printf("esp %u\n", pcb[run_pid].tf_p->esp);
+	cons_printf("ebp %u\n", pcb[run_pid].tf_p->ebp);
+	breakpoint();
 	
 	Loader(pcb[run_pid].tf_p);
 	cons_printf("Loaded trapframe of Idle\n");

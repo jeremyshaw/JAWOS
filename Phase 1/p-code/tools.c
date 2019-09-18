@@ -40,6 +40,7 @@ int DeQue(que_t *p){
 		for(j = 0; j < p->tail; j++){
 			p->que[j] = p->que[j+1];
 		}
+		p->tail--;
 		p->que[p->tail] = '\0';
 		return head;
 	}
@@ -88,12 +89,12 @@ void Bzero(char *start, unsigned int max){
 
 void MemCpy(char *dst, char *src, unsigned int max){
 	for(l = 0; l < max; l++){
-		cons_printf("%c", dst, src);
+		//cons_printf("%c", dst, src);
 	    dst[l] = src[l];
 		//dst++;
 		//src++;
 		//cons_printf(" dst %c src %c\n", *dst, *src);
-		//breakpoint();
+		//if(l%300==0) breakpoint();
 	}
 }
 

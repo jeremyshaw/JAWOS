@@ -9,6 +9,9 @@
 #include "tools.h"
 #include "ksr.h"
 
+int i;
+
+
 // to create a process: alloc PID, PCB, and process stack
 // build trapframe, initialize PCB, record PID to ready_que
 void SpawnSR(func_p_t p) {     // arg: where process code starts
@@ -24,6 +27,13 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 		cons_printf("Panic: out of PID!\n");
 		breakpoint();
 	}
+	
+	// cons_printf("avail_que.tail = %d\n", avail_que.tail);
+	// for(i = 0; i < QUE_MAX; i++){
+		// cons_printf("avail_que.que[%d] %d\n", i, avail_que.que[i]);
+	// }
+	// breakpoint();
+	
 	//cons_printf("Past SpawnSR QueEmpty\n");
     //??get 'pid' initialized by dequeuing the available queue
     //??use a tool function to clear the content of PCB of process 'pid' (Bzero)
@@ -34,6 +44,14 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	//we are supposed to clear the pid's PCB here, not the pid...
 	Bzero((char *)&pcb[pid], STACK_MAX);
 	pcb[pid].state = READY;
+	
+	
+	
+	// cons_printf("avail_que.tail = %d\n", avail_que.tail);
+	// for(i = 0; i < QUE_MAX; i++){
+		// cons_printf("avail_que.que[%d] %d\n", i, avail_que.que[i]);
+	// }
+	// breakpoint();
    
    
     //if 'pid' is not IDLE, use a tool function to enqueue it to the ready queue 
@@ -53,6 +71,10 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
     pcb[pid].tf_p -> efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
     pcb[pid].tf_p -> cs = get_cs();
     pcb[pid].tf_p -> eip = DRAM_START;
+	cons_printf("tf_p %p\n",pcb[pid].tf_p);
+	cons_printf("efl %u\n",pcb[pid].tf_p->efl);
+	cons_printf("cs %u\n",pcb[pid].tf_p->cs);
+	cons_printf("eip %u\n",pcb[pid].tf_p->eip);
 	//cons_printf("end of SpawnSR\n");
     //breakpoint();
 }
