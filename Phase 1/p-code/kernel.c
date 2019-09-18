@@ -67,7 +67,7 @@ void BootStrap(void){         // set up kernel!
 	breakpoint();
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
-	outportb(PIC_CONT_REG, PIC_MASK_VAL);
+	outportb(PIC_MASK_REG, PIC_MASK_VAL);
 		
 	//from prep4
 	// idt = get_idt_base();
