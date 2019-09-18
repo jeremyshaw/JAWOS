@@ -7,6 +7,7 @@
 //need to include const-type.h and ext-data.h
 #include "const-type.h"
 #include "ext-data.h"
+#include "proc.h"
 // Code an Idle() function that doesn't have any input or return, but just
 // flickers the dot symbol at the upper-left corner of the target PC display.
 

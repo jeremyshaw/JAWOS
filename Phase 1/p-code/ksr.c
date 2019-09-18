@@ -7,6 +7,7 @@
 #include "const-type.h"
 #include "ext-data.h"
 #include "tools.h"
+#include "ksr.h"
 
 // to create a process: alloc PID, PCB, and process stack
 // build trapframe, initialize PCB, record PID to ready_que
@@ -28,7 +29,7 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
     //??use a tool function to clear the content of PCB of process 'pid' (Bzero)
     //??set the state of the process 'pid' to READY pcb[pid].state = READY;
     pid = DeQue(&avail_que);
-	//cons_printf("pid = %d\n", pid);
+	cons_printf("pid = %d, p = %d\n", pid, p);
 	//breakpoint();
 	//we are supposed to clear the pid's PCB here, not the pid...
 	Bzero((char *)&pcb[pid], STACK_MAX);
@@ -37,12 +38,12 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
    
     //if 'pid' is not IDLE, use a tool function to enqueue it to the ready queue 
     if(pid != IDLE) EnQue(&ready_que, pid);
-	cons_printf("right before SpawnSR MemCpy\n");
-	breakpoint();
+	//cons_printf("right before SpawnSR MemCpy\n");
+	//breakpoint();
     //??use a tool function to copy from 'p' to DRAM_START, for STACK_MAX bytes
 	MemCpy((char*)DRAM_START, (char *)p, STACK_MAX);
 	//MemCpy((char*)DRAM_START, (char *)Idle, STACK_MAX);
-	breakpoint();
+	//breakpoint();
     //?create trapframe for process 'pid:'
     //1st position trapframe pointer in its PCB to the end of the stack
     //set efl in trapframe to EF_DEFAULT_VALUE|EF_INTR  // handle intr

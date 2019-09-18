@@ -6,6 +6,7 @@
 #include "spede.h"
 #include "const-type.h"
 #include "ext-data.h"
+#include "tools.h"
 
 
 int QueEmpty(que_t *p){
@@ -75,7 +76,7 @@ void EnQue(que_t *p, int num){
 
 void Bzero(char *start, unsigned int max){
 	for(k = 0; k < max; k++){
-		*start = '\0'; // *start = (char) 0; in class
+		*start = (char) 0; // *start = (char) 0; in class
 		start++;
 		//(*start)++
 	}
@@ -87,13 +88,12 @@ void Bzero(char *start, unsigned int max){
 
 void MemCpy(char *dst, char *src, unsigned int max){
 	for(l = 0; l < max; l++){
-		//cons_printf("dst %c src %c\n", dst, src);
-	    *dst = *src;
-		dst++;
-		src++;
-		//cons_printf(" dst %c src %c\n", dst, src);
+		cons_printf("%c", dst, src);
+	    dst[l] = src[l];
+		//dst++;
+		//src++;
+		//cons_printf(" dst %c src %c\n", *dst, *src);
 		//breakpoint();
-		
 	}
 }
 

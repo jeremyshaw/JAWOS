@@ -65,7 +65,7 @@ void BootStrap(void){         // set up kernel!
 	
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
-	outportb(PIC_CONT_REG, PIC_MASK_VAL);
+	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);
 		
 	//from prep4
 	// idt = get_idt_base();
@@ -77,14 +77,23 @@ int main(void) {               // OS starts
 	//do the boot strap things 1st
 	BootStrap();
 
-	SpawnSR(IDLE);              // create Idle thread
+	SpawnSR(Idle);              // create Idle thread
 
 	//set run_pid to IDLE (defined constant)
 	run_pid = IDLE;
 	
-	cons_printf("&pcb[IDLE] = %d &pcb[pid].tf_p %d\n", &pcb[IDLE], &pcb[IDLE].tf_p);
+	cons_printf("&pcb[IDLE] = %d &pcb[IDLE].tf_p %p\n", &pcb[IDLE], &pcb[IDLE].tf_p);
 	breakpoint();
 	//call Loader() to load the trapframe of Idle
+	
+	//eax, ecx, edx, ebx, esp, ebp, esi, edi, eip, cs, efl
+	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->eax);
+	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->ecx);
+	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->edx);
+	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->ebx);
+	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->esp);
+	cons_printf("tf_t %u\n", pcb[IDLE].tf_p->ebp);
+	
 	
 	Loader(pcb[run_pid].tf_p);
 	cons_printf("Loaded trapframe of Idle\n");
@@ -110,7 +119,7 @@ void Scheduler(void) {              // choose a run_pid to run
 
 void Kernel(tf_t *tf_p) {       // kernel runs
 	//copy tf_p to the trapframe ptr (in PCB) of the process in run
-	pcb[run_pid].tf_p = tf_p;
+	tf_p = pcb[run_pid].tf_p;
 
     //call the timer service routine
     TimerSR(); //incomplete?
