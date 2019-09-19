@@ -20,7 +20,7 @@ else return 0;
 int QueFull(que_t *p){ //pointer*?
 //similarly, code a QueFull() function to check for being full or not
 if(p->tail == QUE_MAX) return 1;
-else return 0;//not full
+else return 0;//not full - don't need the else, either
 }
 
 
@@ -33,15 +33,15 @@ int j, k, l;
 
 int DeQue(que_t *p){
 	if(QueEmpty(p) == 1){
-		return -1;
+		return NONE; //NONE = -1
 	}
 	else{
 		head =  p->que[0];
-		for(j = 0; j < p->tail; j++){
+		for(j = 0; j < p->tail-1; j++){//whoops, needed the -1, lol. Or -- the tail beforehand
 			p->que[j] = p->que[j+1];
 		}
 		p->tail--;
-		p->que[p->tail] = '\0';
+		p->que[p->tail] = -1; //this is technically better than NULL?
 		return head;
 	}
 }
@@ -93,7 +93,7 @@ void MemCpy(char *dst, char *src, unsigned int max){
 	    *dst = *src;
 		dst++;
 		src++;
-		
+		//apparently, *dst++ = *src++; will also work
 		//cons_printf(" dst %c src %c\n", *dst, *src);
 		//if(l%1024==0) breakpoint();
 	}
