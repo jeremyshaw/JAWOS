@@ -6,10 +6,10 @@
 #include "syscall.h"     // sys service calls
 #include "tools.h"       // Number2Str()
 
-#define CHR_ARY 20
+#define CHR_ARY 20	// max charcter array length
 
 void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
-...
+...//flash a * instead of a .
 }
 
 void Init(void) {  // Init, PID 1, asks/tests various OS services

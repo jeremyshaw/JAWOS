@@ -7,8 +7,8 @@
 #define SYS_GET_TIME 130
 #define SYS_SLEEP 131
 #define SYS_WRITE 132
-#define VIDEO_START (unsigned short *)0xb8000
-#define VIDEO_END ((unsigned short *)0xb8000 + 25 * 80)
+#define VIDEO_START (unsigned short *)0xb8000 //uns short is 2 byte pointer in this case
+#define VIDEO_END ((unsigned short *)0xb8000 + 25 * 80) 
 
 ...
 
