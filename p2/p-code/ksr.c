@@ -52,7 +52,7 @@ void SyscallSR(void) {
 }
 
 void SysSleep(void) {
-	int sleep_sec = ... from a register value wtihin the trapframe
+	int sleep_sec = ... from a register value wtihin the trapframe (ebx? check again)
 	calculate the wake time of the running process using the current system
 	time count plus the sleep_sec times 100
 	alter the state of the running process to SLEEP
@@ -60,9 +60,10 @@ void SysSleep(void) {
 }
 
 void SysWrite(void) {
-	char *str =  ... passed over by a register value wtihin the trapframe
+	char *str =  ... passed over by a register value wtihin the trapframe (may have to typecast ebx ?addr? to str to print?)
 	show the str one char at a time (use a loop)
       onto the console (at the system cursor position)
       (while doing so, the cursor may wrap back to the top-left corner if needed)
+	  
 }
 

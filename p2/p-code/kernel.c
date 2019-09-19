@@ -14,13 +14,13 @@ void BootStrap(void) {              // set up kernel!
 
    ...
 
-   use fill_gate() to set entry # SYSCALL_EVENT to SyscallEntry
+   use fill_gate() to set entry # SYSCALL_EVENT to SyscallEntry (128 is somewhere?)
+   
 }
 
 int main(void) {               // kernel boots
 
    ... after creating Idle ...
-
    also create Init
 
    ...
