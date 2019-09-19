@@ -28,7 +28,7 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 	// ?? check back on this ?? call Number2Str() to convert it to pid_str
 	Number2Str(my_pid, &pid_str);
 
-	forever loop 
+	//forever loop 
 	while(1){
 		call sys_write() to show "my PID is "
 		call sys_write() to show my pid_str
