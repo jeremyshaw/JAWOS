@@ -34,6 +34,13 @@
 //also from p1
 typedef void (*func_p_t)(void); // void-return function pointer type
 
+typedef struct {
+	int tail;
+	int que[QUE_MAX];
+} que_t;
+
+
+//from p1, modified
 //Add a new state SLEEP to the existing state_t
 typedef enum {AVAIL, READY, RUN, SLEEP} state_t;
 #define AVAIL 0
@@ -41,7 +48,6 @@ typedef enum {AVAIL, READY, RUN, SLEEP} state_t;
 #define RUN 2
 #define SLEEP 3
 //state type
-
 
 //Add an unsigned int wake_time to the PCB type
 typedef struct {
@@ -54,6 +60,8 @@ typedef struct {
 
 
 
+//new code from professor
+
 //Use the new trapframe sequence (entry.S requires alteration):
 //this looks to have already been completed by the instructor, even the Entry.S
 typedef struct {   // add an 'event' into this, phase2
@@ -61,12 +69,6 @@ typedef struct {   // add an 'event' into this, phase2
       edi, esi, ebp, esp, ebx, edx, ecx, eax, event, eip, cs, efl;
 } tf_t;                      // 'trapframe' type
 
-
-//from p1
-typedef struct {
-	int tail;
-	int que[QUE_MAX];
-} que_t;
 
 
 #endif                          // to prevent name mangling
