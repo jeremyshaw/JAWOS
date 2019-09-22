@@ -29,6 +29,7 @@ void Number2Str(int x, char *str) {
 		str2--;
 	}
 	*str = (char)0;
+	
 }
 
 

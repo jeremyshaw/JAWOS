@@ -10,7 +10,7 @@ void BootStrap(void) {              // set up kernel!
 
    ...
 
-   sys_cursor = ???  // have it set to VIDEO_START in BootStrap()
+   sys_cursor = VIDEO_START;  // have it set to VIDEO_START in BootStrap()
 
    ...
 
@@ -20,8 +20,10 @@ void BootStrap(void) {              // set up kernel!
 
 int main(void) {               // kernel boots
 
-   ... after creating Idle ...
-   also create Init
+   // ... after creating Idle ...
+   // also create Init
+   SpawnSR(&Idle);
+   SpawnSR(&Init);
 
    ...
 }
