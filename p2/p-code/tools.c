@@ -10,21 +10,25 @@
 
 void Number2Str(int x, char *str) {
 	
-	int len = 0;
+	int len = 1; //needs an extra boost for the "reversing" loop
+	char *str2;
 	while(x>10){
 		int temp;
 		temp = x % 10;
 		temp += '0'; //convert to ascii digits
-		*str = temp;
-		str++;		
+		*str2 = temp;
+		str2++;		
 		len++;
 	}
-	*str = x;
+	*str2 = x;
 	
 	//now, need to reverse the string to actually make it in the correct order. Don't forget to add a NULL.
-   ...
-   ...
-   ...
+	while(len){
+		*str = &str2;
+		str++;
+		str2--;
+	}
+	*str = (char)0;
 }
 
 
