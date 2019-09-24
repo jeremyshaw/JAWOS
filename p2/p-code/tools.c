@@ -19,6 +19,7 @@ void Number2Str(int x, char *str) {
 		*str2 = temp;
 		str2++;		
 		len++;
+		x/10;
 	}
 	*str2 = x;
 	

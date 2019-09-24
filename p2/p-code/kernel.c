@@ -67,7 +67,7 @@ int main(void) {               // kernel boots
 	//code from p1
 	//set run_pid to IDLE (defined constant)
 	run_pid = IDLE;
-
+	
 	Loader(pcb[run_pid].tf_p);
 
 	return 0; // never would actually reach here
@@ -80,7 +80,6 @@ void Scheduler(void) {              // choose a run_pid to run
 		run_pid = IDLE;               // use the Idle thread
 	} else {
 		pcb[IDLE].state = READY;
-		//EnQue(&ready_que, IDLE);
 		run_pid = DeQue(&ready_que);  // pick a different proc
 	}
 
@@ -92,18 +91,16 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 
 	pcb[run_pid].tf_p = tf_p;
 
-    TimerSR();
-
 	switch(tf_p->event) {
-	case TIMER_EVENT:
-		TimerSR();         // handle tiemr event
-		break;
-	case SYSCALL_EVENT:
-		SyscallSR();       // all syscalls go here 1st
-		break;
-	default:
-		cons_printf("Kernel Panic: no such event!\n");
-		breakpoint();
+		case TIMER_EVENT:
+			TimerSR();         // handle tiemr event
+			break;
+		case SYSCALL_EVENT:
+			SyscallSR();       // all syscalls go here 1st
+			break;
+		default:
+			cons_printf("Kernel Panic: no such event!\n");
+			breakpoint();
 	}
 
 	if(cons_kbhit()) {           // if keyboard pressed

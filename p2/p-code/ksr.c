@@ -70,17 +70,29 @@ void SyscallSR(void) {
 	//eax is the actuall syscall
 	switch (pcb[run_pid].tf_p->eax) {
 		case SYS_GET_PID:
+			cons_printf("SYSGETPID and ebx is %d\n", pcb[run_pid].tf_p->ebx);
+			breakpoint();
 			//copy run_pid to ebx in the trapframe of the running process
 			pcb[run_pid].tf_p->ebx = run_pid;
+			cons_printf("SYSGETPID_done p[p].t->ebx = %d\n",pcb[run_pid].tf_p->ebx );
+			breakpoint();
 			break;
 		case SYS_GET_TIME:
+			cons_printf("SYSGETTIME\n");
+			breakpoint();
 			//copy the system time count to ebx in the trapframe of the running process
 			pcb[run_pid].tf_p->ebx = sys_time_count;
+			cons_printf("SYSGETTIME_done\n");
+			breakpoint();
 			break;			
 		case SYS_SLEEP:
+			cons_printf("Syssleep\n");
+			breakpoint();
 			SysSleep();
 			break;
 		case SYS_WRITE:
+			cons_printf("SysWrite\n");
+			breakpoint();
 			SysWrite();
 			break;
 		default:
@@ -92,6 +104,7 @@ void SyscallSR(void) {
 
 
 void SysSleep(void) {
+	
 	int sleep_sec = pcb[run_pid].tf_p->ebx;//... from a register value wtihin the trapframe (ebx? check again)
 	//calculate the wake time of the running process using the current system
 	//time count plus the sleep_sec times 100
@@ -106,6 +119,7 @@ void SysSleep(void) {
 }
 
 void SysWrite(void) {
+
 	char *str =  (char *)pcb[run_pid].tf_p->ebx;//... passed over by a register value wtihin the trapframe (may have to typecast ebx ?addr? to str to print?)
 	
 	//show the str one char at a time (use a loop)
