@@ -9,7 +9,23 @@
 #define CHR_ARY 20	// max charcter array length
 
 void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
-...//flash a * instead of a .
+	unsigned short *start_pos = (unsigned short *)0xb8000;
+	int flag = 0; //flat = 1 = display
+	//asm("sti");
+	//outportb(PIC_CONT_REG, TIMER_SERVED_VAL);
+	while(1){
+		if(sys_time_count % 100 == 0){
+			// flag = 1;
+			if(flag == 1){
+				*start_pos = '*' + VGA_MASK_VAL;
+				flag = 0;
+			}
+			else{
+				*start_pos = ' ' + VGA_MASK_VAL;
+				flag = 1;
+			}
+		}
+	}
 }
 
 void Init(void) {  // Init, PID 1, asks/tests various OS services

@@ -1,49 +1,81 @@
-// ksr.c, 159
+// ksr.c, 159 Kernal Service Routines
+
+// Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
+
+//need to include spede.h, const-type.h, ext-data.h, tools.h
+#include "spede.h"
+#include "const-type.h"
+#include "ext-data.h"
+#include "tools.h"
+#include "ksr.h"
 
 void SpawnSR(func_p_t p) {     // arg: where process code starts
+	In SpawnSR, make sure the code and stack are being assigned to
+	a new 4KB region for Idle and Init: multiply STACK_MAX with the
+	'pid' dequeued from the 'avail_que' so a new process will occupy
+	a different 4KB of the DRAM.
+
+	int pid;
+
+	if(QueEmpty(&avail_que)==1){
+		cons_printf("Panic: out of PID!\n");
+		breakpoint();
+	}
+
+	pid = DeQue(&avail_que);
+
+	Bzero((char *)&pcb[pid], STACK_MAX);
+	pcb[pid].state = READY;
+
+	if(pid != IDLE) EnQue(&ready_que, pid);
 
 	// copy code to DRAM, both code & stack are separated among processes, phase2
-	MemCpy((char *)DRAM_START + ...?
+	MemCpy((char*)DRAM_START, (char *)p, STACK_MAX);
 
 	// point tf_p to stack & fill TF out
-	pcb[pid].tf_p = (tf_t *)(DRAM_START + ...?
-	...
-	...
-	...
-	pcb[pid].tf_p->eip = DRAM_START + ...?
+	pcb[pid].tf_p = (tf_t *)(DRAM_START + STACK_MAX - sizeof(tf_t));
+	pcb[pid].tf_p -> efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
+	pcb[pid].tf_p -> cs = get_cs();
+	pcb[pid].tf_p -> eip = DRAM_START;
 }
 
 // count run time and switch if hitting time limit
 void TimerSR(void) {
-	...
-	...
-	...
-	original code to here:  ...total_time++;
+	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);//what do we put in source?
+    
+    sys_time_count++;
 
+	pcb[run_pid].time_count++;
+   	pcb[run_pid].total_time++;
+
+	
 	Use a loop to look for any processes that need to be waken up!
 
-	also add here that:
-	if run_pid is IDLE, just simply return;    // Idle exempt from below, phase2
 
-	if(pcb[run_pid].time_count == TIME_MAX) {  // if runs long enough
-	...
-	...
-	...
+	if(run_pid == IDLE) return;    // Idle exempt from below, phase2
+
+	if(pcb[run_pid].time_count >= TIME_MAX){
+		
+		EnQue(&ready_que, run_pid);
+		pcb[run_pid].state = READY;
+		run_pid = NONE;
+		
+    }
 }
 
 void SyscallSR(void) {
-	switch by the eax in the trapframe pointed to by pcb[run_pid].tf_p
-		if it's  SYS_GET_PID,
+	switch (pcb[run_pid].tf_p->eax) {
+		case SYS_GET_PID:
 			copy run_pid to ebx in the trapframe of the running process
 		 
-		if it's SYS_GET_TIME,
+		case SYS_GET_TIME:
 			copy the system time count to ebx in the trapframe of the running process
 
-		if it's SYS_SLEEP,
-			call SysSleep()
+		case SYS_SLEEP:
+			SysSleep()
 
-		if it's SYS_WRITE
-			call SysWrite()
+		case SYS_WRITE:
+			SysWrite()
 
 		default:
 			cons_printf("Kernel Panic: no such syscall!\n");
