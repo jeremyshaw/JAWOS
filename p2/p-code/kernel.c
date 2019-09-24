@@ -57,6 +57,7 @@ void BootStrap(void) {              // set up kernel!
    
 }
 
+
 int main(void) {               // kernel boots
 	
 	BootStrap();
@@ -73,7 +74,9 @@ int main(void) {               // kernel boots
 	return 0; // never would actually reach here
 }
 
+
 void Scheduler(void) {              // choose a run_pid to run
+
 	if(run_pid > IDLE) return;       // a user PID is already picked
 
 	if(QueEmpty(&ready_que)) {
@@ -85,7 +88,9 @@ void Scheduler(void) {              // choose a run_pid to run
 
 	pcb[run_pid].time_count = 0;     // reset runtime count
 	pcb[run_pid].state = RUN;
+	
 }
+
 
 void Kernel(tf_t *tf_p) {       // kernel runs
 

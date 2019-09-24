@@ -4,6 +4,7 @@
 #include "syscall.h"     // for SYS_GET_PID, etc., below
 
 int sys_get_pid(void) {     // phase2
+
 	int pid;
 
 	asm("movl %1, %%eax;     // # for kernel to identify service
@@ -15,11 +16,13 @@ int sys_get_pid(void) {     // phase2
 	);
 
 	return pid;
+	
 }
+
 
 int sys_get_time(void) {     // similar to sys_get_pid
 	//do we need to return a proper time struct or will a formatted string do?
-	//nevermind, I'll do seconds and leave the stuct busting to others
+	//nevermind, I'll do seconds as an INT and leave the stuct busting to others
 	int timeINT;
 	
 	asm("movl %1, %%eax;     // # for kernel to identify service
@@ -31,9 +34,12 @@ int sys_get_time(void) {     // similar to sys_get_pid
 	);
 	
 	return timeINT;
+	
 }
 
+
 void sys_sleep(int sleep_sec) {  // phase2
+
 	asm("movl %0, %%eax;          // # for kernel to identify service
 		movl %1, %%ebx;          // sleep seconds
 		int $128"                // interrupt!
@@ -41,7 +47,9 @@ void sys_sleep(int sleep_sec) {  // phase2
 	   : "g" (SYS_SLEEP), "g" (sleep_sec)  // 2 inputs to asm()
 	   : "eax", "ebx"            // clobbered registers
 	);
+	
 }
+
 
 void sys_write(char *str) {             // similar to sys_sleep
 

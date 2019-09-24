@@ -2,7 +2,6 @@
 
 // Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
-//need to include spede.h, const-type.h, ext-data.h, tools.h
 #include "spede.h"
 #include "const-type.h"
 #include "ext-data.h"
@@ -19,8 +18,10 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	int pid;
 
 	if(QueEmpty(&avail_que)==1){
+		
 		cons_printf("Panic: out of PID!\n");
 		breakpoint();
+		
 	}
 	
 	pid = DeQue(&avail_que);
@@ -39,10 +40,13 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	pcb[pid].tf_p -> efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
 	pcb[pid].tf_p -> cs = get_cs();
 	pcb[pid].tf_p -> eip = DRAM_START + pid * STACK_MAX;
+	
 }
+
 
 // count run time and switch if hitting time limit
 void TimerSR(void) {
+	
 	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);//what do we put in source?
     
     sys_time_count++;
@@ -66,8 +70,9 @@ void TimerSR(void) {
     }
 }
 
+
 void SyscallSR(void) {
-	//eax is the actuall syscall
+
 	switch (pcb[run_pid].tf_p->eax) {
 		case SYS_GET_PID:
 			cons_printf("SYSGETPID and ebx is %d\n", pcb[run_pid].tf_p->ebx);
@@ -99,15 +104,17 @@ void SyscallSR(void) {
 			cons_printf("Kernel Panic: no such syscall!\n");
 			breakpoint();
 	}
+	
 }
-
 
 
 void SysSleep(void) {
 	
-	int sleep_sec = pcb[run_pid].tf_p->ebx;//... from a register value wtihin the trapframe (ebx? check again)
+	//... from a register value wtihin the trapframe (ebx? check again)
 	//calculate the wake time of the running process using the current system
 	//time count plus the sleep_sec times 100
+	int sleep_sec = pcb[run_pid].tf_p->ebx;
+
 	pcb[run_pid].tf_p->ebx = sys_time_count + sleep_sec * 100;
 	
 	// alter the state of the running process to SLEEP
@@ -117,6 +124,7 @@ void SysSleep(void) {
 	run_pid = NONE;
 	
 }
+
 
 void SysWrite(void) {
 
@@ -129,8 +137,6 @@ void SysWrite(void) {
 		
 		//NOT DONE  (while doing so, the cursor may wrap back to the top-left corner if needed)
 	}
-
-
-	  
+	
 }
 

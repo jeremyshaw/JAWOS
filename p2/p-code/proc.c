@@ -1,4 +1,4 @@
-// proc.c, 159
+// proc.c, 159 JAWOS
 // processes are coded here
 
 #include "const-type.h"  // VGA_MASK_VAL
@@ -10,7 +10,9 @@
 
 #define CHR_ARY 20	// max charcter array length
 
+
 void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
+
 	unsigned short *start_pos = (unsigned short *)0xb8000;
 	int flag = 0; //flat = 1 = display
 	//asm("sti");
@@ -30,7 +32,9 @@ void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 	}
 }
 
+
 void Init(void) {  // Init, PID 1, asks/tests various OS services
+
 	// declare two integers: my_pid & os_time
 	int my_pid;
 	int os_time;
@@ -48,6 +52,7 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 
 	//forever loop 
 	while(1){
+		
 		//call sys_write() to show "my PID is "
 		sys_write("my PID is ");
 		
@@ -77,6 +82,7 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 		
 		//call sys_sleep() to sleep for 1 second
 		sys_sleep(1);
+		
 	}
 	
 }
