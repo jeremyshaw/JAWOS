@@ -41,6 +41,8 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	pcb[pid].tf_p -> cs = get_cs();
 	pcb[pid].tf_p -> eip = DRAM_START + pid * STACK_MAX;
 	
+	cons_printf("pid: %d\n", pid);
+	
 }
 
 
@@ -68,6 +70,7 @@ void TimerSR(void) {
 		run_pid = NONE;
 		
     }
+	
 }
 
 

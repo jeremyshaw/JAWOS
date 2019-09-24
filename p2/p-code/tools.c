@@ -19,13 +19,13 @@ void Number2Str(int x, char *str) {
 		*str2 = temp;
 		str2++;		
 		len++;
-		x/10;
+		x = x/10;
 	}
 	*str2 = x;
 	
 	//now, need to reverse the string to actually make it in the correct order. Don't forget to add a NULL.
 	while(len){
-		*str = &str2;
+		*str = *str2;
 		str++;
 		str2--;
 	}
@@ -65,7 +65,7 @@ int DeQue(que_t *p){
 			p->que[j] = p->que[j+1];
 		}
 		p->tail--;
-		p->que[p->tail] = -1; //this is technically better than NULL?
+		p->que[p->tail] = NONE; //this is technically better than NULL?
 		return head;
 	}
 	

@@ -15,21 +15,28 @@ void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 
 	unsigned short *start_pos = (unsigned short *)0xb8000;
 	int flag = 0; //flat = 1 = display
-	//asm("sti");
-	//outportb(PIC_CONT_REG, TIMER_SERVED_VAL);
-	while(1){
-		if(sys_time_count % 100 == 0){
-			// flag = 1;
-			if(flag == 1){
+
+	while(1) {
+		
+		if(sys_time_count % 100 == 0) {
+			
+			if(flag == 1) {
+				
 				*start_pos = '*' + VGA_MASK_VAL;
 				flag = 0;
+				
 			}
-			else{
+			else {
+				
 				*start_pos = ' ' + VGA_MASK_VAL;
 				flag = 1;
+			
 			}
+		
 		}
+
 	}
+
 }
 
 

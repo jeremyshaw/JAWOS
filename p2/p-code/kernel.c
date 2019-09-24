@@ -13,20 +13,20 @@
 // declare kernel data
 
 // aren't all of these in ext-data.h?
-// current running PID; if -1, none selected
-// int run_pid;
+int run_pid; 	// current running PID; if -1, none selected
 
-// que_t avail_que; //avail pid
-// que_t ready_que; //created/ready to run pid
+que_t avail_que; //avail pid
+que_t ready_que; //created/ready to run pid
 
-// pcb_t pcb[PROC_MAX];
+pcb_t pcb[PROC_MAX];
 
-// unsigned int sys_time_count;
-// struct i386_gate *idt;
+unsigned int sys_time_count;
+struct i386_gate *idt;
 
-// unsigned short *sys_cursor;         // phase2
+unsigned short *sys_cursor;         // phase2
 
 char ch;//for kb capture breakpoint
+int i;
 
 
 void BootStrap(void) {              // set up kernel!
@@ -95,6 +95,8 @@ void Scheduler(void) {              // choose a run_pid to run
 void Kernel(tf_t *tf_p) {       // kernel runs
 
 	pcb[run_pid].tf_p = tf_p;
+	cons_printf("Kernel p[p].tf_p = %d\n", tf_p);
+	//breakpoint();	
 
 	switch(tf_p->event) {
 		
@@ -111,9 +113,11 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 	}
 
 	if(cons_kbhit()) {           // if keyboard pressed
+	
 		ch = cons_getchar();
 		cons_printf(" pressed");
 		if(ch=='b')breakpoint();
+		
 	}
 	
 	Scheduler();

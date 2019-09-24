@@ -31,17 +31,14 @@
 #define VIDEO_END (unsigned short *) 0xb8000 + 25 * 80
 
 
-typedef void(*func_p_t)(void); // void-return function pointer type
-//everything above was pasted in from p1
+typedef void(*func_p_t)(void);
 
 
-//from p1, modified
-//Add a new state SLEEP to the existing state_t
 typedef enum {AVAIL, READY, RUN, SLEEP} state_t;
 #define AVAIL 0
 #define READY 1
 #define RUN 2
-#define SLEEP 3
+#define SLEEP 3 //Add a new state SLEEP to the existing state_t
 
 typedef struct {
 	int tail;
@@ -50,22 +47,17 @@ typedef struct {
 
 
 //new code from professor
-
-//Use the new trapframe sequence (entry.S requires alteration):
-//this looks to have already been completed by the instructor, even the Entry.S
-typedef struct {   // add an 'event' into this, phase2
+typedef struct {
 	unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax, event, eip, cs, efl;
-} tf_t;                      // 'trapframe' type
-//end new code from professor
+} tf_t;                      
 
 
-//Add an unsigned int wake_time to the PCB type
 typedef struct {
 	state_t state;
 	tf_t *tf_p;
 	unsigned int time_count;
 	unsigned int total_time;
-	unsigned int wake_time;
+	unsigned int wake_time; //Add an unsigned int wake_time to the PCB type
 } pcb_t;
 
 
