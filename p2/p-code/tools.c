@@ -1,8 +1,6 @@
 // tools.c, 159
-
 // Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
-//includes from p1
 #include "spede.h"
 #include "const-type.h"
 #include "ext-data.h"
@@ -34,8 +32,6 @@ void Number2Str(int x, char *str) {
 }
 
 
-//all of this is from p1
-
 int QueEmpty(que_t *p) {
 	
 	if(p->tail == 0) return 1;
@@ -56,9 +52,7 @@ int j, k, l;
 
 int DeQue(que_t *p){
 	
-	if(QueEmpty(p) == 1){
-		return NONE; //NONE = -1
-	}
+	if(QueEmpty(p) == 1) return NONE;
 	else{
 		head =  p->que[0];
 		for(j = 0; j < p->tail-1; j++){//whoops, needed the -1, lol. Or -- the tail beforehand
@@ -89,19 +83,6 @@ void EnQue(que_t *p, int num){
    
 }
 
+void Bzero(char *start, unsigned int max) { for(k = 0; k < max; k++) *start++ = (char) 0; }
 
-void Bzero(char *start, unsigned int max){
-	for(k = 0; k < max; k++){
-		*start = (char) 0; // *start = (char) 0; in class
-		start++;
-	}
-}
-
-
-void MemCpy(char *dst, char *src, unsigned int max){
-	
-	for(l = 0; l < max; l++){
-	    *dst++ = *src++;
-	}
-	
-}
+void MemCpy(char *dst, char *src, unsigned int max) { for(l = 0; l < max; l++) *dst++ = *src++; }

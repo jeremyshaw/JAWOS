@@ -1,5 +1,4 @@
 // const-type.h, 159, needed constants & types
-
 // Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
 #ifndef _CONST_TYPE_           // to prevent name mangling recursion //"if not define, define"
@@ -21,7 +20,6 @@
 #define IDLE 0                  // Idle thread PID 0
 #define DRAM_START 0xe00000     // 14 MB
 
-
 #define SYSCALL_EVENT 128       // syscall event identifier code, phase2
 #define SYS_GET_PID 129         // different types of syscalls
 #define SYS_GET_TIME 130
@@ -32,7 +30,6 @@
 
 
 typedef void(*func_p_t)(void);
-
 
 typedef enum {AVAIL, READY, RUN, SLEEP} state_t;
 #define AVAIL 0
@@ -45,20 +42,15 @@ typedef struct {
 	int que[QUE_MAX];
 } que_t;
 
-
 //new code from professor
 typedef struct {
 	unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax, event, eip, cs, efl;
 } tf_t;                      
 
-
 typedef struct {
 	state_t state;
 	tf_t *tf_p;
-	unsigned int time_count;
-	unsigned int total_time;
-	unsigned int wake_time; //Add an unsigned int wake_time to the PCB type
+	unsigned int time_count, total_time, wake_time; //Add an unsigned int wake_time to the PCB type
 } pcb_t;
-
 
 #endif                          // to prevent name mangling

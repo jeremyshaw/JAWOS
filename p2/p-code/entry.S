@@ -38,4 +38,3 @@ ENTRY(SyscallEntry)         // similar to TimerEntry
    push %ecx
    cld
    call CNAME(Kernel)
-

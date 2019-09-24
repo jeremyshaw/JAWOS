@@ -9,15 +9,13 @@
 
 #include "const-type.h"
 
-extern que_t avail_que;
-extern que_t ready_que;
+extern que_t avail_que, ready_que;
 
 extern pcb_t pcb[PROC_MAX];
 
 extern unsigned int sys_time_count;
 
-extern int run_pid;
-extern int pid;
+extern int run_pid, pid;
 
 extern struct i386_gate *idt;   
 

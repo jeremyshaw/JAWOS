@@ -1,5 +1,4 @@
 // kernel.c, 159, phase 1
-//
 // Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
 #include "spede.h"
