@@ -9,7 +9,6 @@
 
 #include "const-type.h"
 
-
 extern que_t avail_que;
 extern que_t ready_que;
 
@@ -22,9 +21,7 @@ extern int pid;
 
 extern struct i386_gate *idt;   
 
+extern unsigned short * sys_cursor;
 // like others, add the new sys_cursor newly declared in main.c
-
-// ...
-
 
 #endif

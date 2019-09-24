@@ -106,7 +106,6 @@ void Kernel(tf_t *tf_p) {       // kernel runs
     TimerSR(); //incomplete?
 
     //if 'b' key on target PC is pressed, goto the GDB prompt -->breakpoint()?
-	
 	if(cons_kbhit()){
 		ch = cons_getchar();
 		cons_printf(" pressed");
