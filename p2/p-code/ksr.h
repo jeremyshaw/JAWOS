@@ -11,5 +11,6 @@ void SpawnSR(func_p_t p);
 void TimerSR(void);
 void SyscallSR(void);
 void SysSleep(void);
+void SysWrite(void);
 
 #endif

@@ -3,7 +3,7 @@
 // Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
 #include "spede.h"
-//#include "const-type.h"
+#include "const-type.h"
 #include "entry.h"    // entries to kernel (TimerEntry, etc.)
 #include "tools.h"    // small handy functions
 #include "ksr.h"      // kernel service routines
@@ -14,13 +14,15 @@
 
 //aren't all of theses in ext-data.h?
 // current running PID; if -1, none selected
-// int run_pid;
-// avail PID and those created/ready to run
-// que_t avail_que;
-// que_t ready_que;
-// pcb_t pcb[PROC_MAX];
-// unsigned int sys_time_count;
-//struct i386_gate *idt;         // interrupt descriptor table
+int run_pid;
+// // avail PID and those created/ready to run
+que_t avail_que;
+que_t ready_que;
+
+pcb_t pcb[PROC_MAX];
+
+unsigned int sys_time_count;
+struct i386_gate *idt;         // interrupt descriptor table
 
 char ch;//for kb capture breakpoint
 

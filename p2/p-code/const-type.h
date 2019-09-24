@@ -21,20 +21,18 @@
 #define IDLE 0                  // Idle thread PID 0
 #define DRAM_START 0xe00000     // 14 MB
 
-typedef void(*func_p_t)(void); // void-return function pointer type
-//everything above was pasted in from p1
 
 #define SYSCALL_EVENT 128       // syscall event identifier code, phase2
 #define SYS_GET_PID 129         // different types of syscalls
 #define SYS_GET_TIME 130
 #define SYS_SLEEP 131
 #define SYS_WRITE 132
-#define VIDEO_START ((unsigned short *) 0xb8000) //uns short is 2 byte pointer in this case
-#define VIDEO_END ((unsigned short *) 0xb8000 + 25 * 80)
+#define VIDEO_START (unsigned short *) 0xb8000 //uns short is 2 byte pointer in this case
+#define VIDEO_END (unsigned short *) 0xb8000 + 25 * 80
 
 
-
-
+typedef void(*func_p_t)(void); // void-return function pointer type
+//everything above was pasted in from p1
 
 
 //from p1, modified

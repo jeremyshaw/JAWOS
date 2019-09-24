@@ -38,7 +38,7 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	//cons_printf("pid = %d, p = %d\n", pid, p);
 	//breakpoint();
 	//we are supposed to clear the pid's PCB here, not the pid...
-	Bzero((char *)&pcb[pid], STACK_MAX);
+	Bzero((char *)&pcb[pid], sizeof(pcb_t));
 	pcb[pid].state = READY;
 	
 	// cons_printf("avail_que.tail = %d\n", avail_que.tail);
