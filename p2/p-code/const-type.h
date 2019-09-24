@@ -20,24 +20,21 @@
 #define NONE -1                 // to indicate none
 #define IDLE 0                  // Idle thread PID 0
 #define DRAM_START 0xe00000     // 14 MB
-//everything above was pasted in from p1
 
+typedef void(*func_p_t)(void); // void-return function pointer type
+//everything above was pasted in from p1
 
 #define SYSCALL_EVENT 128       // syscall event identifier code, phase2
 #define SYS_GET_PID 129         // different types of syscalls
 #define SYS_GET_TIME 130
 #define SYS_SLEEP 131
 #define SYS_WRITE 132
-#define VIDEO_START (unsigned short *)0xb8000 //uns short is 2 byte pointer in this case
-#define VIDEO_END ((unsigned short *)0xb8000 + 25 * 80) 
+#define VIDEO_START ((unsigned short *) 0xb8000) //uns short is 2 byte pointer in this case
+#define VIDEO_END ((unsigned short *) 0xb8000 + 25 * 80)
 
-//also from p1
-typedef void (*func_p_t)(void); // void-return function pointer type
 
-typedef struct {
-	int tail;
-	int que[QUE_MAX];
-} que_t;
+
+
 
 
 //from p1, modified
@@ -47,7 +44,21 @@ typedef enum {AVAIL, READY, RUN, SLEEP} state_t;
 #define READY 1
 #define RUN 2
 #define SLEEP 3
-//state type
+
+typedef struct {
+	int tail;
+	int que[QUE_MAX];
+} que_t;
+
+
+//new code from professor
+
+//Use the new trapframe sequence (entry.S requires alteration):
+//this looks to have already been completed by the instructor, even the Entry.S
+typedef struct {   // add an 'event' into this, phase2
+	unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax, event, eip, cs, efl;
+} tf_t;                      // 'trapframe' type
+//end new code from professor
 
 //Add an unsigned int wake_time to the PCB type
 typedef struct {
@@ -57,18 +68,6 @@ typedef struct {
 	unsigned int total_time;
 	unsigned int wake_time;
 } pcb_t;
-
-
-
-//new code from professor
-
-//Use the new trapframe sequence (entry.S requires alteration):
-//this looks to have already been completed by the instructor, even the Entry.S
-typedef struct {   // add an 'event' into this, phase2
-   unsigned int
-      edi, esi, ebp, esp, ebx, edx, ecx, eax, event, eip, cs, efl;
-} tf_t;                      // 'trapframe' type
-
 
 
 #endif                          // to prevent name mangling

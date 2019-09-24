@@ -2,8 +2,8 @@
 //
 // Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
-//#include "spede.h"
-#include "const-type.h"
+#include "spede.h"
+//#include "const-type.h"
 #include "entry.h"    // entries to kernel (TimerEntry, etc.)
 #include "tools.h"    // small handy functions
 #include "ksr.h"      // kernel service routines
@@ -12,17 +12,15 @@
 
 // declare kernel data
 
+//aren't all of theses in ext-data.h?
 // current running PID; if -1, none selected
-int run_pid;
-
+// int run_pid;
 // avail PID and those created/ready to run
-que_t avail_que;
-que_t ready_que;
-
-pcb_t pcb[PROC_MAX];
-
-unsigned int sys_time_count;
-struct i386_gate *idt;         // interrupt descriptor table
+// que_t avail_que;
+// que_t ready_que;
+// pcb_t pcb[PROC_MAX];
+// unsigned int sys_time_count;
+//struct i386_gate *idt;         // interrupt descriptor table
 
 char ch;//for kb capture breakpoint
 
@@ -58,7 +56,8 @@ void BootStrap(void) {              // set up kernel!
 }
 
 int main(void) {               // kernel boots
-	Bootstrap();
+	
+	BootStrap();
 
 	SpawnSR(&Idle);
 	SpawnSR(&Init);
@@ -76,11 +75,11 @@ void Scheduler(void) {              // choose a run_pid to run
 	if(run_pid > IDLE) return;       // a user PID is already picked
 
 	if(QueEmpty(&ready_que)) {
-	  run_pid = IDLE;               // use the Idle thread
+		run_pid = IDLE;               // use the Idle thread
 	} else {
-	  pcb[IDLE].state = READY;
-	  //EnQue(&ready_que, IDLE);
-	  run_pid = DeQue(&ready_que);  // pick a different proc
+		pcb[IDLE].state = READY;
+		//EnQue(&ready_que, IDLE);
+		run_pid = DeQue(&ready_que);  // pick a different proc
 	}
 
 	pcb[run_pid].time_count = 0;     // reset runtime count

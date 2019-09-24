@@ -10,10 +10,13 @@
 #include "ksr.h"
 
 void SpawnSR(func_p_t p) {     // arg: where process code starts
-	In SpawnSR, make sure the code and stack are being assigned to
-	a new 4KB region for Idle and Init: multiply STACK_MAX with the
-	'pid' dequeued from the 'avail_que' so a new process will occupy
-	a different 4KB of the DRAM.
+
+	//NOT FIXED YET!!!
+	
+	// In SpawnSR, make sure the code and stack are being assigned to
+	// a new 4KB region for Idle and Init: multiply STACK_MAX with the
+	// 'pid' dequeued from the 'avail_que' so a new process will occupy
+	// a different 4KB of the DRAM.
 
 	int pid;
 
@@ -66,11 +69,13 @@ void TimerSR(void) {
 void SyscallSR(void) {
 	switch (pcb[run_pid].tf_p->eax) {
 		case SYS_GET_PID:
-			copy run_pid to ebx in the trapframe of the running process
-		 
+			//copy run_pid to ebx in the trapframe of the running process
+			pcb[run_pid].tf_p->ebx run_pid;
+			
 		case SYS_GET_TIME:
-			copy the system time count to ebx in the trapframe of the running process
-
+			//copy the system time count to ebx in the trapframe of the running process
+			pcb[run_pid].tf_p->ebx = sys_time_count;
+			
 		case SYS_SLEEP:
 			SysSleep()
 
