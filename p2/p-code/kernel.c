@@ -12,22 +12,22 @@
 
 // declare kernel data
 
-//aren't all of theses in ext-data.h?
+// aren't all of these in ext-data.h?
 // current running PID; if -1, none selected
-int run_pid;
-// // avail PID and those created/ready to run
-que_t avail_que;
-que_t ready_que;
+// int run_pid;
 
-pcb_t pcb[PROC_MAX];
+// que_t avail_que; //avail pid
+// que_t ready_que; //created/ready to run pid
 
-unsigned int sys_time_count;
-struct i386_gate *idt;         // interrupt descriptor table
+// pcb_t pcb[PROC_MAX];
+
+// unsigned int sys_time_count;
+// struct i386_gate *idt;
+
+// unsigned short *sys_cursor;         // phase2
 
 char ch;//for kb capture breakpoint
 
-int i;//for loops
-unsigned short *sys_cursor;         // phase2
 
 void BootStrap(void) {              // set up kernel!
 
@@ -97,6 +97,7 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 	pcb[run_pid].tf_p = tf_p;
 
 	switch(tf_p->event) {
+		
 		case TIMER_EVENT:
 			TimerSR();         // handle tiemr event
 			break;
@@ -106,6 +107,7 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 		default:
 			cons_printf("Kernel Panic: no such event!\n");
 			breakpoint();
+		
 	}
 
 	if(cons_kbhit()) {           // if keyboard pressed

@@ -74,6 +74,7 @@ void TimerSR(void) {
 void SyscallSR(void) {
 
 	switch (pcb[run_pid].tf_p->eax) {
+		
 		case SYS_GET_PID:
 			cons_printf("SYSGETPID and ebx is %d\n", pcb[run_pid].tf_p->ebx);
 			breakpoint();
@@ -103,6 +104,7 @@ void SyscallSR(void) {
 		default:
 			cons_printf("Kernel Panic: no such syscall!\n");
 			breakpoint();
+			
 	}
 	
 }
