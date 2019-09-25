@@ -53,6 +53,9 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	//breakpoint();
     //??use a tool function to copy from 'p' to DRAM_START, for STACK_MAX bytes
 	MemCpy((char*)DRAM_START, (char *)p, STACK_MAX);
+	
+	cons_printf("pid %d dst = %d src = %d size = %d\n", pid, (char *) DRAM_START + ( pid * STACK_MAX ), (char *)p, STACK_MAX);
+	
 	//MemCpy((char*)DRAM_START, (char *)Idle, STACK_MAX);
 	//breakpoint();
     //?create trapframe for process 'pid:'
@@ -73,6 +76,8 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	//pcb[pid].tf_p->esp = 14684160;
 	//cons_printf("end of SpawnSR\n");
     //breakpoint();
+	cons_printf("in SSR tf_p loc = %d, efl = %d, cs = %d, eip = %d\n", pcb[pid].tf_p, pcb[pid].tf_p->efl, pcb[pid].tf_p->cs, pcb[pid].tf_p->eip); 
+	breakpoint();
 }
 
 

@@ -54,7 +54,7 @@ void sys_sleep(int sleep_sec) {  // phase2
 void sys_write(char *str) {             // similar to sys_sleep
 
 	asm("movl %0, %%eax;          // # for kernel to identify service
-		movl %1, %%ebx;          // sleep seconds
+		movl %1, %%ebx;          // address of str?
 		int $128"                // interrupt!
 	   :                         // no output from asm()
 	   : "g" (SYS_WRITE), "g" (str)  // 2 inputs to asm()

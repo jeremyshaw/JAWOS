@@ -94,8 +94,8 @@ void MemCpy(char *dst, char *src, unsigned int max){
 		dst++;
 		src++;
 		//apparently, *dst++ = *src++; will also work
-		cons_printf("%c", *src);
-		if(l%1024==0) breakpoint();
+		//cons_printf("%c", *src);
+		//if(l%1024==0) breakpoint();
 	}
 }
 

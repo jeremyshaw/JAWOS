@@ -43,10 +43,10 @@ void BootStrap(void) {
 
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
-	outportb(PIC_MASK_REG, PIC_MASK_VAL);
+	// outportb(PIC_MASK_REG, PIC_MASK_VAL);
 
-	//use fill_gate() to set entry # SYSCALL_EVENT to SyscallEntry (128 is somewhere?)
-	idt = get_idt_base();
+	// //use fill_gate() to set entry # SYSCALL_EVENT to SyscallEntry (128 is somewhere?)
+	// idt = get_idt_base();
 	fill_gate(&idt[SYSCALL_EVENT], (int)SyscallEntry, get_cs(), ACC_INTR_GATE, 0);
 	outportb(PIC_MASK_REG, PIC_MASK_VAL);
    
@@ -108,7 +108,6 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 	}
 	
 	Scheduler();
-	cons_printf("pid%d, ebp=%d, esp=%d, tf_p=%d, efl=%d, eip=%d\n", run_pid, pcb[run_pid].tf_p, pcb[run_pid].tf_p->ebp, pcb[run_pid].tf_p->esp, pcb[run_pid].tf_p->efl, pcb[run_pid].tf_p->eip); 
 	Loader(pcb[run_pid].tf_p);
 	
 }
