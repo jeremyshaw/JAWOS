@@ -17,13 +17,11 @@ void Number2Str(int x, char str[]) {
 		len++;
 	}
 	temp = x;
-	
-	if(len > 0){
-		for (ni = 0; ni < len; ni++) {
-			//put them in backwards!
-			str[len-(ni+1)] = ( temp % 10 ) + '0';
-			temp = temp/10;
-		}
+
+	for (ni = 0; ni < len; ni++) {
+		//put them in backwards!
+		str[len-(ni+1)] = ( temp % 10 ) + '0';
+		temp = temp/10;
 	}
 	str[len] = '\0';
 	
