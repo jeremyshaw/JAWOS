@@ -6,28 +6,26 @@
 #include "ext-data.h"
 #include "tools.h"
 
-void Number2Str(int x, char *str) {
+void Number2Str(int x, char str[]) {
+	int ni, temp, len; //ni = for loop's i, but for Num2str
 	
-	int len = 1; //needs an extra boost for the "reversing" loop
-	char *str2;
-	while(x>10){
-		int temp;
-		temp = x % 10;
-		temp += '0'; //convert to ascii digits
-		*str2 = temp;
-		str2++;		
+	temp = x;
+	len = 0;
+	
+	while(temp) {
+		temp = temp/10;
 		len++;
-		x = x/10;
 	}
-	*str2 = x;
+	temp = x;
 	
-	//now, need to reverse the string to actually make it in the correct order. Don't forget to add a NULL.
-	while(len){
-		*str = *str2;
-		str++;
-		str2--;
+	if(len > 0){
+		for (ni = 0; ni < len; ni++) {
+			//put them in backwards!
+			str[len-(ni+1)] = ( temp % 10 ) + '0';
+			temp = temp/10;
+		}
 	}
-	*str = (char)0;
+	str[len] = '\0';
 	
 }
 
