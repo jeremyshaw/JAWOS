@@ -35,6 +35,8 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	// copy code to DRAM, both code & stack are separated among processes, phase2
 	MemCpy( (char *) DRAM_START + ( pid * STACK_MAX ), (char *) p, STACK_MAX );
 	
+	cons_printf("dst = %d src = %d size = %d\n", (char *) DRAM_START + ( pid * STACK_MAX ), (char *)p, STACK_MAX);
+	
 	// point tf_p to stack & fill TF out
 	pcb[pid].tf_p = (tf_t *)DRAM_START + ( ((pid+1)*STACK_MAX) - sizeof(tf_t) );
 	pcb[pid].tf_p -> efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
