@@ -43,17 +43,14 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 	char time_str[CHR_ARY];
 
 
-	// call sys_get_pid() to get my_pid
 	my_pid = sys_get_pid();
 	
-	// call Number2Str() to convert it to pid_str
 	Number2Str(my_pid, pid_str);
 
 	while(1){
 		
 		sys_write("my PID is ");
 		
-		//call sys_write() to show my pid_str
 		sys_write(pid_str);
 		
 		sys_write("... ");
@@ -62,19 +59,14 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 		
 		os_time = sys_get_time();
 		
-		//call Number2Str() to convert it to time_str
 		Number2Str(os_time, time_str);
 		
-		// call sys_write() to show "sys time is "
 		sys_write("sys time is ");
 		
-		//call sys_write() to show time_str
 		sys_write(time_str);
 		
-		// call sys_write to show "... "
 		sys_write("... ");
 		
-		//call sys_sleep() to sleep for 1 second
 		sys_sleep(1);
 		
 	}

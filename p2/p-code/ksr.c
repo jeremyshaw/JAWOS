@@ -1,5 +1,4 @@
 // ksr.c, 159 Kernal Service Routines
-
 // Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
 #include "spede.h"
@@ -11,11 +10,6 @@
 int itsr;
 
 void SpawnSR(func_p_t p) {     // arg: where process code starts
-	
-	// In SpawnSR, make sure the code and stack are being assigned to
-	// a new 4KB region for Idle and Init: multiply STACK_MAX with the
-	// 'pid' dequeued from the 'avail_que' so a new process will occupy
-	// a different 4KB of the DRAM.
 	
 	int pid;
 	
@@ -32,22 +26,19 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	// copy code to DRAM, both code & stack are separated among processes, phase2
 	MemCpy( (char *) (DRAM_START + ( pid * STACK_MAX )), (char *)p, STACK_MAX );
 	
-	cons_printf("pid %d dst = %d src = %d size = %d\n", pid, (char *) (DRAM_START + ( pid * STACK_MAX )), (char *)p, STACK_MAX);
-	
 	// point tf_p to stack & fill TF out
 	pcb[pid].tf_p = (tf_t *)(DRAM_START + ( (pid+1)*STACK_MAX - sizeof(tf_t) ));
 	pcb[pid].tf_p -> efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
 	pcb[pid].tf_p -> cs = get_cs();
 	pcb[pid].tf_p -> eip = (DRAM_START + (pid*STACK_MAX));
 	
-	cons_printf("in SSR tf_p loc = %d, efl = %d, cs = %d, eip = %d\n", pcb[pid].tf_p, pcb[pid].tf_p->efl, pcb[pid].tf_p->cs, pcb[pid].tf_p->eip); 
-	
+
 }
 
 
 void TimerSR(void) {	// count run time and switch if hitting time limit
 	
-	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);	// what do we put in source?
+	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);
     
     sys_time_count++;
 	

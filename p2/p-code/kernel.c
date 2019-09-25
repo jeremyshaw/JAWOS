@@ -43,10 +43,6 @@ void BootStrap(void) {
 
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
-	// outportb(PIC_MASK_REG, PIC_MASK_VAL);
-
-	// //use fill_gate() to set entry # SYSCALL_EVENT to SyscallEntry (128 is somewhere?)
-	// idt = get_idt_base();
 	fill_gate(&idt[SYSCALL_EVENT], (int)SyscallEntry, get_cs(), ACC_INTR_GATE, 0);
 	outportb(PIC_MASK_REG, PIC_MASK_VAL);
    
