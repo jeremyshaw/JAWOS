@@ -114,7 +114,7 @@ void SysWrite(void) {
 	cons_printf("syswrite %c\n", str);
     while( *str != (char) 0 ) {	//show the str one char at a time (use a loop)
 		//onto the console (at the system cursor position)
-		*(sys_cursor++) = *str++;
+		*sys_cursor++ = *str++;
 		
 		// while doing so, the cursor may wrap back to the top-left corner if needed
 		if(sys_cursor >= VIDEO_END) sys_cursor = VIDEO_START;
