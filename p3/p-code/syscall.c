@@ -4,15 +4,33 @@
 #include "syscall.h"     // for SYS_GET_PID, etc., below
 
 void sys_set_cursor(int row, int col) {  // phase3
-   ...
-   ...
-   ...
+
+	int pos;
+	pos = col + (row * 80);
+	
+	asm("movl %0, %%eax;          // # for kernel to identify service
+		movl %1, %%ebx;          // sleep seconds
+		int $128"                // interrupt!
+	   :                         // no output from asm()
+	   : "g" (SYS_SET_CURSOR), "g" (pos)  // 2 inputs to asm()
+	   : "eax", "ebx"            // clobbered registers
+	);
+	
 }
 
 int sys_fork(void) {                     // phase3
-   ...
-   ...
-   ...
+	
+	int fork;
+
+	asm("movl %1, %%eax;     // # for kernel to identify service
+		int $128;           // interrupt!
+		movl %%ebx, %0"     // after, copy ebx to return
+	   : "=g" (fork)         // output from asm()
+	   : "g" (SYS_FORK)  // input to asm()
+	   : "eax", "ebx"       // clobbered registers
+	);
+
+	return fork;
 }
 
 

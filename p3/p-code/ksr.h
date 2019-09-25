@@ -12,5 +12,7 @@ void TimerSR(void);
 void SyscallSR(void);
 void SysSleep(void);
 void SysWrite(void);
+void SysSetCursor(void);
+void SysFork(void);
 
 #endif

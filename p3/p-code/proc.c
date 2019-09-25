@@ -50,15 +50,15 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 	while(1) {
 		
 		sys_sleep(1);
-		set cursor position to my row (equal to my PID), column 0,
+		//set cursor position to my row (equal to my PID), column 0,
+		sys_set_cursor(my_pid, 0);
 		
 		// call sys_write a few times to show my PID as before,
 		sys_write("my PID is ");
 		sys_write(pid_str);
 		sys_write("... ");
 
-		// get time, and convert it,
-		// sleep for a second,
+		// get time, and convert it, sleep for a second,
 		os_time = sys_get_time();
 		Number2Str(os_time, time_str);
 		sys_write("sys time is ");
@@ -66,7 +66,9 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 		sys_write("... ");
 		sys_sleep(1);
 		
-		set cursor position back again,
+		//set cursor position back again, (my_pid or row 0? I assume my_pid for row)
+		sys_set_cursor(my_pid, 0);
+		
 		//call sys_write a few times to show sys time as before.
 		os_time = sys_get_time();
 		Number2Str(os_time, time_str);

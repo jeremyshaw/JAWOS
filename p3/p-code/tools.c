@@ -7,20 +7,19 @@
 #include "tools.h"
 
 void Number2Str(int x, char str[]) {
+	
 	int ni, temp, len; //ni = for loop's i, but for Num2str
 	
 	temp = x;
 	len = 0;
-	
 	while(temp) {
 		temp = temp/10;
 		len++;
 	}
+	
 	temp = x;
-
 	for (ni = 0; ni < len; ni++) {
-		//put them in backwards!
-		str[len-(ni+1)] = ( temp % 10 ) + '0';
+		str[len-(ni+1)] = ( temp % 10 ) + '0';	// put them in backwards!
 		temp = temp/10;
 	}
 	str[len] = '\0';
