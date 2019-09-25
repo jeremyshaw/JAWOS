@@ -36,8 +36,8 @@ void BootStrap(void) {
 	Bzero((char *) &avail_que, sizeof(que_t));
 	Bzero((char *) &ready_que, sizeof(que_t));
 
-	//enqueue all the available PID numbers to avail queue
-	for(i = 0; i < QUE_MAX; i++) EnQue(&avail_que, i);
+	
+	for(i = 0; i < QUE_MAX; i++) EnQue(&avail_que, i);	// enqueue all available PID num to avail_que
 
 	sys_cursor = VIDEO_START;  // have it set to VIDEO_START in BootStrap()
 
@@ -108,7 +108,7 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 	}
 	
 	Scheduler();
-	
+	cons_printf("pid%d, ebp=%d, esp=%d, tf_p=%d, efl=%d, eip=%d\n", run_pid, pcb[run_pid].tf_p, pcb[run_pid].tf_p->ebp, pcb[run_pid].tf_p->esp, pcb[run_pid].tf_p->efl, pcb[run_pid].tf_p->eip); 
 	Loader(pcb[run_pid].tf_p);
 	
 }

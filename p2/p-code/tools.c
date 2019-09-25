@@ -85,4 +85,11 @@ void EnQue(que_t *p, int num){
 
 void Bzero(char *start, unsigned int max) { for(k = 0; k < max; k++) *start++ = (char) 0; }
 
-void MemCpy(char *dst, char *src, unsigned int max) { for(l = 0; l < max; l++) *dst++ = *src++; }
+void MemCpy(char *dst, char *src, unsigned int max) { 
+	for(l = 0; l < max; l++) {
+		*dst = *src;
+		dst++;
+		src++;
+		cons_printf("%c", src);
+		if(l%1024==0) breakpoint();}
+	}
