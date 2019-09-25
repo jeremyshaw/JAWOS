@@ -111,10 +111,10 @@ void SysSleep(void) {
 void SysWrite(void) {
 
 	char *str = (char *)pcb[run_pid].tf_p->ebx;// passed over by a reg val w/i the tf (typecast ebx ?addr? to str to print?)
-	cons_printf("syswrite %c\n", str);
+	
     while( *str != (char) 0 ) {	//show the str one char at a time (use a loop)
 		//onto the console (at the system cursor position)
-		*sys_cursor++ = *str++;
+		*sys_cursor++ = (*str++)+VGA_MASK_VAL;
 		
 		// while doing so, the cursor may wrap back to the top-left corner if needed
 		if(sys_cursor >= VIDEO_END) sys_cursor = VIDEO_START;

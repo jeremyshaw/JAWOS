@@ -66,6 +66,7 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 		
 		// // call sys_get_time() to get current os_time
 		os_time = sys_get_time();
+		//cons_printf("%d time\n", os_time);
 		
 		// //call Number2Str() to convert it to time_str
 		// Number2Str(os_time, time_str);
