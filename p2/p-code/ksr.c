@@ -25,25 +25,22 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	}
 	
 	pid = DeQue(&avail_que);
-	
 	Bzero((char *)&pcb[pid], sizeof(pcb_t));
-	
 	pcb[pid].state = READY;
-	
 	if(pid != IDLE) EnQue(&ready_que, pid);
 	
 	// copy code to DRAM, both code & stack are separated among processes, phase2
 	MemCpy( (char *) DRAM_START + ( pid * STACK_MAX ), (char *) p, STACK_MAX );
 	
-	cons_printf("dst = %d src = %d size = %d\n", (char *) DRAM_START + ( pid * STACK_MAX ), (char *)p, STACK_MAX);
+	cons_printf("pid %d dst = %d src = %d size = %d\n", pid, (char *) DRAM_START + ( pid * STACK_MAX ), (char *)p, STACK_MAX);
 	
 	// point tf_p to stack & fill TF out
-	pcb[pid].tf_p = (tf_t *)DRAM_START + ( ((pid+1)*STACK_MAX) - sizeof(tf_t) );
+	pcb[pid].tf_p = (tf_t *)DRAM_START + ( (pid+1)*STACK_MAX - sizeof(tf_t) );
 	pcb[pid].tf_p -> efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
 	pcb[pid].tf_p -> cs = get_cs();
 	pcb[pid].tf_p -> eip = DRAM_START + (pid*STACK_MAX);
 	
-	cons_printf("pid: %d\n", pid);
+	cons_printf("in SSR tf_p loc = %d, efl = %d, cs = %d, eip = %d\n", pcb[pid].tf_p, pcb[pid].tf_p->efl, pcb[pid].tf_p->cs, pcb[pid].tf_p->eip); 
 	
 }
 
@@ -58,11 +55,11 @@ void TimerSR(void) {	// count run time and switch if hitting time limit
    	pcb[run_pid].total_time++;
 	
 	//Use a loop to look for any processes that need to be waken up!
-	for(itsr = 0; itsr < PROC_MAX; itsr++) if(pcb[itsr].wake_time > sys_time_count) pcb[itsr].state = READY;
+	for(itsr = 0; itsr < PROC_MAX; itsr++) if(pcb[itsr].wake_time == sys_time_count) pcb[itsr].state = READY;
 
 	if(run_pid == IDLE) return;    // Idle exempt from below, phase2
 
-	if(pcb[run_pid].time_count >= TIME_MAX){
+	if(pcb[run_pid].time_count == TIME_MAX){
 		EnQue(&ready_que, run_pid);
 		pcb[run_pid].state = READY;
 		run_pid = NONE;
