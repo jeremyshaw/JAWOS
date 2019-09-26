@@ -79,6 +79,12 @@ void SyscallSR(void) {
 		case SYS_WRITE:
 			SysWrite();
 			break;
+		case SYS_FORK:
+			SysFork();
+			break;
+		case SYS_SET_CURSOR:
+			SysSetCursor();
+			break;
 		default:
 			cons_printf("Kernel Panic: no such syscall!\n");
 			breakpoint();	
@@ -124,29 +130,57 @@ void SysSetCursor(void) {
 }
 
 void SysFork(void) {
-   
-	// 1. allocate a new PID and add it to ready_que (similar to start of SpawnSR)
-	int pid;
-	pid = DeQue(&avail_que);
-	EnQue(&ready_que, pid);
 
-	2. copy PCB from parent process, but alter these:
-		 process state, the two time counts, and ppid
-		 
-		 
-	3. copy the process image (the 4KB DRAM) from parent to child:
-		 figure out destination and source byte addresses
-		 use tool MemCpy() to do the copying
-	4. calculate the byte distance between the two processes
-		 = (child PID - parent PID) * 4K
-	5. apply the distance to the trapframe location in child's PCB
-	6. use child's trapframe pointer to adjust these in the trapframe:
-		 eip (so it points o child's own instructions),
-		 ebp (so it points to child's local data),
-		 also, the value where ebp points to:
-			treat ebp as an integer pointer and alter what it points to
-	7. correctly set return values of sys_fork():
-		 ebx in the parent's trapframe gets the new child PID
-		 ebx in the child's trapframe gets ?
-		 
+	// 1. allocate a new PID and add it to ready_que (similar to start of SpawnSR)
+	int pidF, distance, trap, insP, bseP, bpEbp;
+	pidF = DeQue(&avail_que);
+	Bzero((char *)&pcb[pidF], sizeof(pcb_t));
+	EnQue(&ready_que, pidF);
+	cons_printf("pid %d, run_pid %d\n", pidF, run_pid);
+
+	// 2. copy PCB from parent process, but alter these:
+	// process state, the two time counts, and ppid
+	pcb[pidF].state = READY;
+	pcb[pidF].time_count = 0;
+	pcb[pidF].total_time = 0;
+	pcb[pidF].ppid = run_pid; //gives parent pid to ppid of child
+
+	// 3. copy the process image (the 4KB DRAM) from parent to child:
+	// figure out destination and source byte addresses
+	// use tool MemCpy() to do the copying
+	MemCpy((char *)(DRAM_START + (pidF * STACK_MAX)), (char *)(DRAM_START + (run_pid * STACK_MAX)), STACK_MAX);
+	cons_printf("dst = %d, dst + 4k = %d\n", (DRAM_START + (pidF * STACK_MAX)), (DRAM_START + (pidF * STACK_MAX))+4096);
+	
+	
+	// 4. calculate the byte distance between the two processes
+	// = (child PID - parent PID) * 4K
+	distance = ((pidF-run_pid) * STACK_MAX);
+
+	// 5. apply the distance to the trapframe location in child's PCB
+	//cons_printf("pidF %d tf %d run_pid %d tf %d\n", pidF, pcb[pidF].tf_p, run_pid, pcb[run_pid].tf_p);
+	trap = distance + (int)pcb[run_pid].tf_p;
+	cons_printf("pidF %d trap %d distance %d p[r].t %d\n", pidF, trap, distance, pcb[run_pid].tf_p);
+	pcb[pidF].tf_p = (tf_t*)(distance + (int)pcb[run_pid].tf_p);
+	//cons_printf("pidF %d tf %d run_pid %d tf %d\n", pidF, pcb[pidF].tf_p, run_pid, pcb[run_pid].tf_p);
+	// 6. use child's trapframe pointer to adjust these in the trapframe:
+	// eip (so it points o child's own instructions),
+	// ebp (so it points to child's local data),
+	// also, the value where ebp points to:
+	// treat ebp as an integer pointer and alter what it points to (chain of bp)
+	cons_printf("run_pid %d eip%d ebp%d\n", run_pid, pcb[run_pid].tf_p->eip, pcb[run_pid].tf_p->ebp);
+	insP = distance + (int)pcb[run_pid].tf_p->eip;	
+	bseP = distance + (int)pcb[run_pid].tf_p->ebp;
+	pcb[pidF].tf_p->eip = insP;
+	pcb[pidF].tf_p->ebp = bseP;
+	// &bpEbp = pcb[run_pid].tf_p->ebp + distance;
+	// &pcb[pidF].tf_p->ebp = bpEbp;
+	
+	cons_printf("pidF %d eip%d ebp%d\n\n", pidF, pcb[pidF].tf_p->eip, pcb[pidF].tf_p->ebp);
+
+	// 7. correctly set return values of sys_fork():
+	// ebx in the parent's trapframe gets the new child PID
+	// ebx in the child's trapframe gets ? (is it 0? - no, that's idle's permenant pid)
+	pcb[run_pid].tf_p->ebx = pidF;
+	pcb[pidF].tf_p->ebx = 0;	// pcb[pidF].ppid;	// I don't know if this is correct!
+	
 }

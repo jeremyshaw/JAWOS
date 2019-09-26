@@ -6,6 +6,11 @@
 #include "ext-data.h"
 #include "tools.h"
 
+
+int head;
+int j, k, l;
+
+
 void Number2Str(int x, char str[]) {
 	
 	int ni, temp, len; //ni = for loop's i, but for Num2str
@@ -42,12 +47,9 @@ int QueFull(que_t *p) {
 }
 
 
-int head;
-int j, k, l;
-
 int DeQue(que_t *p){
 	
-	if(QueEmpty(p) == 1) return NONE;
+	if(QueEmpty(p)) return NONE;
 	else{
 		head =  p->que[0];
 		for(j = 0; j < p->tail-1; j++){//whoops, needed the -1, lol. Or -- the tail beforehand
@@ -60,15 +62,10 @@ int DeQue(que_t *p){
 	
 }
 
-//tests if empty, dequeues and pushes elements forward
-
-/* code an EnQue() function given a number and a queue (by a pointer), it
-appends the number to the tail of the queue, or shows an error message
-and go into the GDB */
-      
+ 
 void EnQue(que_t *p, int num){
 	
-   if(QueFull(p) == 1){
+   if(QueFull(p)){
       cons_printf("Panic: queue is full, cannot EnQue!\n");
       breakpoint();
    }else{

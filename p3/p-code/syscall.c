@@ -9,7 +9,7 @@ void sys_set_cursor(int row, int col) {  // phase3
 	pos = col + (row * 80);
 	
 	asm("movl %0, %%eax;          // # for kernel to identify service
-		movl %1, %%ebx;          // sleep seconds
+		movl %1, %%ebx;          // offset?
 		int $128"                // interrupt!
 	   :                         // no output from asm()
 	   : "g" (SYS_SET_CURSOR), "g" (pos)  // 2 inputs to asm()
@@ -18,9 +18,10 @@ void sys_set_cursor(int row, int col) {  // phase3
 	
 }
 
+
 int sys_fork(void) {                     // phase3
 	
-	int fork;
+	int fork; //forked pid
 
 	asm("movl %1, %%eax;     // # for kernel to identify service
 		int $128;           // interrupt!
@@ -51,9 +52,8 @@ int sys_get_pid(void) {     // phase2
 }
 
 
-int sys_get_time(void) {     // similar to sys_get_pid
-	//do we need to return a proper time struct or will a formatted string do?
-	//nevermind, I'll do seconds as an INT and leave the stuct busting to others
+int sys_get_time(void) {     
+
 	int timeINT;
 	
 	asm("movl %1, %%eax;     // # for kernel to identify service
