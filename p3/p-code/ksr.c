@@ -161,19 +161,19 @@ void SysFork(void) {
 	trap = distance + (int)pcb[run_pid].tf_p;
 	cons_printf("pidF %d trap %d distance %d p[r].t %d\n", pidF, trap, distance, pcb[run_pid].tf_p);
 	pcb[pidF].tf_p = (tf_t*)(distance + (int)pcb[run_pid].tf_p);
-	//cons_printf("pidF %d tf %d run_pid %d tf %d\n", pidF, pcb[pidF].tf_p, run_pid, pcb[run_pid].tf_p);
+	
 	// 6. use child's trapframe pointer to adjust these in the trapframe:
 	// eip (so it points o child's own instructions),
 	// ebp (so it points to child's local data),
 	// also, the value where ebp points to:
 	// treat ebp as an integer pointer and alter what it points to (chain of bp)
 	cons_printf("run_pid %d eip%d ebp%d\n", run_pid, pcb[run_pid].tf_p->eip, pcb[run_pid].tf_p->ebp);
-	insP = distance + (int)pcb[run_pid].tf_p->eip;	
-	bseP = distance + (int)pcb[run_pid].tf_p->ebp;
-	pcb[pidF].tf_p->eip = insP;
-	pcb[pidF].tf_p->ebp = bseP;
-	// &bpEbp = pcb[run_pid].tf_p->ebp + distance;
-	// &pcb[pidF].tf_p->ebp = bpEbp;
+	//insP = distance + (int)pcb[run_pid].tf_p->eip;	
+	//bseP = distance + (int)pcb[run_pid].tf_p->ebp;
+	pcb[pidF].tf_p->eip = (distance + (int)pcb[run_pid].tf_p->eip);
+	pcb[pidF].tf_p->ebp = (distance + (int)pcb[run_pid].tf_p->ebp);
+	bpEbp = pcb[run_pid].tf_p->ebp + distance;
+	(int *) pcb[pidF].tf_p->ebp = bpEbp;
 	
 	cons_printf("pidF %d eip%d ebp%d\n\n", pidF, pcb[pidF].tf_p->eip, pcb[pidF].tf_p->ebp);
 
