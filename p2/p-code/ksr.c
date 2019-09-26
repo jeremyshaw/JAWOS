@@ -32,7 +32,6 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	pcb[pid].tf_p -> cs = get_cs();
 	pcb[pid].tf_p -> eip = (DRAM_START + (pid*STACK_MAX));
 	
-
 }
 
 
@@ -107,8 +106,7 @@ void SysWrite(void) {
 		//onto the console (at the system cursor position)
 		*sys_cursor++ = (*str++)+VGA_MASK_VAL;
 		
-		// while doing so, the cursor may wrap back to the top-left corner if needed
-		if(sys_cursor >= VIDEO_END) sys_cursor = VIDEO_START;
+		if(sys_cursor >= VIDEO_END) sys_cursor = VIDEO_START; //wrap cursor
 	}
 	
 }

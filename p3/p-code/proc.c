@@ -16,7 +16,7 @@ void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 	unsigned short *start_pos = (unsigned short *)0xb8000;
 	int flag = 0; //flat = 1 = display
 
-	while(1) {
+	while(1) { 
 		if(sys_time_count % 100 == 0) {
 			if(flag == 1) {
 				*start_pos = '*' + VGA_MASK_VAL;
@@ -28,52 +28,50 @@ void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 			}
 		}
 	}
-	
 }
 
 
 void Init(void) {  // Init, PID 1, asks/tests various OS services
 	
-	int my_pid, os_time, counter, forked_pid;
-	char pid_str[CHR_ARY], time_str[CHR_ARY];
+	int my_pid, os_time, counter, forked_pid, eipI;
+	char pid_str[CHR_ARY], time_str[CHR_ARY], eipC[CHR_ARY];
 
 	counter = 2;
 	
 	forked_pid = sys_fork();
 	if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
-	//sys_write("sys_fork() called \n");
 	
-	// forked_pid = sys_fork();
-	// if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
-	//sys_write("sys_fork() called \n");
+	forked_pid = sys_fork();
+	if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
 	
-
 	my_pid = sys_get_pid();               // what's my PID
 	Number2Str(my_pid, pid_str);          // convert # to str
 
 	while(1) {
 		
 		sys_sleep(1);
-		//set cursor position to my row (equal to my PID), column 0,
-		sys_set_cursor(my_pid, 0);
-		
-		// call sys_write a few times to show my PID as before,
-		sys_write("my PID is ");
+		sys_set_cursor(my_pid, 0);	// set position to row my_pid, column 0
+		sys_write("my PID is ");	// sys_write to show pid
 		sys_write(pid_str);
 		sys_write("... ");
-
-		// get time, and convert it, sleep for a second,
-		os_time = sys_get_time();
+		os_time = sys_get_time();	// get time, show it, and sleep 1 sec
 		Number2Str(os_time, time_str);
+		
 		sys_sleep(1);
-		
-		//set cursor position back again, (my_pid or row 0? I assume my_pid for row)
-		sys_set_cursor(my_pid, 0);
-		
-		//call sys_write a few times to show sys time as before.
-		sys_write("sys time is ");
+		sys_set_cursor(my_pid, 0);	// set cursor back again
+		sys_write("sys time is ");	// sys_write to show the time
 		sys_write(time_str);
 		sys_write("... ");
+		eipI = pcb[my_pid].tf_p->eip;
+		Number2Str(eipI, eipC);
+		
+		sys_sleep(1);
+		sys_set_cursor(my_pid, 0);
+		sys_write("eip is ");
+		sys_write(eipC);
+		sys_write("... ");
+		
+		
 	}
 }
 

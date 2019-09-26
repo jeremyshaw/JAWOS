@@ -122,7 +122,7 @@ void SysWrite(void) {
 
 void SysSetCursor(void) {
    // changes sys_cursor to the position of the row and column numbers
-   // in the trapframe CPU registers (as inserted when called by Init).
+   // in the tf CPU reg (as inserted when called by Init).
    // Hint: the video memory address for row 0, column 0 is the VIDEO_START.
    
    sys_cursor = VIDEO_START + pcb[run_pid].tf_p->ebx;
@@ -132,7 +132,8 @@ void SysSetCursor(void) {
 void SysFork(void) {
 
 	// 1. allocate a new PID and add it to ready_que (similar to start of SpawnSR)
-	int pidF, distance, trap, insP, bseP, bpEbp;
+	int pidF, distance, trap;
+	int* bpEbp;
 	pidF = DeQue(&avail_que);
 	Bzero((char *)&pcb[pidF], sizeof(pcb_t));
 	EnQue(&ready_que, pidF);
@@ -151,7 +152,6 @@ void SysFork(void) {
 	MemCpy((char *)(DRAM_START + (pidF * STACK_MAX)), (char *)(DRAM_START + (run_pid * STACK_MAX)), STACK_MAX);
 	cons_printf("dst = %d, dst + 4k = %d\n", (DRAM_START + (pidF * STACK_MAX)), (DRAM_START + (pidF * STACK_MAX))+4096);
 	
-	
 	// 4. calculate the byte distance between the two processes
 	// = (child PID - parent PID) * 4K
 	distance = ((pidF-run_pid) * STACK_MAX);
@@ -168,19 +168,20 @@ void SysFork(void) {
 	// also, the value where ebp points to:
 	// treat ebp as an integer pointer and alter what it points to (chain of bp)
 	cons_printf("run_pid %d eip%d ebp%d\n", run_pid, pcb[run_pid].tf_p->eip, pcb[run_pid].tf_p->ebp);
-	//insP = distance + (int)pcb[run_pid].tf_p->eip;	
-	//bseP = distance + (int)pcb[run_pid].tf_p->ebp;
 	pcb[pidF].tf_p->eip = (distance + (int)pcb[run_pid].tf_p->eip);
 	pcb[pidF].tf_p->ebp = (distance + (int)pcb[run_pid].tf_p->ebp);
-	bpEbp = pcb[run_pid].tf_p->ebp + distance;
-	(int *) pcb[pidF].tf_p->ebp = bpEbp;
 	
-	cons_printf("pidF %d eip%d ebp%d\n\n", pidF, pcb[pidF].tf_p->eip, pcb[pidF].tf_p->ebp);
-
+	//from phase 2
+	pcb[pidF].tf_p->efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
+	pcb[pidF].tf_p->edi = (distance + (int)pcb[run_pid].tf_p->edi);
+	pcb[pidF].tf_p->cs = get_cs();
+	bpEbp = (int*) pcb[run_pid].tf_p->ebp + distance;
+	cons_printf("pidF %d eip%d ebp%d bpEbp %d\n", pidF, pcb[pidF].tf_p->eip, pcb[pidF].tf_p->ebp, bpEbp);
+	
 	// 7. correctly set return values of sys_fork():
 	// ebx in the parent's trapframe gets the new child PID
-	// ebx in the child's trapframe gets ? (is it 0? - no, that's idle's permenant pid)
+	// ebx in the child's trapframe gets ? (is it 0?)
 	pcb[run_pid].tf_p->ebx = pidF;
-	pcb[pidF].tf_p->ebx = 0;	// pcb[pidF].ppid;	// I don't know if this is correct!
+	pcb[pidF].tf_p->ebx = 0;	
 	
 }
