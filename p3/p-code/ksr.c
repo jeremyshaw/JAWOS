@@ -125,8 +125,7 @@ void SysSetCursor(void) { sys_cursor = VIDEO_START + pcb[run_pid].tf_p->ebx; /* 
 void SysFork(void) {
 
 	// 1. allocate a new PID and add it to ready_que (similar to start of SpawnSR)
-	int pidF, distance, trap;
-	int* bpEbp;
+	int pidF, distance, trap, *bpEbp;
 	pidF = DeQue(&avail_que);
 	Bzero((char *)&pcb[pidF], sizeof(pcb_t));
 	EnQue(&ready_que, pidF);
