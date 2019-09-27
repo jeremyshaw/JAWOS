@@ -37,12 +37,10 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 	char pid_str[CHR_ARY], time_str[CHR_ARY], eipC[CHR_ARY];
 
 	counter = 2;
-	
-	forked_pid = sys_fork();
-	if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
-	
-	forked_pid = sys_fork();
-	if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
+	while(counter--){
+		forked_pid = sys_fork();
+		if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
+	}
 	
 	my_pid = sys_get_pid();               // what's my PID
 	Number2Str(my_pid, pid_str);          // convert # to str
@@ -62,6 +60,7 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 		sys_write("sys time is ");	// sys_write to show the time
 		sys_write(time_str);
 		sys_write("... ");
+		
 		eipI = pcb[my_pid].tf_p->eip;
 		Number2Str(eipI, eipC);
 		
@@ -70,8 +69,7 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 		sys_write("eip is ");
 		sys_write(eipC);
 		sys_write("... ");
-		
-		
+				
 	}
 }
 

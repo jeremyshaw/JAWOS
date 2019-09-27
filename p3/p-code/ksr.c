@@ -32,7 +32,6 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 	pcb[pid].tf_p -> cs = get_cs();
 	pcb[pid].tf_p -> eip = (DRAM_START + (pid*STACK_MAX));
 	
-
 }
 
 
@@ -95,7 +94,7 @@ void SyscallSR(void) {
 
 void SysSleep(void) {
 	
-	// from reg value w/i tf (ebx?) calc wake_time of the running process 
+	// from passed value w/i tf->ebx calc wake_time of the running process 
 	// using sys_time_count plus the sleep_sec times 100
 	int sleep_sec = pcb[run_pid].tf_p->ebx;
 	pcb[run_pid].wake_time = (sys_time_count + (sleep_sec * 100));
@@ -120,14 +119,8 @@ void SysWrite(void) {
 }
 
 
-void SysSetCursor(void) {
-   // changes sys_cursor to the position of the row and column numbers
-   // in the tf CPU reg (as inserted when called by Init).
-   // Hint: the video memory address for row 0, column 0 is the VIDEO_START.
-   
-   sys_cursor = VIDEO_START + pcb[run_pid].tf_p->ebx;
+void SysSetCursor(void) { sys_cursor = VIDEO_START + pcb[run_pid].tf_p->ebx; /* Offset in ebx */ }
 
-}
 
 void SysFork(void) {
 
@@ -137,7 +130,7 @@ void SysFork(void) {
 	pidF = DeQue(&avail_que);
 	Bzero((char *)&pcb[pidF], sizeof(pcb_t));
 	EnQue(&ready_que, pidF);
-	cons_printf("pid %d, run_pid %d\n", pidF, run_pid);
+	cons_printf("pidF %d, run_pid %d\n", pidF, run_pid);
 
 	// 2. copy PCB from parent process, but alter these:
 	// process state, the two time counts, and ppid
@@ -150,7 +143,6 @@ void SysFork(void) {
 	// figure out destination and source byte addresses
 	// use tool MemCpy() to do the copying
 	MemCpy((char *)(DRAM_START + (pidF * STACK_MAX)), (char *)(DRAM_START + (run_pid * STACK_MAX)), STACK_MAX);
-	cons_printf("dst = %d, dst + 4k = %d\n", (DRAM_START + (pidF * STACK_MAX)), (DRAM_START + (pidF * STACK_MAX))+4096);
 	
 	// 4. calculate the byte distance between the two processes
 	// = (child PID - parent PID) * 4K
@@ -173,9 +165,18 @@ void SysFork(void) {
 	
 	//from phase 2
 	pcb[pidF].tf_p->efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
-	pcb[pidF].tf_p->edi = (distance + (int)pcb[run_pid].tf_p->edi);
+	pcb[pidF].tf_p->edi = (distance + (int)pcb[run_pid].tf_p->edi);	// destination index
 	pcb[pidF].tf_p->cs = get_cs();
-	bpEbp = (int*) pcb[run_pid].tf_p->ebp + distance;
+	pcb[pidF].tf_p->eax = 0;	// neutralize the syscall var
+	
+	// heck, catch all of them.
+	pcb[pidF].tf_p->esi = (distance + (int)pcb[run_pid].tf_p->esi);	// source index
+	pcb[pidF].tf_p->esp = (distance + (int)pcb[run_pid].tf_p->esp);
+	
+	// now, to deal with the Init process' main bp, since we have been manipulating the called syscallFork's "sub" bp
+	bpEbp = (int*) (pcb[pidF].tf_p->ebp);	// var recieves ebp as int pointer
+	*bpEbp += distance;	// offset the value pointed to by pointer by value 'distance'
+	bpEbp = (int *)*bpEbp;	// convert that into a pointer
 	cons_printf("pidF %d eip%d ebp%d bpEbp %d\n", pidF, pcb[pidF].tf_p->eip, pcb[pidF].tf_p->ebp, bpEbp);
 	
 	// 7. correctly set return values of sys_fork():
