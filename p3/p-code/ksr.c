@@ -46,7 +46,7 @@ void TimerSR(void) {	// count run time and switch if hitting time limit
 	
 	//Use a loop to look for any processes that need to be waken up!
 	for(itsr = 0; itsr < PROC_MAX; itsr++) {
-		if(pcb[itsr].wake_time == sys_time_count) {
+		if((pcb[itsr].wake_time == sys_time_count) && (pcb[itsr].state == SLEEP)) {
 			pcb[itsr].state = READY;
 			EnQue(&ready_que, itsr);
 		}
