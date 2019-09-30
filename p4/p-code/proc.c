@@ -1,0 +1,65 @@
+// proc.c, 159 JAWOS
+// processes are coded here
+
+#include "const-type.h"  // VGA_MASK_VAL
+#include "ext-data.h"    // sys_time_count
+#include "syscall.h"     // sys service calls
+#include "tools.h"       // Number2Str()
+#include "proc.h"
+
+
+#define CHR_ARY 20	// max charcter array length
+
+
+void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
+
+	unsigned short *start_pos = (unsigned short *)0xb8000;
+	int flag = 0; //flat = 1 = display
+
+	while(1) { 
+		sys_rand_count++;	// p4
+		if(sys_time_count % 100 == 0) {
+			if(flag == 1) {
+				*start_pos = '*' + VGA_MASK_VAL;
+				flag = 0;
+			}
+			else {
+				*start_pos = ' ' + VGA_MASK_VAL;
+				flag = 1;
+			}
+		}
+	}
+}
+
+
+
+void Init(void) {    // illustrates a racing condition
+	int col, my_pid, forked_pid, rand;
+	char pid_str[20];
+
+	forked_pid = sys_fork();
+	if(forked_pid == NONE)sys_write("sys_fork() failed!\n");
+
+	forked_pid = sys_fork();
+	if(forked_pid == NONE)sys_write("sys_fork() failed!\n");
+
+	my_pid = sys_get_pid();              // what's my PID
+	Number2Str(my_pid, pid_str);         // convert # to str
+
+	Init has this infinite loop instead:
+	start column with 0
+	add a subloop (to loop until column reaches 70):
+		lock video mutex
+		set video cursor
+		write my PID
+		unlock video mutex
+		get a number ranging from 1 to 4 inclusive randomly
+		call sleep with that number as sleep period
+		increment column by 1
+	end subloop
+	erase my entire row (use mutex & loop, of course)
+	sleep for 30 (3 seconds)
+	(end of infinite loop)
+}
+
+
