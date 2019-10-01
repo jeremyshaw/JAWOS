@@ -7,7 +7,7 @@
 #include "tools.h"
 
 
-int head, j, k, l;
+int j, k, l;
 
 
 void Number2Str(int x, char str[]) {
@@ -32,6 +32,8 @@ void Number2Str(int x, char str[]) {
 
 
 int DeQue(que_t *p){
+	
+	int head;
 	
 	if(QueEmpty(p)) return NONE;
 	else{
@@ -59,15 +61,9 @@ void EnQue(que_t *p, int num){
    
 }
 
-int QueEmpty(que_t *p) { 
-	if (p->tail == 0) return 1;
-	return 0; 
-}
+int QueEmpty(que_t *p) { (p->tail == 0) ? (return 1) : return 0; }
 
-int QueFull(que_t *p) {
-	if (p->tail == QUE_MAX) return 1;
-	return 0;
-}
+int QueFull(que_t *p) { (p->tail == QUE_MAX) ? (return 1) : (return 0); }
 
 void Bzero(char *start, unsigned int max) { for(k = 0; k < max; k++) *start++ = (char) 0; }
 
