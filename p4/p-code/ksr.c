@@ -86,35 +86,38 @@ void SyscallSR(void) {
 			break;
 		case SYS_GET_RAND:
 			// ?=? just do this directly;
+			? = sys_get_rand();
 			break;
 		case SYS_LOCK_MUTEX:
-			// ?
+			SysLockMutex();
 			break;
 		case SYS_UNLOCK_MUTEX:
-			// ?
+			SysUnlockMutex();
 			break;
 		default:
 			cons_printf("Kernel Panic: no such syscall!\n");
 			breakpoint();	
 	}
-	
-	
-	 if run_pid is not NONE, we penalize it by
-      a. downgrade its state to READY
-      b. moving it to the back of the ready-to-run process queue
-      c. reset run_pid (is now NONE)
+		
+	// if run_pid is not NONE, we penalize it by
+	// a. downgrade its state to READY
+	// b. moving it to the back of the ready-to-run process queue
+	// c. reset run_pid (is now NONE)
+	if(run_pid!=NONE) {
+		pcb[run_pid].state = READY;
+		EnQue(&ready_que, run_pid);
+		run_pid = NONE;
+	}
 	
 }
 
 
 void SysSleep(void) {
 	
-	// from passed value w/i tf->ebx calc wake_time of the running process 
-	// using sys_time_count plus the sleep_sec times 100
 	int sleep_sec = pcb[run_pid].tf_p->ebx;
 	pcb[run_pid].wake_time = (sys_time_count + (sleep_sec * 10));	// p4, now 10 to speedup
-	pcb[run_pid].state = SLEEP;	// alter the state of the running process to SLEEP
-	run_pid = NONE;	// alter the value of run_pid to NONE
+	pcb[run_pid].state = SLEEP;	// SLEEP the running process
+	run_pid = NONE;	// No running process
 	
 }
 
@@ -135,6 +138,7 @@ void SysWrite(void) {
 
 
 void SysLockMutex(void) {
+	
 	int mutex_id;
 	
 	mutex_id = ...
@@ -149,10 +153,12 @@ void SysLockMutex(void) {
 		cons_printf("Panic: no such mutex ID!\n");
 		breakpoint();
 	}
+	
 }
 
 
 void SysUnlockMutex(void) {
+	
 	int mutex_id, released_pid;
 
 	mutex_id = ...
@@ -167,6 +173,7 @@ void SysUnlockMutex(void) {
 		cons_printf("Panic: no such mutex ID!\n");
 		breakpoint();
 	}
+	
 }
 
 		

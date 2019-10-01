@@ -46,20 +46,29 @@ void Init(void) {    // illustrates a racing condition
 	my_pid = sys_get_pid();              // what's my PID
 	Number2Str(my_pid, pid_str);         // convert # to str
 
-	Init has this infinite loop instead:
-	start column with 0
-	add a subloop (to loop until column reaches 70):
-		lock video mutex
-		set video cursor
-		write my PID
-		unlock video mutex
-		get a number ranging from 1 to 4 inclusive randomly
-		call sleep with that number as sleep period
-		increment column by 1
-	end subloop
-	erase my entire row (use mutex & loop, of course)
-	sleep for 30 (3 seconds)
-	(end of infinite loop)
+	while(1){
+		col = 0;	// start column with 0
+		sys_set_cursor(0, col);
+		for (i = 0; i <= 70; i++) {	// add a subloop (to loop until column reaches 70):
+			sys_lock_mutex(VIDEO_MUTEX);	// lock video mutex
+			
+			sys_set_cursor(i, col);	// set video cursor
+			
+			sys_write(pid_str);	// write my PID
+			
+			sys_unlock_mutex(VIDEO_MUTEX);	// unlock video mutex
+			
+			get a number ranging from 1 to 4 inclusive randomly
+			
+			sys_sleep(ranOut);	// call sleep with that number as sleep period
+			col++;	// increment column by 1
+			
+		}
+		
+		erase my entire row (use mutex & loop, of course)
+		
+		sys_sleep(30);	// sleep for 30 (3 seconds)
+	}
 }
 
 

@@ -43,6 +43,13 @@ void BootStrap(void) {
 	for(i = 0; i < QUE_MAX; i++) EnQue(&avail_que, i);	// enqueue all available PID num to avail_que
 	
 	// add code to initialize sys_rand_count and video_mutex
+	// 
+	// 
+	
+	
+	
+	
+	
 
 	sys_cursor = VIDEO_START;  // have it set to VIDEO_START in BootStrap()
 

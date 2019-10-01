@@ -12,29 +12,15 @@
 
 
 void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
-
 	unsigned short *start_pos = (unsigned short *)0xb8000;
-	int flag = 0; //flat = 1 = display
-
-	while(1) { 
-		if(sys_time_count % 100 == 0) {
-			if(flag == 1) {
-				*start_pos = '*' + VGA_MASK_VAL;
-				flag = 0;
-			}
-			else {
-				*start_pos = ' ' + VGA_MASK_VAL;
-				flag = 1;
-			}
-		}
-	}
-}
+	while(1) { (sys_time_count % 100 < 50) ? (*start_pos = '*' + VGA_MASK_VAL) : (*start_pos = ' ' + VGA_MASK_VAL); }
+}	// now it's a "reasonably" accurate flash with 1 second period, 50% duty cycle.
 
 
 void Init(void) {  // Init, PID 1, asks/tests various OS services
 	
-	int my_pid, os_time, counter, forked_pid, eipI;
-	char pid_str[CHR_ARY], time_str[CHR_ARY], eipC[CHR_ARY];
+	int my_pid, os_time, counter, forked_pid;
+	char pid_str[CHR_ARY], time_str[CHR_ARY];
 
 	counter = 2;
 	while(counter--){
@@ -61,15 +47,6 @@ void Init(void) {  // Init, PID 1, asks/tests various OS services
 		sys_write(time_str);
 		sys_write("... ");
 		
-		eipI = pcb[my_pid].tf_p->eip;
-		Number2Str(eipI, eipC);
-		
-		sys_sleep(1);
-		sys_set_cursor(my_pid, 0);
-		sys_write("eip is ");
-		sys_write(eipC);
-		sys_write("... ");
-				
 	}
 }
 

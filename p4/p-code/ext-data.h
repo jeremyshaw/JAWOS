@@ -22,6 +22,5 @@ extern struct i386_gate *idt;
 extern unsigned short * sys_cursor;
 
 extern mutex_t video_mutex;
-// like others, add the new sys_cursor newly declared in main.c
 
 #endif
