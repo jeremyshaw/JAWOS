@@ -12,24 +12,9 @@
 
 
 void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
-
 	unsigned short *start_pos = (unsigned short *)0xb8000;
-	int flag = 0; //flat = 1 = display
-
-	while(1) { 
-		sys_rand_count++;	// p4
-		if(sys_time_count % 100 == 0) {
-			if(flag == 1) {
-				*start_pos = '*' + VGA_MASK_VAL;
-				flag = 0;
-			}
-			else {
-				*start_pos = ' ' + VGA_MASK_VAL;
-				flag = 1;
-			}
-		}
-	}
-}
+	while(1) { (sys_time_count % 100 < 50) ? (*start_pos = '*' + VGA_MASK_VAL) : (*start_pos = ' ' + VGA_MASK_VAL); }
+}	// now it's a "reasonably" accurate flash with 1 second period, 50% duty cycle.
 
 
 
@@ -38,10 +23,10 @@ void Init(void) {    // illustrates a racing condition
 	char pid_str[20];
 
 	forked_pid = sys_fork();
-	if(forked_pid == NONE)sys_write("sys_fork() failed!\n");
+	if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
 
 	forked_pid = sys_fork();
-	if(forked_pid == NONE)sys_write("sys_fork() failed!\n");
+	if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
 
 	my_pid = sys_get_pid();              // what's my PID
 	Number2Str(my_pid, pid_str);         // convert # to str

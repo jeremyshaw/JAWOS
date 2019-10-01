@@ -169,7 +169,6 @@ void SysUnlockMutex(void) {
 	
 }
 
-		
 
 void SysSetCursor(void) { sys_cursor = VIDEO_START + pcb[run_pid].tf_p->ebx; /* Offset in ebx */ }
 
@@ -204,7 +203,6 @@ void SysFork(void) {
 	// 6. use child's trapframe pointer to adjust these in the trapframe:
 	// eip (so it points o child's own instructions),
 	// ebp (so it points to child's local data),
-	//cons_printf("parent of fork run_pid %d eip%d ebp%d\n", run_pid, pcb[run_pid].tf_p->eip, pcb[run_pid].tf_p->ebp);
 	pcb[pidF].tf_p->eip = (distance + (int)pcb[run_pid].tf_p->eip);
 	pcb[pidF].tf_p->ebp = (distance + (int)pcb[run_pid].tf_p->ebp);
 	
