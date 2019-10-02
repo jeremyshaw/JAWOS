@@ -61,7 +61,7 @@ unsigned sys_get_rand(void) {	// 135
 	asm("movl %1, %%eax;     // # for kernel to identify service
 		int $128;           // interrupt!
 		movl %%ebx, %0"     // after, copy ebx to return
-		: "=g" (randNum)         // output from asm()
+		: "=g" (ranNum)         // output from asm()
 		: "g" (SYS_GET_RAND)  // input to asm()
 		: "eax", "ebx"       // clobbered registers
 	);

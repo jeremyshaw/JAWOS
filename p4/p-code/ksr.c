@@ -6,14 +6,14 @@
 #include "ext-data.h"
 #include "tools.h"
 #include "ksr.h"
+#include "syscall.h"
 
-int itsr;
 
 void SpawnSR(func_p_t p) {     // arg: where process code starts
 	
 	int pid;
 	
-	if(QueEmpty(&avail_que)==1){
+	if(QueEmpty(&avail_que)){
 		cons_printf("Panic: out of PID!\n");
 		breakpoint();
 	}
@@ -37,10 +37,11 @@ void SpawnSR(func_p_t p) {     // arg: where process code starts
 
 void TimerSR(void) {	// count run time and switch if hitting time limit
 	
+	int itsr;
+	
 	outportb(PIC_CONT_REG, TIMER_SERVED_VAL);
     
-    sys_time_count++;
-	
+	sys_time_count++;
 	pcb[run_pid].time_count++;
    	pcb[run_pid].total_time++;
 	
@@ -85,8 +86,7 @@ void SyscallSR(void) {
 			SysSetCursor();
 			break;
 		case SYS_GET_RAND:
-			// ?=? just do this directly;
-			? = sys_get_rand();
+			pcb[run_pid].tf_p->ebx = sys_rand_count;	// just do this directly; 1-4 inclusive
 			break;
 		case SYS_LOCK_MUTEX:
 			SysLockMutex();
@@ -99,7 +99,7 @@ void SyscallSR(void) {
 			breakpoint();	
 	}
 		
-	if(run_pid!=NONE) {	// if run_pid is not NONE, we penalize it by
+	if(run_pid != NONE) {	// if run_pid is not NONE, we penalize it by
 		pcb[run_pid].state = READY;	// a. downgrade its state to READY
 		EnQue(&ready_que, run_pid);	// b. moving it to the back of the ready-to-run process queue
 		run_pid = NONE;	// c. reset run_pid (is now NONE)
@@ -121,7 +121,6 @@ void SysSleep(void) {
 void SysWrite(void) {
 
 	char *str = (char *)pcb[run_pid].tf_p->ebx;	// passed over by a reg val w/i the tf (typecast ebx ?addr? to str to print?)
-	
     while( *str != (char) 0 ) {	//show the str one char at a time (use a loop)
 		*sys_cursor++ = (*str++)+VGA_MASK_VAL;	// onto console @ sys_cursor position
 		if(sys_cursor >= VIDEO_END) sys_cursor = VIDEO_START;	// wrap back to top left
@@ -133,14 +132,15 @@ void SysWrite(void) {
 void SysLockMutex(void) {
 	
 	int mutex_id;
+	mutex_id = video_mutex.id;	// I had to expand the mutex type to include an ID
 	
-	mutex_id = ...
-	
-	if(mutex_id == ...) {
-		if the lock of the ... is UNLOCKED
-			set the lock of the mutex to be LOCKED
-		} else {
-			suspend the running/calling process: steps 1, 2, 3
+	if(mutex_id == VIDEO_MUTEX) {
+		if(video_mutex.lock==UNLOCKED)	// if the lock of the ... is UNLOCKED
+			video_mutex.lock=LOCKED;	// set the lock of the mutex to be LOCKED
+		else {	// suspend the running/calling process: steps 1, 2, 3
+			pcb[run_pid].state = SLEEP;
+			EnQue(&video_mutex.suspend_que, run_pid);
+			run_pid = NONE;
 		}
 	} else {
 		cons_printf("Panic: no such mutex ID!\n");
@@ -153,15 +153,15 @@ void SysLockMutex(void) {
 void SysUnlockMutex(void) {
 	
 	int mutex_id, released_pid;
+	mutex_id = video_mutex.id;
 
-	mutex_id = ...
-
-	if(mutex_id == ...) {
-		if(the suspend queue of the mutex is NOT empty) {
-		release the 1st process in the suspend queue: steps 1, 2, 3
-		} else {
-		 set the lock of the mutex to be UNLOCKED
-		}
+	if(mutex_id == VIDEO_MUTEX) {
+		if(QueEmpty(&video_mutex.suspend_que) != 1) {	// if the suspend queue of the mutex is NOT empty
+			// release the 1st process in the suspend queue: steps 1, 2, 3
+			released_pid = DeQue(&video_mutex.suspend_que);
+			EnQue(&ready_que, released_pid);
+			pcb[released_pid].state = READY;
+		} else video_mutex.lock = UNLOCKED;	// set the lock of the mutex to be UNLOCKED
 	} else {
 		cons_printf("Panic: no such mutex ID!\n");
 		breakpoint();

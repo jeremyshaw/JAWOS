@@ -13,8 +13,6 @@
 #include <spede/machine/seg.h>
 #include <spede/stdio.h>
 
-int col, i, ranOut;
-
 //prototype of Idle() coded in proc.c 
 void Idle(void);
 void Init(void);

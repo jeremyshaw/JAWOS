@@ -9,6 +9,7 @@
 #include "ksr.h"      // kernel service routines
 #include "proc.h"     // all user process code here
 #include "ext-data.h"
+#include "syscall.h"
 
 // declare kernel data
 
@@ -38,18 +39,13 @@ void BootStrap(void) {
 
 	Bzero((char *) &avail_que, sizeof(que_t));
 	Bzero((char *) &ready_que, sizeof(que_t));
-
 	
 	for(i = 0; i < QUE_MAX; i++) EnQue(&avail_que, i);	// enqueue all available PID num to avail_que
 	
 	// add code to initialize sys_rand_count and video_mutex
-	// 
-	// 
-	
-	
-	
-	
-	
+	sys_rand_count = 0;
+	video_mutex.lock = UNLOCKED;
+	video_mutex.id = VIDEO_MUTEX;
 
 	sys_cursor = VIDEO_START;  // have it set to VIDEO_START in BootStrap()
 
@@ -71,7 +67,7 @@ int main(void) {	// kernel boots
 	run_pid = IDLE;	// set run_pid to IDLE (defined constant)
 	
 	Loader(pcb[run_pid].tf_p);
-
+	
 	return 0; // never would actually reach here
 	
 }

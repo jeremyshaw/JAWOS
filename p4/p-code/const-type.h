@@ -18,6 +18,7 @@
 
 #define NONE -1                 // to indicate none
 #define IDLE 0                  // Idle thread PID 0
+
 #define DRAM_START 0xe00000     // 14 MB
 
 #define SYSCALL_EVENT 128       // syscall event identifier code, phase2
@@ -32,6 +33,7 @@
 #define SYS_UNLOCK_MUTEX 137
 
 #define VIDEO_MUTEX 0
+
 #define VIDEO_START (unsigned short *) 0xb8000 //uns short is 2 byte pointer in this case
 #define VIDEO_END (unsigned short *) 0xb8000 + 25 * 80
 
@@ -54,7 +56,8 @@ typedef enum {LOCKED, UNLOCKED} lock_t;	// make sure this name is okay
 #define UNLOCKED 0
 
 typedef struct {
-	int lock;
+	int id;	// I think we need this.
+	lock_t lock;
 	que_t suspend_que;
 } mutex_t;	// make sure this name is okay
 

@@ -13,43 +13,51 @@
 
 void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 	unsigned short *start_pos = (unsigned short *)0xb8000;
-	while(1) { (sys_time_count % 100 < 50) ? (*start_pos = '*' + VGA_MASK_VAL) : (*start_pos = ' ' + VGA_MASK_VAL); }
+	while(1) { 
+		if (sys_time_count % 100 < 50)
+			*start_pos = '*' + VGA_MASK_VAL;
+		else *start_pos = ' ' + VGA_MASK_VAL; 
+		sys_rand_count++;	// part of the "random" counter	
+	}
 }	// now it's a "reasonably" accurate flash with 1 second period, 50% duty cycle.
 
 
-
 void Init(void) {    // illustrates a racing condition
-	int col, my_pid, forked_pid, rand, i, j;
-	char pid_str[20];
-
-	forked_pid = sys_fork();
-	if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
-
-	forked_pid = sys_fork();
-	if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
+	int col, my_pid, counter, forked_pid, rand;
+	char pid_str[CHR_ARY];
+	
+	counter = 2;
+	while(counter--){
+		forked_pid = sys_fork();
+		if(forked_pid == NONE) sys_write("sys_fork() failed!\n");
+	}
 
 	my_pid = sys_get_pid();              // what's my PID
 	Number2Str(my_pid, pid_str);         // convert # to str
 
 	while(1){
-		col = 0;	// start column with 0
-		sys_set_cursor(0, col);
-		for (i = 0; i < 70; i++) {	// add a subloop (to loop until column reaches 70):
+		
+		// col = 0;	// start column with 0	// integrated into for loop counter
+		// sys_set_cursor(my_pid, col);
+		for (col = 0; col < 70; col++) {	// add a subloop (to loop until column reaches 70):
 			sys_lock_mutex(VIDEO_MUTEX);	// lock video mutex
-			sys_set_cursor(i, col);	// set video cursor
+			sys_set_cursor(my_pid, col);	// set video cursor
 			sys_write(pid_str);	// write my PID
 			sys_unlock_mutex(VIDEO_MUTEX);	// unlock video mutex
-			rand = sys_get_rand();	// get a number ranging from 1 to 4 inclusive randomly
-			sys_sleep(ranOut);	// call sleep with that number as sleep period
-			col++;	// increment column by 1
+			rand = sys_get_rand() % 4 + 1;	// get a number ranging from 1 to 4 inclusive randomly
+			sys_sleep(rand);	// call sleep with that number as sleep period
 		}
 		
 		// erase my entire row (use mutex & loop, of course)
 		sys_lock_mutex(VIDEO_MUTEX);
-		for(j = 0; j < 70; j++) { sys_write(' '); }
+		for(col = 0; col < 70; col++) { 
+			sys_set_cursor(my_pid, col);
+			sys_write(" "); 
+		}
 		sys_unlock_mutex(VIDEO_MUTEX);
 		
 		sys_sleep(30);	// sleep for 30 (3 seconds)
+		
 	}
 }
 
