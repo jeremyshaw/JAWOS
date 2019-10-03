@@ -99,6 +99,7 @@ void SyscallSR(void) {
 			breakpoint();	
 	}
 		
+	// basically, any syscall causes a demotion into a RR
 	if(run_pid != NONE) {	// if run_pid is not NONE, we penalize it by
 		pcb[run_pid].state = READY;	// a. downgrade its state to READY
 		EnQue(&ready_que, run_pid);	// b. moving it to the back of the ready-to-run process queue
@@ -135,10 +136,10 @@ void SysLockMutex(void) {
 	mutex_id = video_mutex.id;	// I had to expand the mutex type to include an ID
 	
 	if(mutex_id == VIDEO_MUTEX) {
-		if(video_mutex.lock==UNLOCKED)	// if the lock of the ... is UNLOCKED
-			video_mutex.lock=LOCKED;	// set the lock of the mutex to be LOCKED
+		if(video_mutex.lock == UNLOCKED)	// if the lock of the ... is UNLOCKED
+			video_mutex.lock = LOCKED;	// set the lock of the mutex to be LOCKED
 		else {	// suspend the running/calling process: steps 1, 2, 3
-			pcb[run_pid].state = SLEEP;
+			pcb[run_pid].state = SLEEP;	// SLEEP, instead?
 			EnQue(&video_mutex.suspend_que, run_pid);
 			run_pid = NONE;
 		}
@@ -156,11 +157,11 @@ void SysUnlockMutex(void) {
 	mutex_id = video_mutex.id;
 
 	if(mutex_id == VIDEO_MUTEX) {
-		if(QueEmpty(&video_mutex.suspend_que) != 1) {	// if the suspend queue of the mutex is NOT empty
-			// release the 1st process in the suspend queue: steps 1, 2, 3
+		if(QueEmpty(&video_mutex.suspend_que) != 1) {	// if suspend_que of the mutex is NOT empty
+			// release the 1st process in suspend_que: steps 1, 2, 3
 			released_pid = DeQue(&video_mutex.suspend_que);
-			EnQue(&ready_que, released_pid);
 			pcb[released_pid].state = READY;
+			EnQue(&ready_que, released_pid);
 		} else video_mutex.lock = UNLOCKED;	// set the lock of the mutex to be UNLOCKED
 	} else {
 		cons_printf("Panic: no such mutex ID!\n");
@@ -214,6 +215,9 @@ void SysFork(void) {
 	*bpEbp += distance;	// offset the value pointed to by pointer by value 'distance'
 	bpEbp = (int *)*bpEbp;	// convert that into a pointer
 	// that took all the way until ptr5.c in your "PtrBasics" tutorial
+	
+	//bpEbp[0] += distance
+	//bpEbp[1] += distance (same as the ret deal below)
 	
 	// also return address (from in class on Sept30) - otherwise, the eip will just jump back to parent location
 	ret = (int*) (pcb[pidF].tf_p->ebp+4);

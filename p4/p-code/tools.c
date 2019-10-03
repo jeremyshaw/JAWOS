@@ -69,7 +69,7 @@ int QueEmpty(que_t *p) {
 int QueFull(que_t *p) { 
 	if (p->tail == QUE_MAX) return 1;
 	return 0; 
-	}
+}
 
 void Bzero(char *start, unsigned int max) { for(k = 0; k < max; k++) *start++ = (char) 0; }
 

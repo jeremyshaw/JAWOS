@@ -23,7 +23,7 @@ void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 
 
 void Init(void) {    // illustrates a racing condition
-	int col, my_pid, counter, forked_pid, random;
+	int col, my_pid, counter, forked_pid, rand;
 	char pid_str[CHR_ARY];
 	
 	counter = 2;
@@ -44,8 +44,8 @@ void Init(void) {    // illustrates a racing condition
 			sys_set_cursor(my_pid, col);	// set video cursor
 			sys_write(pid_str);	// write my PID
 			sys_unlock_mutex(VIDEO_MUTEX);	// unlock video mutex
-			random = sys_get_rand() % 4 + 1;	// get a number ranging from 1 to 4 inclusive randomly
-			sys_sleep(random);	// call sleep with that number as sleep period
+			rand = sys_get_rand() % 4 + 1;	// get a number ranging from 1 to 4 inclusive randomly
+			sys_sleep(rand);	// call sleep with that number as sleep period
 		}
 		
 		// erase my entire row (use mutex & loop, of course)

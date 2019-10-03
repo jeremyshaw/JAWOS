@@ -44,6 +44,7 @@ void BootStrap(void) {
 	
 	// add code to initialize sys_rand_count and video_mutex
 	sys_rand_count = 0;
+	// we apparently have to bzero this, which means there is no lock type, rather, it should be an INT as instructed.
 	video_mutex.lock = UNLOCKED;
 	video_mutex.id = VIDEO_MUTEX;
 
