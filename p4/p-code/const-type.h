@@ -33,6 +33,8 @@
 #define SYS_UNLOCK_MUTEX 137
 
 #define VIDEO_MUTEX 0
+#define LOCKED 1
+#define UNLOCKED 0	// this works because Bzero in Bootstrap
 
 #define VIDEO_START (unsigned short *) 0xb8000 //uns short is 2 byte pointer in this case
 #define VIDEO_END (unsigned short *) 0xb8000 + 25 * 80
@@ -40,24 +42,25 @@
 
 typedef void(*func_p_t)(void);
 
-typedef enum {AVAIL, READY, RUN, SLEEP} state_t;
+typedef enum {AVAIL, READY, RUN, SLEEP, SUSPEND} state_t;
 #define AVAIL 0
 #define READY 1
 #define RUN 2
 #define SLEEP 3
+#define SUSPEND 4
 
 typedef struct {
 	int tail;
 	int que[QUE_MAX];
 } que_t;
 
-typedef enum {LOCKED, UNLOCKED} lock_t;	// make sure this name is okay
-#define LOCKED 1
-#define UNLOCKED 0
+// I liked this better :D
+// typedef enum {LOCKED, UNLOCKED} lock_t;	// make sure this name is okay
+// #define LOCKED 1
+// #define UNLOCKED 0
 
 typedef struct {
-	int id;	// I think we need this.
-	lock_t lock;
+	int lock;
 	que_t suspend_que;
 } mutex_t;	// make sure this name is okay
 

@@ -86,7 +86,8 @@ void SyscallSR(void) {
 			SysSetCursor();
 			break;
 		case SYS_GET_RAND:
-			pcb[run_pid].tf_p->ebx = sys_rand_count;	// just do this directly; 1-4 inclusive
+			pcb[run_pid].tf_p->ebx = sys_rand_count;	// just do this directly
+			// cons_printf("%d:%d ", run_pid, pcb[run_pid].tf_p->ebx % 4 + 1);
 			break;
 		case SYS_LOCK_MUTEX:
 			SysLockMutex();
@@ -133,14 +134,14 @@ void SysWrite(void) {
 void SysLockMutex(void) {
 	
 	int mutex_id;
-	mutex_id = video_mutex.id;	// I had to expand the mutex type to include an ID
+	mutex_id = pcb[run_pid].tf_p->ebx;
 	
 	if(mutex_id == VIDEO_MUTEX) {
 		if(video_mutex.lock == UNLOCKED)	// if the lock of the ... is UNLOCKED
 			video_mutex.lock = LOCKED;	// set the lock of the mutex to be LOCKED
 		else {	// suspend the running/calling process: steps 1, 2, 3
-			pcb[run_pid].state = SLEEP;	// SLEEP, instead?
 			EnQue(&video_mutex.suspend_que, run_pid);
+			pcb[run_pid].state = SUSPEND;
 			run_pid = NONE;
 		}
 	} else {
@@ -154,7 +155,7 @@ void SysLockMutex(void) {
 void SysUnlockMutex(void) {
 	
 	int mutex_id, released_pid;
-	mutex_id = video_mutex.id;
+	mutex_id = pcb[run_pid].tf_p->ebx;
 
 	if(mutex_id == VIDEO_MUTEX) {
 		if(QueEmpty(&video_mutex.suspend_que) != 1) {	// if suspend_que of the mutex is NOT empty
@@ -177,7 +178,7 @@ void SysSetCursor(void) { sys_cursor = VIDEO_START + pcb[run_pid].tf_p->ebx; /* 
 void SysFork(void) {
 
 	// 1. allocate a new PID and add it to ready_que (similar to start of SpawnSR)
-	int pidF, distance, *bpEbp, *ret;
+	int pidF, distance, *bpEbp;
 	pidF = DeQue(&avail_que);
 	Bzero((char *)&pcb[pidF], sizeof(pcb_t));
 	EnQue(&ready_que, pidF);
@@ -187,7 +188,7 @@ void SysFork(void) {
 	pcb[pidF].state = READY;
 	pcb[pidF].time_count = 0;
 	pcb[pidF].total_time = 0;
-	pcb[pidF].ppid = run_pid; //gives parent pid to ppid of child
+	pcb[pidF].ppid = run_pid; // gives parent pid to ppid of child
 
 	// 3. copy the process image (the 4KB DRAM) from parent to child:
 	// figure out destination and source byte addresses
@@ -204,25 +205,31 @@ void SysFork(void) {
 	// 6. use child's trapframe pointer to adjust these in the trapframe:
 	// eip (so it points o child's own instructions),
 	// ebp (so it points to child's local data),
-	pcb[pidF].tf_p->eip = (distance + (int)pcb[run_pid].tf_p->eip);
-	pcb[pidF].tf_p->ebp = (distance + (int)pcb[run_pid].tf_p->ebp);
+	pcb[pidF].tf_p->eip = (distance + pcb[run_pid].tf_p->eip);
+	pcb[pidF].tf_p->ebp = (distance + pcb[run_pid].tf_p->ebp);
+	
+	// let's get them all
+	// pcb[pidF].tf_p->esi = (distance + pcb[run_pid].tf_p->esi);
+	// pcb[pidF].tf_p->edi = (distance + pcb[run_pid].tf_p->edi);
+	// pcb[pidF].tf_p->esp = (distance + pcb[run_pid].tf_p->esp);
+	// pcb[pidF].tf_p->cs = (pcb[run_pid].tf_p->cs);
 	
 	// also, the value where ebp points to:
 	// treat ebp as an integer pointer and alter what it points to (chain of bp)
 	
 	// now, to deal with the Init process' main bp, since we have been manipulating the called syscallFork's "sub" bp
-	bpEbp = (int*) (pcb[pidF].tf_p->ebp);	// var recieves ebp as int pointer
-	*bpEbp += distance;	// offset the value pointed to by pointer by value 'distance'
-	bpEbp = (int *)*bpEbp;	// convert that into a pointer
-	// that took all the way until ptr5.c in your "PtrBasics" tutorial
-	
-	//bpEbp[0] += distance
-	//bpEbp[1] += distance (same as the ret deal below)
-	
-	// also return address (from in class on Sept30) - otherwise, the eip will just jump back to parent location
-	ret = (int*) (pcb[pidF].tf_p->ebp+4);
-	*ret += distance;
-	ret = (int *) *ret;
+	bpEbp = (int*) (pcb[pidF].tf_p->ebp);
+	bpEbp[0] += distance;	// for ebp of the caller
+	bpEbp[1] += distance;	// handles the iret/eip
+	// cons_printf("\npidF %d\n", pidF);
+	// for(i = 0; i < 12; i++)
+		// cons_printf("%d ", bpEbp[i]);
+	// cons_printf("eip %d ebp %d", pcb[pidF].tf_p->eip, pcb[pidF].tf_p->ebp);
+	// bpEbp[3] += distance;
+	// bpEbp[4] += distance;
+	// bpEbp[5] += distance;
+	// bpEbp[6] += distance;
+	// bpEbp = (int*)*bpEbp;
 	
 	// 7. correctly set return values of sys_fork():
 	pcb[run_pid].tf_p->ebx = pidF;	// ebx in the parent's trapframe gets the new child PID
