@@ -31,7 +31,7 @@ void Init(void) {    // illustrates a racing condition
 	int col, my_pid, counter, forked_pid, rand;
 	char pid_str[CHR_ARY];
 	
-	counter = 3;
+	counter = 2;
 	while(counter--){
 		forked_pid = sys_fork();
 		if(forked_pid == NONE) sys_write("sys_fork() failed!\n");

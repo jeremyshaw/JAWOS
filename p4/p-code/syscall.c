@@ -97,16 +97,14 @@ void sys_sleep(int sleep_sec) {  // phase2
 
 
 void sys_set_cursor(int row, int col) {  // phase3
-
-	int pos;
-	pos = col + (row * 80);
 	
 	asm("movl %0, %%eax;          // # for kernel to identify service
 		movl %1, %%ebx;          // offset?
+		movl %2, %%edx;
 		int $128"                // interrupt!
 	   :                         // no output from asm()
-	   : "g" (SYS_SET_CURSOR), "g" (pos)  // 2 inputs to asm()
-	   : "eax", "ebx"            // clobbered registers
+	   : "g" (SYS_SET_CURSOR), "g" (row), "g" (col)  // 2 inputs to asm()
+	   : "eax", "ebx", "edx"            // clobbered registers
 	);
 	
 }

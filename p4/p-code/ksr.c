@@ -172,7 +172,14 @@ void SysUnlockMutex(void) {
 }
 
 
-void SysSetCursor(void) { sys_cursor = VIDEO_START + pcb[run_pid].tf_p->ebx; /* Offset in ebx */ }
+void SysSetCursor(void) { 
+	
+	int row, col;
+	row = pcb[run_pid].tf_p->ebx;
+	col = pcb[run_pid].tf_p->edx;
+	sys_cursor = VIDEO_START + (row * 80) + col; 
+	
+}
 
 
 void SysFork(void) {
@@ -221,15 +228,6 @@ void SysFork(void) {
 	bpEbp = (int*) (pcb[pidF].tf_p->ebp);
 	bpEbp[0] += distance;	// for ebp of the caller
 	bpEbp[1] += distance;	// handles the iret/eip
-	// cons_printf("\npidF %d\n", pidF);
-	// for(i = 0; i < 12; i++)
-		// cons_printf("%d ", bpEbp[i]);
-	// cons_printf("eip %d ebp %d", pcb[pidF].tf_p->eip, pcb[pidF].tf_p->ebp);
-	// bpEbp[3] += distance;
-	// bpEbp[4] += distance;
-	// bpEbp[5] += distance;
-	// bpEbp[6] += distance;
-	// bpEbp = (int*)*bpEbp;
 	
 	// 7. correctly set return values of sys_fork():
 	pcb[run_pid].tf_p->ebx = pidF;	// ebx in the parent's trapframe gets the new child PID
