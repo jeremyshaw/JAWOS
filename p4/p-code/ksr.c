@@ -192,6 +192,7 @@ void SysFork(void) {
 
 	// 2. copy PCB from parent process, but alter these:
 	// process state, the two time counts, and ppid
+	MemCpy((char*)&pcb[pidF], (char*)&pcb[run_pid], sizeof(pcb_t));
 	pcb[pidF].state = READY;
 	pcb[pidF].time_count = 0;
 	pcb[pidF].total_time = 0;
@@ -215,12 +216,6 @@ void SysFork(void) {
 	pcb[pidF].tf_p->eip = (distance + pcb[run_pid].tf_p->eip);
 	pcb[pidF].tf_p->ebp = (distance + pcb[run_pid].tf_p->ebp);
 	
-	// let's get them all
-	// pcb[pidF].tf_p->esi = (distance + pcb[run_pid].tf_p->esi);
-	// pcb[pidF].tf_p->edi = (distance + pcb[run_pid].tf_p->edi);
-	// pcb[pidF].tf_p->esp = (distance + pcb[run_pid].tf_p->esp);
-	// pcb[pidF].tf_p->cs = (pcb[run_pid].tf_p->cs);
-	
 	// also, the value where ebp points to:
 	// treat ebp as an integer pointer and alter what it points to (chain of bp)
 	
@@ -232,5 +227,6 @@ void SysFork(void) {
 	// 7. correctly set return values of sys_fork():
 	pcb[run_pid].tf_p->ebx = pidF;	// ebx in the parent's trapframe gets the new child PID
 	pcb[pidF].tf_p->ebx = 0;	// ebx in the child's trapframe gets ? (is it 0?)
+	// cons_printf("pidF %d t_c %d t_t %d ebx %d ppid %d\n", pidF, pcb[pidF].time_count, pcb[pidF].total_time, pcb[pidF].tf_p->ebx, pcb[pidF].ppid);
 	
 }

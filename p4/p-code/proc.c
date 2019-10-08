@@ -51,26 +51,6 @@ void Init(void) {    // illustrates a racing condition
 			sys_sleep(rand % 4 + 1);
 		}
 		
-		// sys_lock_mutex(VIDEO_MUTEX);
-		// rand = pcb[sys_get_pid()].tf_p->eip;
-		// Number2Str(rand, pid_str);
-		// sys_set_cursor(my_pid, 0);
-		// sys_write(pid_str);
-		// rand = pcb[sys_get_pid()].tf_p->ebp;
-		// Number2Str(rand, pid_str);
-		// sys_set_cursor(my_pid, 10);
-		// sys_write(pid_str);
-		// rand = pcb[sys_get_pid()].tf_p->esp;
-		// Number2Str(rand, pid_str);
-		// sys_set_cursor(my_pid, 20);
-		// sys_write(pid_str);
-		// rand = pcb[sys_get_pid()].tf_p->eip;
-		// Number2Str(rand, pid_str);
-		// sys_set_cursor(my_pid, 30);
-		// sys_write(pid_str);
-		// sys_unlock_mutex(VIDEO_MUTEX);
-		// sys_sleep(sys_get_rand() % 4 + 1);
-		
 		sys_lock_mutex(VIDEO_MUTEX);
 		for (col = 0; col < 70; col++) {
 			sys_set_cursor(my_pid, col);
