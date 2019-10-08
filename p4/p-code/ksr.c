@@ -187,7 +187,6 @@ void SysFork(void) {
 	// 1. allocate a new PID and add it to ready_que (similar to start of SpawnSR)
 	int pidF, distance, *bpEbp;
 	pidF = DeQue(&avail_que);
-	Bzero((char *)&pcb[pidF], sizeof(pcb_t));
 	EnQue(&ready_que, pidF);
 
 	// 2. copy PCB from parent process, but alter these:
