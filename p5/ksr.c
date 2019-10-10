@@ -86,8 +86,7 @@ void SyscallSR(void) {
 			SysSetCursor();
 			break;
 		case SYS_GET_RAND:
-			pcb[run_pid].tf_p->ebx = sys_rand_count;	// just do this directly
-			// cons_printf("%d:%d ", run_pid, pcb[run_pid].tf_p->ebx % 4 + 1);
+			pcb[run_pid].tf_p->ebx = sys_rand_count;
 			break;
 		case SYS_LOCK_MUTEX:
 			SysLockMutex();
@@ -125,14 +124,18 @@ void SysExit(void) {
 		pcb[pcb[run_pid].ppid].state = READY;
 		EnQue(&ready_que, pcb[run_pid].ppid);
 
-         // also:
-            // pass over exiting PID to parent
-            // pass over exit code to parent
+        // also:
+        // pass over exiting PID to parent
+        // pass over exit code to parent
 		
-
+		
 		// also:
-            // reclaim child resources
-            // no running process anymore
+        // reclaim child resources
+        // no running process anymore
+		// Bzero((char*)(DRAM_START + (run_pid*STACK_MAX)), STACK_MAX);
+		Bzero((char *)&pcb[run_pid], sizeof(pcb_t));
+		EnQue(&avail_pid, run_pid);
+		run_pid = NONE;
 		
 	}
 	
@@ -144,12 +147,20 @@ void SysWait(void) {
 	
 	for(i = 0; i < PROC_MAX; i++) {	// any child called to exit?
 		
-		if(found one) {
+		if(!found one) {
+			// parent is blocked into WAIT state
+			// no running process anymore
+			pcb[pcb[run_pid].ppid].state = WAIT;
+			run_pid = NONE;
+		} else {
+			// pass over its PID to parent
+			// pass over its exit code to parent
+			// reclaim child resources
 			
+			// this isn't done right, right now. The syscall.c isn't setup properly
+			pcb[pcb[run_pid].ppid].tf_p->ebx = run_pid;
+			pcb[pcb[run_pid].ppid].tf_p->edx = pcb[run_pid].tf_p->edx;	// exit_code;
 		}
-		
-		pcb[pcb[run_pid].ppid].state = WAIT;
-		run_pid = NONE;
 		
 	}
 }

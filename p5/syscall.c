@@ -52,7 +52,8 @@ int sys_get_time(void) {
 	return timeINT;
 	
 }
-
+//signal (SIGINT, WriteMsg);
+//void WriteMsg(void) { printf("Howdy!\n"); }
 
 unsigned sys_get_rand(void) {	// 135
 	
@@ -151,15 +152,18 @@ void sys_exit(int exit_code) {	// 138
 //I have not finished this whatsoever
 int sys_wait(int *exit_code) {	// 139
 
+	int pid;
+
 	asm("movl %1, %%eax;     // # for kernel to identify service
 		int $128;           // interrupt!
 		movl %%ebx, %0"     // after, copy ebx to return
+		movl %2, %%edx;
 	   : "=g" (*exit_code)         // output from asm()
-	   : "g" (SYS_WAIT)  // input to asm()
-	   : "eax", "ebx"       // clobbered registers
+	   : "g" (SYS_WAIT), "g" (pid)  // input to asm()
+	   : "eax", "ebx", "edx"    // clobbered registers
 	);
 
-	return *exit_code;
+	return pid;
 }
 
 

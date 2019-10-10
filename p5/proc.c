@@ -32,7 +32,7 @@ void Init(void) {
 
 	for (i = 0; i < 5; i++) {
 		forked_pid = sys_fork();	// call sys_fork() and get its function return as forked_pid
-		if(pcb[run_pid].ppid) break;	// a child process now breaks the loop
+		// a child process now breaks the loop
 		if (forked_pid == NONE) {
 			sys_write("sys_fork() failed!\n");
 			sys_exit(NONE);	// call exit with code NONE
