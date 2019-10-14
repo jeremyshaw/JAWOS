@@ -32,7 +32,9 @@ void Init(void) {
 
 	for (i = 0; i < 5; i++) {
 		forked_pid = sys_fork();	// call sys_fork() and get its function return as forked_pid
-		// a child process now breaks the loop
+		// a child process now breaks the loop [where is the code for this?]
+		if("is child") break;
+		
 		if (forked_pid == NONE) {
 			sys_write("sys_fork() failed!\n");
 			sys_exit(NONE);	// call exit with code NONE
@@ -47,7 +49,7 @@ void Init(void) {
 			exit_pid = sys_wait(&exit_code);	// call sys_wait() with addr of exit_code as argument, 
 			// sys_wait returns an integer, received as exit_pid
 
-			sys_lock_mutex(video_mutex);
+			sys_lock_mutex(VIDEO_MUTEX);
 			sys_set_cursor(my_pid, i*14); 
 			sys_write("PID ");
 			Number2Str(exit_pid, str);
@@ -55,7 +57,7 @@ void Init(void) {
 			sys_write(": ");
 			Number2Str(exit_code, str);
 			sys_write(str);
-			sys_unlock_mutex(video mutex);
+			sys_unlock_mutex(VIDEO_MUTEX);
 		}
 		sys_write("  Init exits.");
 		call exit with code 0;
@@ -64,10 +66,10 @@ void Init(void) {
 	total_sleep_period = 0;
 	col = 0;
 	while (col < 70) {
-		sys_lock_mutex(video_mutex);
+		sys_lock_mutex(VIDEO_MUTEX);
 		sys_set_cursor(my_pid, col);
 		sys_write(pid_str)
-		sys_unlock_mutex(video_mutex);
+		sys_unlock_mutex(VIDEO_MUTEX);
 
 		i = (sys_get_rand()/my_pid) % 4 + 1;	// get a random sleep_period = ... // get rand # 1~4
 		sys_sleep(i);	// sleep with that random period

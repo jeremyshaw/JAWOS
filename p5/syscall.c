@@ -153,13 +153,15 @@ void sys_exit(int exit_code) {	// 138
 int sys_wait(int *exit_code) {	// 139
 
 	int pid;
+	
+	// ec to ebx, pid to edx
 
 	asm("movl %1, %%eax;     // # for kernel to identify service
+		movl %%ebx, %2"     // after, copy ebx to return
+		movl %0, %%edx;
 		int $128;           // interrupt!
-		movl %%ebx, %0"     // after, copy ebx to return
-		movl %2, %%edx;
-	   : "=g" (*exit_code)         // output from asm()
-	   : "g" (SYS_WAIT), "g" (pid)  // input to asm()
+	   : "=g" (pid)         // output from asm()
+	   : "g" (SYS_WAIT), "g" (*exit_code)  // input to asm()
 	   : "eax", "ebx", "edx"    // clobbered registers
 	);
 

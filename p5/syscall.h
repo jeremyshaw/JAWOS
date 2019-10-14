@@ -15,6 +15,6 @@ void sys_lock_mutex(int mutex_id);
 void sys_unlock_mutex(int mutex_id);
 
 void sys_exit(int exit_code);
-int sys_wait(int *exit code);
+int sys_wait(int *exit_code);
 
 #endif

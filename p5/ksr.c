@@ -115,18 +115,25 @@ void SyscallSR(void) {
 }
 
 void SysExit(void) {
+	
+	int *exit_code;
+	//ebx is e_c
+	*exit_code = pcb[run_pid].tf_p->ebx;
+	
 	if(pcb[pcb[run_pid].ppid].state != WAIT) {
 		pcb[run_pid].state = ZOMBIE;
+		run_pid = NONE;
 	} else {
-		// release parent:
-		// upgrade parent's state
-		// move parent to be ready to run again
-		pcb[pcb[run_pid].ppid].state = READY;
-		EnQue(&ready_que, pcb[run_pid].ppid);
+				
+		pcb[pcb[run_pid].ppid].state = READY;	// release parent: upgrade parent's state
+		EnQue(&ready_que, pcb[run_pid].ppid);	// and move parent to be ready to run again
 
         // also:
-        // pass over exiting PID to parent
-        // pass over exit code to parent
+        // pass over exiting PID to parent (is it in trapframe?) (edx from run_pid)
+		pcb[pcb[run_pid].ppid].tf_p->edx = run_pid;
+        // pass over exit code to parent deref ebx to get ec  (*ebx from run_pid) notes backwards
+		pcb[pcb[run_pid].ppid].tf_p->ebx = (int)*exit_code;
+		
 		
 		
 		// also:
@@ -134,7 +141,7 @@ void SysExit(void) {
         // no running process anymore
 		// Bzero((char*)(DRAM_START + (run_pid*STACK_MAX)), STACK_MAX);
 		Bzero((char *)&pcb[run_pid], sizeof(pcb_t));
-		EnQue(&avail_pid, run_pid);
+		EnQue(&avail_que, run_pid);	// also change stage to AVAIL
 		run_pid = NONE;
 		
 	}
@@ -144,22 +151,21 @@ void SysExit(void) {
 
 void SysWait(void) {
 	int i;
+	// ebx has int * ec; *p = exit_code (from zombie child ebx); first find 1 ZOMBIE, then do the earlier
 	
+	// one ebx is from parent, which wants the pointer. The other ebx is from the child, which has the address the pointer wants
+	// parent has no penalty in here
 	for(i = 0; i < PROC_MAX; i++) {	// any child called to exit?
 		
-		if(!found one) {
-			// parent is blocked into WAIT state
-			// no running process anymore
-			pcb[pcb[run_pid].ppid].state = WAIT;
-			run_pid = NONE;
+		if(!"found one") {
+			pcb[pcb[run_pid].ppid].state = WAIT;	// parent is blocked into WAIT state
+			run_pid = NONE;	// no running process anymore
 		} else {
-			// pass over its PID to parent
-			// pass over its exit code to parent
+			// I may have set this up backwards, compared to how Chang wants it 
+			//edx = exit_code
+			pcb[pcb[run_pid].ppid].tf_p->ebx = run_pid;	// pass over its PID to parent
+			pcb[pcb[run_pid].ppid].tf_p->edx = pcb[run_pid].tf_p->edx;	// pass over its exit code to parent
 			// reclaim child resources
-			
-			// this isn't done right, right now. The syscall.c isn't setup properly
-			pcb[pcb[run_pid].ppid].tf_p->ebx = run_pid;
-			pcb[pcb[run_pid].ppid].tf_p->edx = pcb[run_pid].tf_p->edx;	// exit_code;
 		}
 		
 	}
@@ -257,7 +263,7 @@ void SysFork(void) {
 		pcb[pidF].state = READY;
 		pcb[pidF].time_count = 0;
 		pcb[pidF].total_time = 0;
-		pcb[pidF].ppid = run_pid; // gives parent pid to ppid of child
+		pcb[pidF].ppid = run_pid; // child gets parent's pid
 
 		// 3. copy the process image (the 4KB DRAM) from parent to child:
 		// figure out destination and source byte addresses
