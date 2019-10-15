@@ -109,6 +109,7 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 		ch = cons_getchar();
 		cons_printf("%c pressed", ch);
 		if(ch=='b') breakpoint();	
+		if(ch==' ') SpawnSR(&Init);
 	}
 	
 	Scheduler();

@@ -32,50 +32,57 @@ void Init(void) {
 
 	for (i = 0; i < 5; i++) {
 		forked_pid = sys_fork();	// call sys_fork() and get its function return as forked_pid
-		// a child process now breaks the loop [where is the code for this?]
-		if("is child") break;
-		
+		if(forked_pid == 0) break;	// a child process now breaks the loop [where is the code for this?]
 		if (forked_pid == NONE) {
 			sys_write("sys_fork() failed!\n");
 			sys_exit(NONE);	// call exit with code NONE
 		}
 	}
-
+	
+	exit_code = 10;
 	my_pid = sys_get_pid();
 	Number2Str(my_pid, pid_str);
 	
-	if("is parent"){	// for the one parent process, it does
+	if(forked_pid != 0){	// for the one parent process, it does
+
 		for (i = 0; i < 5; i++) {
 			exit_pid = sys_wait(&exit_code);	// call sys_wait() with addr of exit_code as argument, 
 			// sys_wait returns an integer, received as exit_pid
-
 			sys_lock_mutex(VIDEO_MUTEX);
 			sys_set_cursor(my_pid, i*14); 
 			sys_write("PID ");
 			Number2Str(exit_pid, str);
 			sys_write(str);
 			sys_write(": ");
-			Number2Str(exit_code, str);
+			Number2Str((int)&exit_code, str);
 			sys_write(str);
 			sys_unlock_mutex(VIDEO_MUTEX);
 		}
+
 		sys_write("  Init exits.");
-		call exit with code 0;
+		sys_exit(0);	// call exit with code 0;
+
 	}
+
 	// child code below, similar to prev, race across screen
 	total_sleep_period = 0;
 	col = 0;
-	while (col < 70) {
+
+	while (col < 5) {	// revert this back to 70 before submitting
+	
 		sys_lock_mutex(VIDEO_MUTEX);
 		sys_set_cursor(my_pid, col);
-		sys_write(pid_str)
+		sys_write(pid_str);
 		sys_unlock_mutex(VIDEO_MUTEX);
 
-		i = (sys_get_rand()/my_pid) % 4 + 1;	// get a random sleep_period = ... // get rand # 1~4
-		sys_sleep(i);	// sleep with that random period
-		total_sleep_period += i;	// add random period to total_sleep_period
+		sleep_period = (sys_get_rand()/my_pid) % 4 + 1;	// get a random sleep_period = ... // get rand # 1~4
+		sys_sleep(sleep_period);	// sleep with that random period
+		total_sleep_period += sleep_period;	// add random period to total_sleep_period
 		col++;
+	
 	}
+	
 	sys_exit(total_sleep_period);	// call exit sesrvice with total_sleep_period as exit code
+
 }
 

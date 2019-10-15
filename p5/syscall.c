@@ -150,22 +150,40 @@ void sys_exit(int exit_code) {	// 138
 }
 
 //I have not finished this whatsoever
-int sys_wait(int *exit_code) {	// 139
+int sys_wait(int *exit_code_ptr) {	// 139
 
 	int pid;
 	
 	// ec to ebx, pid to edx
 
 	asm("movl %1, %%eax;     // # for kernel to identify service
-		movl %%ebx, %2"     // after, copy ebx to return
-		movl %0, %%edx;
+		movl %2, %%ebx;
 		int $128;           // interrupt!
+		movl %%edx, %0"     // after, copy edx to return
 	   : "=g" (pid)         // output from asm()
-	   : "g" (SYS_WAIT), "g" (*exit_code)  // input to asm()
-	   : "eax", "ebx", "edx"    // clobbered registers
+	   : "g" (SYS_WAIT), "g" (*exit_code_ptr)  // input to asm()
+	   : "edx", "eax", "ebx"    // clobbered registers
 	);
 
 	return pid;
 }
+
+
+// int sys_fork(void) {                     // phase3
+	
+	// int fork; //forked pid
+
+	// asm("movl %1, %%eax;     // # for kernel to identify service
+		// int $128;           // interrupt!
+		// movl %%ebx, %0"     // after, copy ebx to return
+	   // : "=g" (fork)         // output from asm()
+	   // : "g" (SYS_FORK)  // input to asm()
+	   // : "eax", "ebx"       // clobbered registers
+	// );
+
+	// return fork;
+// }
+
+
 
 
