@@ -107,7 +107,7 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 
 	if(cons_kbhit()) {           // if keyboard pressed
 		ch = cons_getchar();
-		cons_printf("%c pressed", ch);
+		cons_printf("%c pressed. ", ch);
 		if(ch=='b') breakpoint();	
 		if(ch==' ') SpawnSR(&Init);
 	}
