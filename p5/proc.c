@@ -48,7 +48,7 @@ void Init(void) {
 			Number2Str(exit_pid, str);
 			sys_write(str);
 			sys_write(": ");
-			Number2Str((int)&exit_code, str);
+			Number2Str(exit_code, str);
 			sys_write(str);
 			sys_unlock_mutex(VIDEO_MUTEX);
 		}
@@ -60,7 +60,7 @@ void Init(void) {
 	total_sleep_period = 0;
 	col = 0;
 
-	while (col < 5) {	// revert this back to 70 before submitting
+	while (col < 70) {	// revert this back to 70 before submitting
 	
 		sys_lock_mutex(VIDEO_MUTEX);
 		sys_set_cursor(my_pid, col);
