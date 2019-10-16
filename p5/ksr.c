@@ -116,7 +116,7 @@ void SyscallSR(void) {
 
 void SysExit(void) {	
 	
-	int i;
+	int i, *ecp;
 	i = pcb[run_pid].ppid;
 	
 	if(pcb[i].state == WAIT) {
@@ -125,10 +125,10 @@ void SysExit(void) {
         // also: pass over exiting PID to parent (is it in trapframe?) (edx from run_pid)
 		pcb[i].tf_p->edx = run_pid;
         // pass over exit code to parent deref ebx to get ec  (*ebx from run_pid) notes backwards
-		*((int *)pcb[i].tf_p->ebx) = *(&pcb[run_pid].tf_p->ebx);	// ebx is e_c
+		ecp = &pcb[run_pid].tf_p->ebx;
+		*((int *)pcb[i].tf_p->ebx) = *ecp;	// ebx is e_c
 
-		// also: reclaim child resources; no running process anymore
-		pcb[run_pid].state = AVAIL;
+		pcb[run_pid].state = AVAIL;	// also: reclaim child resources; no running process anymore
 		EnQue(&avail_que, run_pid);
 	} else {
 		pcb[run_pid].state = ZOMBIE;
@@ -140,7 +140,7 @@ void SysExit(void) {
 
 void SysWait(void) {
 	
-	int i;	// edx pid, ebx *ec
+	int i, *ecp;	// edx pid, ebx *ec
 	// ebx has int * ec; *p = exit_code (from zombie child ebx); first find 1 ZOMBIE, then do the earlier
 	// one ebx is from parent, which wants the pointer. The other ebx is from the child, which has the address the pointer wants
 	// parent has no penalty in here
@@ -154,7 +154,8 @@ void SysWait(void) {
 		run_pid = NONE;	// no running process anymore
 	} else {	// child called to exit
 		pcb[run_pid].tf_p->edx = i;	// pass over its PID to parent
-		*((int *)pcb[run_pid].tf_p->ebx) = *(&pcb[i].tf_p->ebx);	// pass over its exit code to parent
+		ecp = &pcb[i].tf_p->ebx;
+		*((int *)pcb[run_pid].tf_p->ebx) = *ecp;	// pass over its exit code to parent
 		pcb[i].state = AVAIL;	// reclaim child resources
 		EnQue(&avail_que, i);
 	}
