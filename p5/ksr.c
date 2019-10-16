@@ -117,16 +117,16 @@ void SyscallSR(void) {
 void SysExit(void) {	
 	
 	int i;
-	i = (int *)pcb[run_pid].tf_p->ebx
+	i = pcb[run_pid].ppid;
 	
-	if(pcb[pcb[run_pid].ppid].state == WAIT) {
-		pcb[pcb[run_pid].ppid].state = READY;	// release parent: upgrade parent's state
+	if(pcb[i].state == WAIT) {
+		pcb[i].state = READY;	// release parent: upgrade parent's state
 		EnQue(&ready_que, pcb[run_pid].ppid);	// and move parent to be ready to run again
         // also: pass over exiting PID to parent (is it in trapframe?) (edx from run_pid)
-		pcb[pcb[run_pid].ppid].tf_p->edx = run_pid;
+		pcb[i].tf_p->edx = run_pid;
         // pass over exit code to parent deref ebx to get ec  (*ebx from run_pid) notes backwards
 		// pcb[pcb[run_pid].ppid].tf_p->ebx = *exit_code;
-		(int *)pcb[pcb[run_pid].ppid].tf_p->ebx = &pcb[run_pid].tf_p->ebx;	// ebx is e_c
+		*((int *)pcb[i].tf_p->ebx) = *(&pcb[run_pid].tf_p->ebx);	// ebx is e_c
 		cons_printf("rp%d e%d ", run_pid, &pcb[run_pid].tf_p->ebx);
 
 		// also: reclaim child resources; no running process anymore
