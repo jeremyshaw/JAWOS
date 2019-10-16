@@ -114,41 +114,36 @@ void SyscallSR(void) {
 	
 }
 
-void SysExit(void) {
+void SysExit(void) {	
 	
-	int *exit_code;
+	int i;
+	i = (int *)pcb[run_pid].tf_p->ebx
 	
-	
-	if(pcb[pcb[run_pid].ppid].state != WAIT) {
-		// cons_printf("NWrp%d e_c %d  ", run_pid, *exit_code);
-		pcb[run_pid].state = ZOMBIE;
-		run_pid = NONE;
-	} else {
+	if(pcb[pcb[run_pid].ppid].state == WAIT) {
 		pcb[pcb[run_pid].ppid].state = READY;	// release parent: upgrade parent's state
 		EnQue(&ready_que, pcb[run_pid].ppid);	// and move parent to be ready to run again
-		
-		exit_code = &pcb[run_pid].tf_p->ebx;	// ebx is e_c
-
         // also: pass over exiting PID to parent (is it in trapframe?) (edx from run_pid)
 		pcb[pcb[run_pid].ppid].tf_p->edx = run_pid;
         // pass over exit code to parent deref ebx to get ec  (*ebx from run_pid) notes backwards
 		// pcb[pcb[run_pid].ppid].tf_p->ebx = *exit_code;
-		pcb[pcb[run_pid].ppid].tf_p->ebx = *exit_code;
-		// cons_printf("rp%d (int)ex%d ", run_pid, (int)exit_code);
+		(int *)pcb[pcb[run_pid].ppid].tf_p->ebx = &pcb[run_pid].tf_p->ebx;	// ebx is e_c
+		cons_printf("rp%d e%d ", run_pid, &pcb[run_pid].tf_p->ebx);
 
 		// also: reclaim child resources; no running process anymore
 		pcb[run_pid].state = AVAIL;
 		EnQue(&avail_que, run_pid);
-		run_pid = NONE;
-	}
+	} else {
+		pcb[run_pid].state = ZOMBIE;
+	} 
+	run_pid = NONE;	// both of the cases do this, so may as well move it out
 	
 }
 
 
 void SysWait(void) {
-	int i, *ecp;
-	// ebx has int * ec; *p = exit_code (from zombie child ebx); first find 1 ZOMBIE, then do the earlier
 	
+	int i, *ecp;	// edx pid, ebx *ec
+	// ebx has int * ec; *p = exit_code (from zombie child ebx); first find 1 ZOMBIE, then do the earlier
 	// one ebx is from parent, which wants the pointer. The other ebx is from the child, which has the address the pointer wants
 	// parent has no penalty in here
 	for(i = 0; i < PROC_MAX; i++) {	// any child (of mine?) called to exit?
@@ -159,20 +154,17 @@ void SysWait(void) {
 		// cons_printf("Wrp%d ",run_pid);
 		pcb[run_pid].state = WAIT;	// parent is blocked into WAIT state
 		run_pid = NONE;	// no running process anymore
-	}
-	//edx pid, ebx *ec
-	
-	if(i < PROC_MAX){	// child called to exit
+	} else {	// child called to exit
 		ecp = &pcb[run_pid].tf_p->ebx;
+		//(int **)pcb[run_pid].tf_p->ebx = (int *)pcb[i].tf_p->ebx;
 		pcb[run_pid].tf_p->edx = i;	// pass over its PID to parent
 		*ecp = pcb[i].tf_p->ebx;	// pass over its exit code to parent
 		// cons_printf("SWp%d e%d  ", run_pid, ecp);
 		// reclaim child resources
 		pcb[i].state = AVAIL;
-		EnQue(&avail_que, i);	// also change stage to AVAIL
+		EnQue(&avail_que, i);
 	}
-
-
+	
 }
 
 

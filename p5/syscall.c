@@ -161,7 +161,7 @@ int sys_wait(int *exit_code_ptr) {	// 139
 		int $128;           // interrupt!
 		movl %%edx, %0"     // after, copy edx to return
 	   : "=g" (pid)         // output from asm()
-	   : "g" (SYS_WAIT), "g" (*exit_code_ptr)  // input to asm()
+	   : "g" (SYS_WAIT), "g" (exit_code_ptr)  // input to asm()
 	   : "edx", "eax", "ebx"    // clobbered registers
 	);
 

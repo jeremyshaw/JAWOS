@@ -12,17 +12,13 @@
 
 
 void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
-	
 	unsigned short *start_pos = (unsigned short *)0xb8000;
 	while(1) { 
-		
 		if (sys_time_count % 100 < 50)
 			*start_pos = '*' + VGA_MASK_VAL;
 		else *start_pos = ' ' + VGA_MASK_VAL; 
 		sys_rand_count++;	// part of the "random" counter	
-		
 	}
-	
 }	// now it's a "reasonably" accurate flash with 1 second period, 50% duty cycle.
 
 
@@ -39,12 +35,10 @@ void Init(void) {
 		}
 	}
 	
-	exit_code = 10;
 	my_pid = sys_get_pid();
 	Number2Str(my_pid, pid_str);
 	
 	if(forked_pid != 0){	// for the one parent process, it does
-
 		for (i = 0; i < 5; i++) {
 			exit_pid = sys_wait(&exit_code);	// call sys_wait() with addr of exit_code as argument, 
 			// sys_wait returns an integer, received as exit_pid
@@ -58,10 +52,8 @@ void Init(void) {
 			sys_write(str);
 			sys_unlock_mutex(VIDEO_MUTEX);
 		}
-
 		sys_write("  Init exits.");
 		sys_exit(0);	// call exit with code 0;
-
 	}
 
 	// child code below, similar to prev, race across screen
