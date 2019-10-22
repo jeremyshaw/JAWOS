@@ -52,8 +52,7 @@ int sys_get_time(void) {
 	return timeINT;
 	
 }
-//signal (SIGINT, WriteMsg);
-//void WriteMsg(void) { printf("Howdy!\n"); }
+
 
 unsigned sys_get_rand(void) {	// 135
 	
@@ -71,11 +70,33 @@ unsigned sys_get_rand(void) {	// 135
 }
 
 
+void sys_signal(int signal_name, func_p_t p){	// 140	// for a process to 'register' a function p as the handler for a certain signal
+	
+		asm("movl %0, %%eax;          // # for kernel to identify service
+		movl %1, %%ebx;
+		movl %2, %%edx;
+		int $128"                // interrupt!
+	   :	// no output from asm()
+	   : "g" (SYS_SIGNAL), "g" (signal_name), "g" (p)	// 3 inputs to asm()
+	   : "eax", "ebx", "edx"	// clobbered registers
+	);
+	
+}
 
-void sys_signal(int signal_name, func_p_t p);	// 140	// for a process to 'register' a function p as the handler for a certain signal
-void sys_kill(int pid, int signal_name);	// 141	// for a process to send a signal to a process (or all in the same process group)
 
 
+void sys_kill(int signal_name, int pid){	// 141	// for a process to send a signal to a process (or all in the same process group)
+	
+		asm("movl %0, %%eax;          // # for kernel to identify service
+		movl %1, %%ebx;
+		movl %2, %%edx;
+		int $128"                // interrupt!
+	   :	// no output from asm()
+	   : "g" (SYS_KILL), "g" (signal_name), "g" (pid)	// 3 inputs to asm()
+	   : "eax", "ebx", "edx"	// clobbered registers
+	);
+	
+}
 
 
 void sys_write(char *str) {             // similar to sys_sleep
@@ -156,7 +177,7 @@ void sys_exit(int exit_code) {	// 138
 	
 }
 
-//I have not finished this whatsoever
+
 int sys_wait(int *exit_code_ptr) {	// 139
 
 	int pid;
@@ -174,23 +195,3 @@ int sys_wait(int *exit_code_ptr) {	// 139
 
 	return pid;
 }
-
-
-// int sys_fork(void) {                     // phase3
-	
-	// int fork; //forked pid
-
-	// asm("movl %1, %%eax;     // # for kernel to identify service
-		// int $128;           // interrupt!
-		// movl %%ebx, %0"     // after, copy ebx to return
-	   // : "=g" (fork)         // output from asm()
-	   // : "g" (SYS_FORK)  // input to asm()
-	   // : "eax", "ebx"       // clobbered registers
-	// );
-
-	// return fork;
-// }
-
-
-
-

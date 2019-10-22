@@ -64,11 +64,6 @@ typedef struct {
 	int que[QUE_MAX];
 } que_t;
 
-// I liked this better :D
-// typedef enum {LOCKED, UNLOCKED} lock_t;	// make sure this name is okay
-// #define LOCKED 1
-// #define UNLOCKED 0
-
 typedef struct {
 	int lock;
 	que_t suspend_que;

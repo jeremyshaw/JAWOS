@@ -103,7 +103,7 @@ void SyscallSR(void) {
 		case SYS_SIGNAL:
 			SysSignal();
 			break;
-		case SYS_KILL;
+		case SYS_KILL:
 			SysKill();
 			break;
 		default:
@@ -122,47 +122,55 @@ void SyscallSR(void) {
 
 
 void SysSignal(void){
-	      use the signal name (as the array index) and function ptr
-      (as the value) passed from syscall to initialize the
-      signal-handler array in run_pid's PCB
+	int signal_name;
+	      // use the signal name (as the array index) and function ptr
+      // (as the value) passed from syscall to initialize the
+      // signal-handler array in run_pid's PCB
 
 	
 }
 
 
 void SysKill(void){
-	      the pid and signal name are passed via syscall
-      if the pid is zero and the signal is SIGCONT:
-      wake up sleeping children of run_pid
+	int pid;	// the pid and signal name are passed via syscall
+	int signal_name;
+	pid = 0;	// lol, this is not it
+	if(pid == 0 && signal_name == SIGCONT){	// if the pid is zero and the signal is SIGCONT: 
+		// wake up sleeping children of run_pid
+		
+	}
 	
 }
 
-void AlterStack(pid, func_p_t p){
+void AlterStack(int pid, func_p_t p){
 	
-	   AlterStack(pid, func_p_t p) is to alter the current stack
-   of process 'pid' by:
-      a. lowering trapframe by 4 bytes,
-      b. replacing EIP in trapframe with 'p'
-      c. insert the original EIP into the gap (between
-         the lowered trapframe and what originally above)
+	int eip;
+	eip = pcb[pid].tf_p->eip;
+	
+	// AlterStack(pid, func_p_t p) is to alter the current stack of process 'pid' by:
+	// a. lowering trapframe by 4 bytes,
+	// &pcb[pid].tf_p -= 4;
+	// b. replacing EIP in trapframe with 'p'
+	pcb[pid].tf_p->eip = *p;
+	// c. insert the original EIP into the gap (between the lowered trapframe and what originally above)
 	
 	
 	
 }
 
 void MyChildExitHandler(void) {	// the handler when a child process exits:
-      call sys_wait() to get exiting child PID and exit code
-      call sys_get_pid() to get my PID
+      // call sys_wait() to get exiting child PID and exit code
+      // call sys_get_pid() to get my PID
 
-      convert exiting child pid to a string
-      convert exiting code to another string
+      // convert exiting child pid to a string
+      // convert exiting code to another string
 
-      lock the video mutex
-      set the video cursor to row: exiting child pid, column: 72
-      write 1st string
-      write ":"
-      write 2nd string
-      unlock the video mutex
+      // lock the video mutex
+      // set the video cursor to row: exiting child pid, column: 72
+      // write 1st string
+      // write ":"
+      // write 2nd string
+      // unlock the video mutex
 }
 
 
@@ -173,12 +181,13 @@ void SysExit(void) {
 	
 	if(pcb[i].state == WAIT) {
 		pcb[i].state = READY;	// release parent: upgrade parent's state
-		EnQue(&ready_que, pcb[run_pid].ppid);	// and move parent to be ready to run again
+		EnQue(&ready_que, i);	// and move parent to be ready to run again
         // also: pass over exiting PID to parent (is it in trapframe?) (edx from run_pid)
 		pcb[i].tf_p->edx = run_pid;
         // pass over exit code to parent deref ebx to get ec  (*ebx from run_pid) notes backwards
-		ecp = &pcb[run_pid].tf_p->ebx;
-		*((int *)pcb[i].tf_p->ebx) = *ecp;	// ebx is e_c
+		// ecp = &pcb[run_pid].tf_p->ebx;
+		// *((int *)pcb[i].tf_p->ebx) = *ecp;	// ebx is e_c
+		*((int *)pcb[i].tf_p->ebx) = pcb[run_pid].tf_p->ebx;
 
 		pcb[run_pid].state = AVAIL;	// also: reclaim child resources; no running process anymore
 		EnQue(&avail_que, run_pid);
@@ -206,8 +215,9 @@ void SysWait(void) {
 		run_pid = NONE;	// no running process anymore
 	} else {	// child called to exit
 		pcb[run_pid].tf_p->edx = i;	// pass over its PID to parent
-		ecp = &pcb[i].tf_p->ebx;
-		*((int *)pcb[run_pid].tf_p->ebx) = *ecp;	// pass over its exit code to parent
+		// ecp = &pcb[i].tf_p->ebx;
+		// *((int *)pcb[run_pid].tf_p->ebx) = *ecp;	// pass over its exit code to parent
+		*((int *)pcb[run_pid].tf_p->ebx) = pcb[i].tf_p->ebx;
 		pcb[i].state = AVAIL;	// reclaim child resources
 		EnQue(&avail_que, i);
 	}
