@@ -7,7 +7,6 @@
 #include "tools.h"       // Number2Str()
 #include "proc.h"
 
-
 #define CHR_ARY 20	// max charcter array length
 
 
@@ -19,7 +18,7 @@ void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 		else *start_pos = ' ' + VGA_MASK_VAL; 
 		sys_rand_count++;	// part of the "random" counter	
 	}
-}	// now it's a "reasonably" accurate flash with 1 second period, 50% duty cycle.
+}
 
 
 void Init(void) {
@@ -27,21 +26,20 @@ void Init(void) {
 	int my_pid, forked_pid, i, col, exit_pid, exit_code, sleep_period, total_sleep_period;
 
 	for (i = 0; i < 5; i++) {
-		forked_pid = sys_fork();	// call sys_fork() and get its function return as forked_pid
-		if(forked_pid == 0) break;	// a child process now breaks the loop [where is the code for this?]
+		forked_pid = sys_fork();
+		if(forked_pid == 0) break;	// child breaks loop
 		if (forked_pid == NONE) {
 			sys_write("sys_fork() failed!\n");
-			sys_exit(NONE);	// call exit with code NONE
+			sys_exit(NONE);
 		}
 	}
 	
 	my_pid = sys_get_pid();
 	Number2Str(my_pid, pid_str);
 	
-	if(forked_pid != 0){	// for the one parent process, it does
+	if(forked_pid != 0){	// for the one parent process
 		for (i = 0; i < 5; i++) {
-			exit_pid = sys_wait(&exit_code);	// call sys_wait() with addr of exit_code as argument, 
-			// sys_wait returns an integer, received as exit_pid
+			exit_pid = sys_wait(&exit_code);
 			sys_lock_mutex(VIDEO_MUTEX);
 			sys_set_cursor(my_pid, i*14); 
 			sys_write("PID ");
@@ -53,28 +51,27 @@ void Init(void) {
 			sys_unlock_mutex(VIDEO_MUTEX);
 		}
 		sys_write("  Init exits.");
-		sys_exit(0);	// call exit with code 0;
+		sys_exit(0);
 	}
-
-	// child code below, similar to prev, race across screen
+	
 	total_sleep_period = 0;
 	col = 0;
 
-	while (col < 70) {	// revert this back to 70 before submitting
+	while (col < 70) {
 	
 		sys_lock_mutex(VIDEO_MUTEX);
 		sys_set_cursor(my_pid, col);
 		sys_write(pid_str);
 		sys_unlock_mutex(VIDEO_MUTEX);
 
-		sleep_period = (sys_get_rand()/my_pid) % 4 + 1;	// get a random sleep_period = ... // get rand # 1~4
-		sys_sleep(sleep_period);	// sleep with that random period
-		total_sleep_period += sleep_period;	// add random period to total_sleep_period
+		sleep_period = (sys_get_rand()/my_pid) % 4 + 1;
+		sys_sleep(sleep_period);
+		total_sleep_period += sleep_period;
 		col++;
 	
 	}
 	
-	sys_exit(total_sleep_period);	// call exit sesrvice with total_sleep_period as exit code
+	sys_exit(total_sleep_period);
 
 }
 

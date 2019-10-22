@@ -1,4 +1,5 @@
 // spede.h, 159, needed spede include
+// JAWOS Jeremy Alex Will OS
 
 #ifndef _SPEDE_
 #define _SPEDE_

@@ -36,17 +36,11 @@ int i;
 void BootStrap(void) {
 
 	sys_time_count = 0;
-
 	Bzero((char *) &avail_que, sizeof(que_t));
 	Bzero((char *) &ready_que, sizeof(que_t));
-	
 	for(i = 0; i < QUE_MAX; i++) EnQue(&avail_que, i);	// enqueue all available PID num to avail_que
-	
-	// add code to initialize sys_rand_count and video_mutex
 	sys_rand_count = 0;
-	// we apparently have to bzero this, which means there is no lock type, rather, it should be an INT as instructed.
 	Bzero((char *) &video_mutex, sizeof(mutex_t));
-
 	sys_cursor = VIDEO_START;  // have it set to VIDEO_START in BootStrap()
 
 	idt = get_idt_base();
@@ -60,12 +54,9 @@ void BootStrap(void) {
 int main(void) {	// kernel boots
 	
 	BootStrap();
-
 	SpawnSR(&Idle);
 	SpawnSR(&Init);
-
 	run_pid = IDLE;	// set run_pid to IDLE (defined constant)
-	
 	Loader(pcb[run_pid].tf_p);
 	
 	return 0; // never would actually reach here
@@ -109,7 +100,7 @@ void Kernel(tf_t *tf_p) {       // kernel runs
 		ch = cons_getchar();
 		cons_printf("%c pressed. ", ch);
 		if(ch=='b') breakpoint();	
-		if(ch==' ') SpawnSR(&Init);
+		// if(ch==' ') SpawnSR(&Init);
 	}
 	
 	Scheduler();

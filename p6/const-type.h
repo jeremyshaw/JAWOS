@@ -38,7 +38,7 @@
 
 #define VIDEO_MUTEX 0
 #define LOCKED 1
-#define UNLOCKED 0	// this works because Bzero in Bootstrap
+#define UNLOCKED 0
 
 #define VIDEO_START (unsigned short *) 0xb8000 //uns short is 2 byte pointer in this case
 #define VIDEO_END (unsigned short *) 0xb8000 + 25 * 80
@@ -55,7 +55,7 @@ typedef enum {AVAIL, READY, RUN, SLEEP, SUSPEND, WAIT, ZOMBIE} state_t;
 #define WAIT 5
 #define ZOMBIE 6
 
-typedef enum {SIGCHLD, SIGCONT} signal_t;
+// typedef enum {SIGCHLD, SIGCONT} signal_t;
 #define SIGCHLD 17
 #define SIGCONT 18
 
@@ -67,7 +67,7 @@ typedef struct {
 typedef struct {
 	int lock;
 	que_t suspend_que;
-} mutex_t;	// make sure this name is okay
+} mutex_t;
 
 typedef struct {
 	unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax, event, eip, cs, efl;
@@ -76,7 +76,7 @@ typedef struct {
 typedef struct {
 	state_t state;
 	tf_t *tf_p;
-	unsigned int time_count, total_time, wake_time, ppid; //ppid
+	unsigned int time_count, total_time, wake_time, ppid;
 	func_p_t signal_handler[32];
 } pcb_t;
 

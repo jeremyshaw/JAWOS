@@ -1,6 +1,4 @@
-// entry.h
-// prototypes those in entry.S
-
+// entry.h for entry.S
 // Team Name: JAWOS (Members: Alex Leones, Jeremy Shaw, William Guo)
 
 #ifndef _ENTRY_

@@ -4,9 +4,9 @@
 #include "syscall.h"     // for SYS_GET_PID, etc., below
 
 
-int sys_fork(void) {                     // phase3
+int sys_fork(void) {
 	
-	int fork; //forked pid
+	int fork;
 
 	asm("movl %1, %%eax;     // # for kernel to identify service
 		int $128;           // interrupt!
@@ -20,7 +20,7 @@ int sys_fork(void) {                     // phase3
 }
 
 
-int sys_get_pid(void) {     // phase2
+int sys_get_pid(void) {
 
 	int pid;
 
@@ -99,7 +99,7 @@ void sys_kill(int signal_name, int pid){	// 141	// for a process to send a signa
 }
 
 
-void sys_write(char *str) {             // similar to sys_sleep
+void sys_write(char *str) {
 
 	asm("movl %0, %%eax;          // # for kernel to identify service
 		movl %1, %%ebx;          // address of str?
@@ -125,7 +125,7 @@ void sys_sleep(int sleep_sec) {  // phase2
 }
 
 
-void sys_set_cursor(int row, int col) {  // phase3
+void sys_set_cursor(int row, int col) {
 	
 	asm("movl %0, %%eax;          // # for kernel to identify service
 		movl %1, %%ebx;          // offset?
@@ -180,9 +180,7 @@ void sys_exit(int exit_code) {	// 138
 
 int sys_wait(int *exit_code_ptr) {	// 139
 
-	int pid;
-	
-	// ec to ebx, pid to edx
+	int pid;	// ec to ebx, pid to edx
 
 	asm("movl %1, %%eax;     // # for kernel to identify service
 		movl %2, %%ebx;
