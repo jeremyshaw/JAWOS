@@ -11,9 +11,6 @@
 #include "ext-data.h"
 #include "syscall.h"
 
-// declare kernel data
-
-// aren't all of these in ext-data.h?
 int run_pid; 	// current running PID; if -1, none selected
 
 que_t avail_que; //avail pid
@@ -24,24 +21,22 @@ pcb_t pcb[PROC_MAX];
 unsigned int sys_time_count;
 struct i386_gate *idt;
 
-unsigned short *sys_cursor;         // phase2
-
+unsigned short *sys_cursor;
 unsigned sys_rand_count;
 mutex_t video_mutex;
 
-char ch;//for kb capture breakpoint
+char ch;
 int i;
-
 
 void BootStrap(void) {
 
 	sys_time_count = 0;
 	Bzero((char *) &avail_que, sizeof(que_t));
 	Bzero((char *) &ready_que, sizeof(que_t));
-	for(i = 0; i < QUE_MAX; i++) EnQue(&avail_que, i);	// enqueue all available PID num to avail_que
+	for(i = 0; i < QUE_MAX; i++) EnQue(&avail_que, i);
 	sys_rand_count = 0;
 	Bzero((char *) &video_mutex, sizeof(mutex_t));
-	sys_cursor = VIDEO_START;  // have it set to VIDEO_START in BootStrap()
+	sys_cursor = VIDEO_START;
 
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
@@ -51,12 +46,12 @@ void BootStrap(void) {
 }
 
 
-int main(void) {	// kernel boots
+int main(void) {
 	
 	BootStrap();
 	SpawnSR(&Idle);
 	SpawnSR(&Init);
-	run_pid = IDLE;	// set run_pid to IDLE (defined constant)
+	run_pid = IDLE;
 	Loader(pcb[run_pid].tf_p);
 	
 	return 0; // never would actually reach here
@@ -64,39 +59,39 @@ int main(void) {	// kernel boots
 }
 
 
-void Scheduler(void) {              // choose a run_pid to run
+void Scheduler(void) { 
 
-	if( run_pid > IDLE ) return;       // a user PID is already picked
+	if( run_pid > IDLE ) return;
 
-	if( QueEmpty(&ready_que) ) run_pid = IDLE;               // use the Idle thread
+	if( QueEmpty(&ready_que) ) run_pid = IDLE;
 	else {
 		pcb[IDLE].state = READY;
-		run_pid = DeQue(&ready_que);  // pick a different proc
+		run_pid = DeQue(&ready_que);
 	}
 
-	pcb[run_pid].time_count = 0;     // reset runtime count
+	pcb[run_pid].time_count = 0;
 	pcb[run_pid].state = RUN;
 	
 }
 
 
-void Kernel(tf_t *tf_p) {       // kernel runs
+void Kernel(tf_t *tf_p) {
 	
 	pcb[run_pid].tf_p = tf_p;
 
 	switch(tf_p->event) {
 		case TIMER_EVENT:
-			TimerSR();         // handle tiemr event
+			TimerSR(); 
 			break;
 		case SYSCALL_EVENT:
-			SyscallSR();       // all syscalls go here 1st
+			SyscallSR();
 			break;
 		default:
 			cons_printf("Kernel Panic: no such event!\n");
 			breakpoint();
 	}
 
-	if(cons_kbhit()) {           // if keyboard pressed
+	if(cons_kbhit()) { 
 		ch = cons_getchar();
 		cons_printf("%c pressed. ", ch);
 		if(ch=='b') breakpoint();	

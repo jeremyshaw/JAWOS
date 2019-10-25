@@ -15,6 +15,7 @@
 #define PROC_MAX 20             // max number of processes
 #define STACK_MAX 4096          // process stack in bytes
 #define QUE_MAX 20              // capacity of a process queue
+#define CHR_ARY 20				// max charcter array length
 
 #define NONE -1                 // to indicate none
 #define IDLE 0                  // Idle thread PID 0

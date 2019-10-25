@@ -7,12 +7,12 @@
 #include "tools.h"
 
 
-int j, k, l;
+int k, l;
 
 
 void Number2Str(int x, char str[]) {
 	
-	int ni, temp, len; //ni = for loop's i, but for Num2str
+	int ni, temp, len;
 	
 	temp = x;
 	len = 0;
@@ -33,16 +33,16 @@ void Number2Str(int x, char str[]) {
 
 int DeQue(que_t *p){
 	
-	int head;
+	int head, i;
 	
 	if(QueEmpty(p)) return NONE;
 	else{
 		head =  p->que[0];
-		for(j = 0; j < p->tail-1; j++){//whoops, needed the -1, lol. Or -- the tail beforehand
-			p->que[j] = p->que[j+1];
+		for(i = 0; i < p->tail-1; i++){
+			p->que[i] = p->que[i+1];
 		}
 		p->tail--;
-		p->que[p->tail] = NONE; //this is technically better than NULL?
+		p->que[p->tail] = NONE;
 		return head;
 	}
 	

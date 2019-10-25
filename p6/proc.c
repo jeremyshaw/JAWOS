@@ -7,8 +7,6 @@
 #include "tools.h"       // Number2Str()
 #include "proc.h"
 
-#define CHR_ARY 20	// max charcter array length
-
 
 void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 	unsigned short *start_pos = (unsigned short *)0xb8000;
@@ -21,9 +19,33 @@ void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 }
 
 
+// done
+void MyChildExitHandler(void) {	// the handler when a child process exits:
+
+	int cpid, my_pid, ec;
+	char cpidstr[CHR_ARY], ecstr[CHR_ARY];
+	  
+	cpid = sys_wait(&ec);	// call sys_wait() to get exiting child PID and exit code
+	my_pid = sys_get_pid();
+	
+	Number2Str(cpid, cpidstr);
+	Number2Str(ec, ecstr);
+
+	sys_lock_mutex(VIDEO_MUTEX);
+	sys_set_cursor(cpid, 72);	// set the video cursor to row: exiting child pid, column: 72
+	sys_write(cpidstr);
+    sys_write(":");
+	sys_write(ecstr);
+    sys_unlock_mutex(VIDEO_MUTEX);
+	
+}
+
+
 void Init(void) {
-	char pid_str[CHR_ARY], str[CHR_ARY];
-	int my_pid, forked_pid, i, col, exit_pid, exit_code, sleep_period, total_sleep_period;
+	char pid_str[CHR_ARY];
+	int my_pid, forked_pid, i, col, sleep_period, total_sleep_period;
+	
+	sys_signal(SIGCHLD, MyChildExitHandler);
 
 	for (i = 0; i < 5; i++) {
 		forked_pid = sys_fork();
@@ -38,26 +60,28 @@ void Init(void) {
 	Number2Str(my_pid, pid_str);
 	
 	if(forked_pid != 0){	// for the one parent process
-		for (i = 0; i < 5; i++) {
-			exit_pid = sys_wait(&exit_code);
+		sys_sleep(10);
+		sys_kill(SIGCONT, 0);
+		while(1) {
 			sys_lock_mutex(VIDEO_MUTEX);
-			sys_set_cursor(my_pid, i*14); 
-			sys_write("PID ");
-			Number2Str(exit_pid, str);
-			sys_write(str);
-			sys_write(": ");
-			Number2Str(exit_code, str);
-			sys_write(str);
+			sys_set_cursor(my_pid, 0);
+			sys_write(pid_str);
 			sys_unlock_mutex(VIDEO_MUTEX);
+			sys_sleep(10);
+			
+			sys_lock_mutex(VIDEO_MUTEX);
+			sys_set_cursor(my_pid, 0);
+			sys_write("-");
+			sys_unlock_mutex(VIDEO_MUTEX);
+			sys_sleep(10);
+			
 		}
-		sys_write("  Init exits.");
-		sys_exit(0);
 	}
 	
+	sys_sleep(1000000);
 	total_sleep_period = 0;
 	col = 0;
-
-	while (col < 70) {
+	while (col < 10) {	// change this back to 70 for production
 	
 		sys_lock_mutex(VIDEO_MUTEX);
 		sys_set_cursor(my_pid, col);
@@ -67,10 +91,14 @@ void Init(void) {
 		sleep_period = (sys_get_rand()/my_pid) % 4 + 1;
 		sys_sleep(sleep_period);
 		total_sleep_period += sleep_period;
+		
+		sys_lock_mutex(VIDEO_MUTEX);
+		sys_set_cursor(my_pid, col);
+		sys_write(".");
+		sys_unlock_mutex(VIDEO_MUTEX);
 		col++;
 	
 	}
-	
 	sys_exit(total_sleep_period);
 
 }

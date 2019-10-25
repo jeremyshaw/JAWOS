@@ -119,62 +119,38 @@ void SyscallSR(void) {
 
 
 void SysSignal(void){
-	int signal_name, *ptr;
-	signal_name = pcb[run_pid].tf_p->ebx;
-	*ptr = pcb[run_pid].tf_p->edx;
-	
-	pcb[run_pid].signal_handler[signal_name] = *ptr;
-	// use the signal name (as the array index) and function ptr
-    // (as the value) passed from syscall to initialize the
-    // signal-handler array in run_pid's PCB
-
-	
+	int signal_name;
+	signal_name = pcb[run_pid].tf_p->ebx;	// use signal name (as array index) and function ptr (as the value) passed from syscall to initialize the
+	pcb[run_pid].signal_handler[signal_name] = pcb[run_pid].tf_p->edx;    // signal-handler array in run_pid's PCB
 }
 
 
 void SysKill(void){
-	int pid;	// the pid and signal name are passed via syscall
-	int signal_name;
+	int pid, signal_name, i;	// the pid and signal name are passed via syscall
 	pid = pcb[run_pid].tf_p->edx;
 	signal_name = pcb[run_pid].tf_p->ebx;
 	if(pid == 0 && signal_name == SIGCONT){	// if the pid is zero and the signal is SIGCONT: 
-		// wake up sleeping children of run_pid
-		
+		for(i = 0; i<PROC_MAX; i++) {	// wake up sleeping children of run_pid
+			if(pcb[i].ppid == run_pid){
+				pcb[i].state = READY;
+				EnQue(&ready_que, i);
+			}
+		}
 	}
-	
 }
+
 
 void AlterStack(int pid, func_p_t p){
 	
-	int eip;
+	int eip, *tfp;
 	eip = pcb[pid].tf_p->eip;
-	
 	// AlterStack(pid, func_p_t p) is to alter the current stack of process 'pid' by:
-	// a. lowering trapframe by 4 bytes,
-	// &pcb[pid].tf_p -= 4;
-	// b. replacing EIP in trapframe with 'p'
-	pcb[pid].tf_p->eip = *p;
-	// c. insert the original EIP into the gap (between the lowered trapframe and what originally above)
-	
-	
+	*tfp = (int*)(pcb[pid].tf_p + sizeof(tf_t));
+	pcb[pid].tf_p -= 4;	// a. lowering trapframe by 4 bytes
+	pcb[pid].tf_p->eip = p;	// b. replacing EIP in trapframe with 'p'
+	tfp = eip;// c. insert the original EIP into the gap (between the lowered trapframe and what originally above)
 	
 }
-
-void MyChildExitHandler(void) {	// the handler when a child process exits:
-      // call sys_wait() to get exiting child PID and exit code
-      // call sys_get_pid() to get my PID
-
-      // convert exiting child pid to a string
-      // convert exiting code to another string
-
-      // lock the video mutex
-      // set the video cursor to row: exiting child pid, column: 72
-      // write 1st string
-      // write ":"
-      // write 2nd string
-      // unlock the video mutex
-}
-
 
 void SysExit(void) {	
 	
@@ -188,7 +164,13 @@ void SysExit(void) {
 		*((int *)pcb[ppid].tf_p->ebx) = pcb[run_pid].tf_p->ebx;
 		pcb[run_pid].state = AVAIL;
 		EnQue(&avail_que, run_pid);
-	} else { pcb[run_pid].state = ZOMBIE; } 
+	} else { 
+		pcb[run_pid].state = ZOMBIE; 
+		if(pcb[ppid].signal_handler[SIGCHLD] != 0) {	// check if parent has 'registered' a handler for SIGCHLD event 
+			// if so, altering parent's stack is needed
+			AlterStack(ppid, &Init);
+		}
+	} 
 	run_pid = NONE;
 }
 
