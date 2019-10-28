@@ -7,6 +7,7 @@
 #include "tools.h"
 #include "ksr.h"
 #include "syscall.h"
+#include "proc.h"	// remove this if uneccsary, only use for Init in SysExit AlterStack call
 
 
 void SpawnSR(func_p_t p) {
@@ -167,8 +168,9 @@ void SysExit(void) {
 	} else { 
 		pcb[run_pid].state = ZOMBIE; 
 		if(pcb[ppid].signal_handler[SIGCHLD] != 0) {	// check if parent has 'registered' a handler for SIGCHLD event 
-			// if so, altering parent's stack is needed
-			AlterStack(ppid, &Init);
+			AlterStack(ppid, &Init);	// if so, altering parent's stack is needed
+			cons_printf("Altering p_stack ");
+			breakpoint();
 		}
 	} 
 	run_pid = NONE;
