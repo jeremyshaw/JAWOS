@@ -145,7 +145,7 @@ void AlterStack(int pid, func_p_t p){
 	int eip, *tfp;
 	eip = pcb[pid].tf_p->eip;
 	// AlterStack(pid, func_p_t p) is to alter the current stack of process 'pid' by:
-	*tfp = (int*)(pcb[pid].tf_p + sizeof(tf_t));
+	*tfp = (int*)(pcb[pid].tf_p + sizeof(pcb_t));
 	pcb[pid].tf_p -= 4;	// a. lowering trapframe by 4 bytes
 	pcb[pid].tf_p->eip = p;	// b. replacing EIP in trapframe with 'p'
 	tfp = eip;// c. insert the original EIP into the gap (between the lowered trapframe and what originally above)
