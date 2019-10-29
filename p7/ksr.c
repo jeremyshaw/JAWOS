@@ -150,15 +150,28 @@ void KBSR(void) {
       give it the key
 	*/
 	
+	if (kb not even pressed)
+		return;
+	
+	if(key is '$')
+		breakpoint();
+	
+	if(QueEmpty(kb.wait_que))
+		//enque the key to the buffer of the KBSR
+	else {
+			
+		
+		
+	}
+		
+	
+	
 }
 
 
 
 
-void SysSignal(void){
-	// use sig name (as array index) & funct ptr (as value) to initialize the sig-hndlr arry in run_pid PCB
-	pcb[run_pid].signal_handler[pcb[run_pid].tf_p->ebx] = (func_p_t)pcb[run_pid].tf_p->edx;
-}
+void SysSignal(void){ pcb[run_pid].signal_handler[pcb[run_pid].tf_p->ebx] = (func_p_t)pcb[run_pid].tf_p->edx; }
 
 
 void SysKill(void){
@@ -247,19 +260,17 @@ void SysWrite(void) {
 
 	char *str = (char *)pcb[run_pid].tf_p->ebx;
     while( *str != (char) 0 ) {
-		*sys_cursor++ = (*str++)+VGA_MASK_VAL;
-		if(sys_cursor >= VIDEO_END) sys_cursor = VIDEO_START;
+		if(*str == '\r') sys_cursor = VIDEO_START;	// this just resets to start, fix this
+		else *sys_cursor++ = (*str++)+VGA_MASK_VAL;
+		if(sys_cursor >= VIDEO_END)	while(sys_cursor>VIDEO_START){ *sys_cursor-- = ' '+VGA_MASK_VAL; }
 	}
 	
 }
 
 /*
-
-9. modify kernel service routine SysWrite():
    When the character to display is '\r,' instead of display it, advance
    sys_cursor to the start position of the next new row.
    When sys_cursor is wrapping back to VIDEO_START, erase the whole screen.
-   
 */
 
 

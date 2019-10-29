@@ -72,13 +72,34 @@ unsigned sys_get_rand(void) {	// 135
 
 void sys_read(char *str) {	//142
 
-	asm("movl %0, %%eax;          // # for kernel to identify service
-		movl %1, %%ebx;          // address of str?
-		int $128"                // interrupt!
-	   :                         // no output from asm()
-	   : "g" (SYS_READ), "g" (str)  // 2 inputs to asm()
-	   : "eax", "ebx"            // clobbered registers
-	);
+	char *strMax;
+	int index;
+	index = 0;
+	
+	while(1) {
+		asm("movl %0, %%eax;
+			movl %1, %%ebx;
+			int $128"
+			:
+			:"g"(SYS_READ), "g" (str)
+			:"eax", "ebx"
+		);
+		
+		
+		// if this even partially works, refactor all of the below
+		if(str[0] != '\r') strMax[index] = str[0];
+		else strMax[index + 1] = '\0';
+		
+		sys_write(strMax);
+		
+		if(index < STR_MAX -1) index++;
+		else {
+			(strMax[index+1] = '\0';
+			return;
+		}
+		
+		
+	}
 
 }
 /*
