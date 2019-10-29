@@ -143,15 +143,18 @@ void SysKill(void){
 
 void AlterStack(int pid, func_p_t p){
 	
-	int eip, tmp, *local;
-	eip = pcb[pid].tf_p->eip;
+	int *local, eip;
+	tf_t tmp;
 	//efl address is as the top... original efl address is where we are dumping the eip
 	//so int *q; q = &...efl
 	tmp = *pcb[pid].tf_p;
+	eip = pcb[pid].tf_p->eip;
 	local = &pcb[pid].tf_p->efl;	// efl is at top of stack, address is where we insert later
-	pcb[pid].tf_p -= (int*)4;
+	tmp.eip = (int)p;
+	pcb[pid].tf_p = (tf_t*)((int)pcb[pid].tf_p - 4);
 	*pcb[pid].tf_p = tmp;
-	pcb[pid].tf_p->eip = p;
+	*local = eip;
+	
 	
 	
 	//deref tf_p (to get data inside trapframe), copy to temp trapframe; tmp = *pcb[pid].tf_p
@@ -184,9 +187,7 @@ void SysExit(void) {
 	} else { 
 		pcb[run_pid].state = ZOMBIE; 
 		if(pcb[ppid].signal_handler[SIGCHLD] != 0) {	// check if parent has 'registered' a handler for SIGCHLD event 
-			AlterStack(ppid, Init);	// if so, altering parent's stack is needed
-			cons_printf("Altering p_stack ");
-			breakpoint();
+			AlterStack(ppid, pcb[ppid].signal_handler[SIGCHLD]);	// from board tonight, we are passing in the handler itself?
 		}
 	} 
 	run_pid = NONE;
