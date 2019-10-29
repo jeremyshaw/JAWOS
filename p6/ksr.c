@@ -120,17 +120,16 @@ void SyscallSR(void) {
 
 
 void SysSignal(void){
-	int signal_name;
-	signal_name = pcb[run_pid].tf_p->ebx;	// use signal name (as array index) and function ptr (as the value) passed from syscall to initialize the
-	pcb[run_pid].signal_handler[signal_name] = pcb[run_pid].tf_p->edx;    // signal-handler array in run_pid's PCB
+	// use sig name (as array index) & funct ptr (as value) to initialize the sig-hndlr arry in run_pid PCB
+	pcb[run_pid].signal_handler[pcb[run_pid].tf_p->ebx] = (func_p_t)pcb[run_pid].tf_p->edx;
 }
 
 
 void SysKill(void){
-	int pid, signal_name, i;	// the pid and signal name are passed via syscall
+	int pid, signal_name, i;
 	pid = pcb[run_pid].tf_p->edx;
 	signal_name = pcb[run_pid].tf_p->ebx;
-	if(pid == 0 && signal_name == SIGCONT){	// if the pid is zero and the signal is SIGCONT: 
+	if(pid == 0 && signal_name == SIGCONT){	// if pid=0 and sig=SIGCONT: 
 		for(i = 0; i<PROC_MAX; i++) {	// wake up sleeping children of run_pid
 			if(pcb[i].ppid == run_pid){
 				pcb[i].state = READY;
@@ -145,31 +144,15 @@ void AlterStack(int pid, func_p_t p){
 	
 	int *local, eip;
 	tf_t tmp;
-	//efl address is as the top... original efl address is where we are dumping the eip
-	//so int *q; q = &...efl
-	tmp = *pcb[pid].tf_p;
-	eip = pcb[pid].tf_p->eip;
+
+	tmp = *pcb[pid].tf_p;	// deref tf_p (to get data inside trapframe), copy to temp trapframe; tmp = *pcb[pid].tf_p
+	eip = pcb[pid].tf_p->eip;		
 	local = &pcb[pid].tf_p->efl;	// efl is at top of stack, address is where we insert later
-	tmp.eip = (int)p;
-	pcb[pid].tf_p = (tf_t*)((int)pcb[pid].tf_p - 4);
-	*pcb[pid].tf_p = tmp;
+	tmp.eip = (int)p;	// tmp.eip = handler addr
+	pcb[pid].tf_p = (tf_t*)((int)pcb[pid].tf_p - 4);	// then decrease tf_p by 4 points (change to int, minus 4, then change back)
+	*pcb[pid].tf_p = tmp;	// *pcb...tf_p = tmp (don't need memcpy)
 	*local = eip;
-	
-	
-	
-	//deref tf_p (to get data inside trapframe), copy to temp trapframe; tmp = *pcb[pid].tf_p
-	//tmp.eip = handler addr
-	
-	
-	// then decrease tf_p by 4 points (change to int, minus 4, then change back)
-	// *pcb...tf_p = tmp (don't need memcpy)
-	// AlterStack(pid, func_p_t p) is to alter the current stack of process 'pid' by:
-	// *tfp = (char*)(pcb[pid].tf_p);
-	// MemCpy((char*)pcb[pid].tf_p, (char*)(pcb[pid].tf_p+4), sizeof(tf_t));
-	// pcb[pid].tf_p -= 4;	// a. lowering trapframe by 4 bytes
-	// pcb[pid].tf_p->eip = p;	// b. replacing EIP in trapframe with 'p'
-	// tfp = eip;// c. insert the original EIP into the gap (between the lowered trapframe and what originally above)
-	
+		
 }
 
 void SysExit(void) {	
@@ -187,7 +170,7 @@ void SysExit(void) {
 	} else { 
 		pcb[run_pid].state = ZOMBIE; 
 		if(pcb[ppid].signal_handler[SIGCHLD] != 0) {	// check if parent has 'registered' a handler for SIGCHLD event 
-			AlterStack(ppid, pcb[ppid].signal_handler[SIGCHLD]);	// from board tonight, we are passing in the handler itself?
+			AlterStack(ppid, pcb[ppid].signal_handler[SIGCHLD]);	// from AlterPid, we are passing in the handler func_ptr
 		}
 	} 
 	run_pid = NONE;

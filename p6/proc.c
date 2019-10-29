@@ -81,7 +81,7 @@ void Init(void) {
 	sys_sleep(1000000);
 	total_sleep_period = 0;
 	col = 0;
-	while (col < 10) {	// change this back to 70 for production
+	while (col < 70) {	// change this back to 70 for production
 	
 		sys_lock_mutex(VIDEO_MUTEX);
 		sys_set_cursor(my_pid, col);
