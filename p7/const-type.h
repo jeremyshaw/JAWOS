@@ -63,15 +63,16 @@ typedef enum {AVAIL, READY, RUN, SLEEP, SUSPEND, WAIT, ZOMBIE, IO_WAIT} state_t;
 #define SIGCHLD 17
 #define SIGCONT 18
 
-typedef struct {
-	que_t buffer;
-	que_t wait_que;
-} kb_t;
 
 typedef struct {
 	int tail;
 	int que[QUE_MAX];
 } que_t;
+
+typedef struct {
+	que_t buffer;
+	que_t wait_que;
+} kb_t;
 
 typedef struct {
 	int lock;

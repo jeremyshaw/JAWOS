@@ -131,7 +131,7 @@ void SysKill(void){
 	signal_name = pcb[run_pid].tf_p->ebx;
 	if(pid == 0 && signal_name == SIGCONT){	// if pid=0 and sig=SIGCONT: 
 		for(i = 0; i<PROC_MAX; i++) {	// wake up sleeping children of run_pid
-			if(pcb[i].ppid == run_pid){
+			if(pcb[i].ppid == run_pid && pcb[i].state == SLEEP){
 				pcb[i].state = READY;
 				EnQue(&ready_que, i);
 			}
@@ -142,13 +142,14 @@ void SysKill(void){
 
 void AlterStack(int pid, func_p_t p){
 	
-	int *local, eip;
+	int *local;
+	unsigned eip;
 	tf_t tmp;
 
 	tmp = *pcb[pid].tf_p;	// deref tf_p (to get data inside trapframe), copy to temp trapframe; tmp = *pcb[pid].tf_p
 	eip = pcb[pid].tf_p->eip;		
 	local = &pcb[pid].tf_p->efl;	// efl is at top of stack, address is where we insert later
-	tmp.eip = (int)p;	// tmp.eip = handler addr
+	tmp.eip = (unsigned int)p;	// tmp.eip = handler addr
 	pcb[pid].tf_p = (tf_t*)((int)pcb[pid].tf_p - 4);	// then decrease tf_p by 4 points (change to int, minus 4, then change back)
 	*pcb[pid].tf_p = tmp;	// *pcb...tf_p = tmp (don't need memcpy)
 	*local = eip;

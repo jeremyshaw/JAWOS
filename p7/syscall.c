@@ -72,7 +72,7 @@ unsigned sys_get_rand(void) {	// 135
 
 void sys_read(char *str) {	//142
 
-	char *strMax;
+	char *strMax, ch;
 	int index;
 	index = 0;
 	
@@ -86,20 +86,17 @@ void sys_read(char *str) {	//142
 		);
 		
 		
-		// if this even partially works, refactor all of the below
-		if(str[0] != '\r') strMax[index] = str[0];
-		else strMax[index + 1] = '\0';
+		if(strMax == '\r') break;
+		
+		*str = strMax;
 		
 		sys_write(strMax);
 		
-		if(index < STR_MAX -1) index++;
-		else {
-			(strMax[index+1] = '\0';
-			return;
-		}
-		
-		
+		if(index == STR_MAX -1) break;
+			
 	}
+	*str = '\0';
+	return;
 
 }
 /*

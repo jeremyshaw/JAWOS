@@ -98,9 +98,11 @@ void Kernel(tf_t *tf_p) {
 	if(cons_kbhit()) { 
 		ch = cons_getchar();
 		cons_printf("%c pressed. ", ch);
-		if(ch=='$') breakpoint();	
+		if(ch=='&') breakpoint();	
 		// if(ch==' ') SpawnSR(&Init);
 	}
+	
+	KBSR();
 	
 	Scheduler();
 	Loader(pcb[run_pid].tf_p);

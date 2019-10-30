@@ -15,6 +15,8 @@
 void Idle(void);
 void Init(void);
 void MyChildExitHandler(void);
+
 void Login(void);
+int StrCmp (char *a, char *b);
 
 #endif

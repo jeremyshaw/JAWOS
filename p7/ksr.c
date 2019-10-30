@@ -131,43 +131,30 @@ void SysRead(void){
       no running process now
 	  */
 
+	if(QueEmpty(&kb.buffer)) pcb[run_pid].tf_p->ebx = DeQue(&kb.buffer);
+	else {
+		EnQue(&kb.wait_que, run_pid);
+		pcb[run_pid].state = IO_WAIT;
+		run_pid = NONE;		
+	}
 }
 
 
 void KBSR(void) {
 	
-	/*
-	8. add a new kernel service routine KBSR():
-   if keyboard is not even pressed: return
-   read in the key
-   if the key is '$,' breakpoint() // used to be 'b'
-
-   if no process awaits (wait queue is empty in kb):
-      enqueue the key to the buffer of kb
-   else
-      release the 1st process from the wait queue
-      alter its state, queue it to the new queue
-      give it the key
-	*/
-	
-	if (kb not even pressed)
-		return;
-	
-	if(key is '$')
-		breakpoint();
-	
-	if(QueEmpty(kb.wait_que))
-		//enque the key to the buffer of the KBSR
+	char ch;
+	int pid;
+	if (cons_kbhit() != 0) return;
+	ch = cons_getchar();
+	if(ch == '$') breakpoint();	
+	if(QueEmpty(&kb.wait_que)) EnQue(&kb.buffer, (int)ch);
 	else {
-			
-		
-		
+		pid = DeQue(&kb.wait_que);
+		pcb[pid].state = IO_WAIT;
+		pcb[pid].tf_p->ebx = ch;
 	}
 		
-	
-	
 }
-
 
 
 
@@ -180,7 +167,7 @@ void SysKill(void){
 	signal_name = pcb[run_pid].tf_p->ebx;
 	if(pid == 0 && signal_name == SIGCONT){	// if pid=0 and sig=SIGCONT: 
 		for(i = 0; i<PROC_MAX; i++) {	// wake up sleeping children of run_pid
-			if(pcb[i].ppid == run_pid){
+			if(pcb[i].ppid == run_pid  && pcb[i].state == SLEEP){
 				pcb[i].state = READY;
 				EnQue(&ready_que, i);
 			}
@@ -191,13 +178,14 @@ void SysKill(void){
 
 void AlterStack(int pid, func_p_t p){
 	
-	int *local, eip;
+	int *local;
+	unsigned eip;
 	tf_t tmp;
 
 	tmp = *pcb[pid].tf_p;	// deref tf_p (to get data inside trapframe), copy to temp trapframe; tmp = *pcb[pid].tf_p
 	eip = pcb[pid].tf_p->eip;		
 	local = &pcb[pid].tf_p->efl;	// efl is at top of stack, address is where we insert later
-	tmp.eip = (int)p;	// tmp.eip = handler addr
+	tmp.eip = (unsigned int)p;	// tmp.eip = handler addr
 	pcb[pid].tf_p = (tf_t*)((int)pcb[pid].tf_p - 4);	// then decrease tf_p by 4 points (change to int, minus 4, then change back)
 	*pcb[pid].tf_p = tmp;	// *pcb...tf_p = tmp (don't need memcpy)
 	*local = eip;
@@ -256,11 +244,22 @@ void SysSleep(void) {
 }
 
 
+/*
 void SysWrite(void) {
 
 	char *str = (char *)pcb[run_pid].tf_p->ebx;
     while( *str != (char) 0 ) {
-		if(*str == '\r') sys_cursor = VIDEO_START;	// this just resets to start, fix this
+		*sys_cursor++ = (*str++)+VGA_MASK_VAL;
+		if(sys_cursor >= VIDEO_END) sys_cursor = VIDEO_START;
+	}
+	
+}
+*/
+void SysWrite(void) {
+
+	char *str = (char *)pcb[run_pid].tf_p->ebx;
+    while( *str != (char) 0 ) {
+		if(*str == '\r') sys_cursor = VIDEO_START + 25;	// this just resets to start, fix this
 		else *sys_cursor++ = (*str++)+VGA_MASK_VAL;
 		if(sys_cursor >= VIDEO_END)	while(sys_cursor>VIDEO_START){ *sys_cursor-- = ' '+VGA_MASK_VAL; }
 	}

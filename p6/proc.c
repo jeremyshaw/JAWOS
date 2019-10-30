@@ -22,11 +22,10 @@ void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 // done
 void MyChildExitHandler(void) {	// the handler when a child process exits:
 
-	int cpid, my_pid, ec;
+	int cpid, ec;
 	char cpidstr[CHR_ARY], ecstr[CHR_ARY];
 	  
 	cpid = sys_wait(&ec);	// call sys_wait() to get exiting child PID and exit code
-	my_pid = sys_get_pid();
 	
 	Number2Str(cpid, cpidstr);
 	Number2Str(ec, ecstr);

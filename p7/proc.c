@@ -19,6 +19,22 @@ void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 }
 
 
+
+int StrCmp (char *a, char *b){
+	
+	int diff;	// implementing a classical StrCmp from memory
+	//	let's hope it works!	
+	while(a != '\0' && b != '\0') {
+		
+		diff = (int)a-(int)b;
+		
+	}
+	return diff;
+}
+
+
+
+
 void Login(void) {
 	
 	char login_str[STR_MAX], passwd_str[STR_MAX];
@@ -56,11 +72,10 @@ void Login(void) {
 
 void MyChildExitHandler(void) {	// the handler when a child process exits:
 
-	int cpid, my_pid, ec;
+	int cpid, ec;
 	char cpidstr[STR_MAX], ecstr[STR_MAX];
 	  
 	cpid = sys_wait(&ec);	// call sys_wait() to get exiting child PID and exit code
-	my_pid = sys_get_pid();
 	
 	Number2Str(cpid, cpidstr);
 	Number2Str(ec, ecstr);
