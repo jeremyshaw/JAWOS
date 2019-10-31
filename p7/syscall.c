@@ -75,8 +75,7 @@ void sys_read(char *str) {	//142
 	char ch;
 	char chSt[2];
 	int index = STR_MAX-1;
-	chSt[1] = 0;
-	
+	chSt[1] = '\0';
 	while(index--) {
 		asm("movl %1, %%eax;
 			int $128;
