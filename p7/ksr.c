@@ -133,14 +133,6 @@ void SysRead(void){
 }
 
 
-int StrCmp (char *a, char *b){
-	// classic strcmp would return difference, iirc. But all we need is 1 for sucess, 0 for fail
-	while((*a != '\0' && *b != '\0') && *(a++) == *(b++) ){	if(*a != *b) return 0; }
-	return 1;
-	
-}
-
-
 void SysSignal(void){ pcb[run_pid].signal_handler[pcb[run_pid].tf_p->ebx] = (func_p_t)pcb[run_pid].tf_p->edx; }
 
 
@@ -232,7 +224,7 @@ void SysWrite(void) {
 	char *str= (char *)pcb[run_pid].tf_p->ebx;
     while( *str != (char) 0 ) {
 		if(*str == '\r') {
-			sys_cursor = VIDEO_START + 80;	// this just skips a line, fix this
+			sys_cursor = ((((sys_cursor-VIDEO_START)/80)+1)*80)+VIDEO_START;	// this just skips a line, fix this
 			break;
 		} else *sys_cursor++ = (*str++)+VGA_MASK_VAL;
 		if(sys_cursor >= VIDEO_END)	while(sys_cursor>VIDEO_START) { *sys_cursor-- = ' '+VGA_MASK_VAL; }

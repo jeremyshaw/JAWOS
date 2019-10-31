@@ -72,7 +72,6 @@ unsigned sys_get_rand(void) {	// 135
 
 void sys_read(char *str) {	//142
 
-	char *strMax;
 	char ch;
 	char chSt[2];
 	int index = STR_MAX-1;

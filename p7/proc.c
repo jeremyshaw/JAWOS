@@ -28,11 +28,10 @@ void Login(void) {
 		sys_read(login_str);
 		sys_write("passwd: ");
 		sys_read(passwd_str);
-		sys_write("last");
-		if(StrCmp(login_str, passwd_str)) sys_write("prompt: login failed!\r");
-		else break;
+		if(StrCmp(login_str, passwd_str) == 0) sys_write("prompt: login failed!\r");
+		else sys_write("prompt: login sucessful!\r");	// break;
 		
 	}
-	sys_write("prompt: login sucessful!\r");
+	
 	// sys_vfork(Shell); phase 8
 }

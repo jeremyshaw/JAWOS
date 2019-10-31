@@ -10,6 +10,24 @@
 int k, l;
 
 
+int StrCmp (char *a, char *b){
+	// classic strcmp would return difference, iirc. But all we need is 1 for sucess, 0 for fail
+	sys_write("a");
+	sys_write(a);
+	sys_write("b");
+	sys_write(b);
+	while(1) {
+		if(*a == '\0' && *b == '\0') return 1; 
+		if(*b != *a) break;
+		a++;
+		b++;
+	}
+
+	return 0;
+	
+}
+
+
 void Number2Str(int x, char str[]) {
 	
 	int ni, temp, len;
