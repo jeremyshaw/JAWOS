@@ -35,11 +35,12 @@ void BootStrap(void) {
 	sys_time_count = 0;
 	Bzero((char *) &avail_que, sizeof(que_t));
 	Bzero((char *) &ready_que, sizeof(que_t));
-	Bzero((char *) &kb, sizeof(que_t));
 	for(i = 0; i < QUE_MAX; i++) EnQue(&avail_que, i);
 	sys_rand_count = 0;
 	Bzero((char *) &video_mutex, sizeof(mutex_t));
 	sys_cursor = VIDEO_START;
+	
+	Bzero((char *) &kb, sizeof(kb_t));
 
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
@@ -78,6 +79,24 @@ void Scheduler(void) {
 }
 
 
+void KBSR(void) {
+	
+	int pidKB;
+	if (cons_kbhit()) {
+		ch = cons_getchar();
+		if(ch == '$') breakpoint();	
+		if(QueEmpty(&kb.wait_que)) EnQue(&kb.buffer, (int)ch);
+		else {
+			pidKB = DeQue(&kb.wait_que);
+			pcb[pidKB].state = READY;
+			EnQue(&ready_que, pidKB);
+			pcb[pidKB].tf_p->ebx = ch;
+		}
+	}
+	return;
+}
+
+
 void Kernel(tf_t *tf_p) {
 	
 	pcb[run_pid].tf_p = tf_p;
@@ -94,16 +113,7 @@ void Kernel(tf_t *tf_p) {
 			breakpoint();
 	}
 
-	// keep this util debug routing in new process and syscall works
-	if(cons_kbhit()) { 
-		ch = cons_getchar();
-		cons_printf("%c pressed. ", ch);
-		if(ch=='&') breakpoint();	
-		// if(ch==' ') SpawnSR(&Init);
-	}
-	
 	KBSR();
-	
 	Scheduler();
 	Loader(pcb[run_pid].tf_p);
 	

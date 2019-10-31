@@ -22,6 +22,6 @@ void SysKill(void);
 void AlterStack(int pid, func_p_t p);
 
 void SysRead(void);
-void KBSR(void);
+int StrCmp (char *a, char *b);
 
 #endif

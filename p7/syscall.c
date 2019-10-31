@@ -72,28 +72,25 @@ unsigned sys_get_rand(void) {	// 135
 
 void sys_read(char *str) {	//142
 
-	char *strMax, ch;
-	int index;
-	index = 0;
+	char *strMax;
+	char ch;
+	char chSt[2];
+	int index = STR_MAX-1;
+	chSt[1] = 0;
 	
-	while(1) {
-		asm("movl %0, %%eax;
-			movl %1, %%ebx;
-			int $128"
-			:
-			:"g"(SYS_READ), "g" (str)
+	while(index--) {
+		asm("movl %1, %%eax;
+			int $128;
+			movl %%ebx, %0"
+			:"=g" (ch)
+			:"g"(SYS_READ)
 			:"eax", "ebx"
 		);
-		
-		
-		if(strMax == '\r') break;
-		
-		*str = strMax;
-		
-		sys_write(strMax);
-		
-		if(index == STR_MAX -1) break;
-			
+		chSt[0] = ch;
+		sys_write(chSt);
+		if(ch == '\r') break;
+		*str = ch;
+		str++;
 	}
 	*str = '\0';
 	return;
