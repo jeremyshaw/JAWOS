@@ -133,9 +133,6 @@ void SysRead(void){
 }
 
 
-void SysSignal(void){ pcb[run_pid].signal_handler[pcb[run_pid].tf_p->ebx] = (func_p_t)pcb[run_pid].tf_p->edx; }
-
-
 void SysKill(void){
 	int i;
 	int pid = pcb[run_pid].tf_p->edx;
@@ -157,12 +154,12 @@ void AlterStack(int pid, func_p_t p){
 	unsigned eip;
 	tf_t tmp;
 
-	tmp = *pcb[pid].tf_p;	// deref tf_p (to get data inside trapframe), copy to temp trapframe; tmp = *pcb[pid].tf_p
+	tmp = *pcb[pid].tf_p;
 	eip = pcb[pid].tf_p->eip;		
 	local = &pcb[pid].tf_p->efl;	// efl is at top of stack, address is where we insert later
-	tmp.eip = (unsigned int)p;	// tmp.eip = handler addr
-	pcb[pid].tf_p = (tf_t*)((int)pcb[pid].tf_p - 4);	// then decrease tf_p by 4 points (change to int, minus 4, then change back)
-	*pcb[pid].tf_p = tmp;	// *pcb...tf_p = tmp (don't need memcpy)
+	tmp.eip = (unsigned int)p;
+	pcb[pid].tf_p = (tf_t*)((int)pcb[pid].tf_p - 4);	// shift down by 4
+	*pcb[pid].tf_p = tmp;
 	*local = eip;
 	
 }
@@ -180,10 +177,9 @@ void SysExit(void) {
 		pcb[run_pid].state = AVAIL;
 		EnQue(&avail_que, run_pid);
 	} else { 
-		pcb[run_pid].state = ZOMBIE; 
-		if(pcb[ppid].signal_handler[SIGCHLD] != 0) {	// check if parent has 'registered' a handler for SIGCHLD event 
-			AlterStack(ppid, pcb[ppid].signal_handler[SIGCHLD]);	// from AlterPid, we are passing in the handler func_ptr
-		}
+		pcb[run_pid].state = ZOMBIE;
+		// if parent doesn't have SIGCHLD handler, add it back!
+		if(pcb[ppid].signal_handler[SIGCHLD] != 0) AlterStack(ppid, pcb[ppid].signal_handler[SIGCHLD]);
 	} 
 	run_pid = NONE;
 }
@@ -192,11 +188,9 @@ void SysExit(void) {
 void SysWait(void) {
 	
 	int i;	
-	for(i = 0; i < PROC_MAX; i++) {
-		if(pcb[i].state == ZOMBIE && pcb[i].ppid == run_pid) break;
-	}
+	for(i = 0; i < PROC_MAX; i++) { if(pcb[i].state == ZOMBIE && pcb[i].ppid == run_pid) break; }
 	
-	if(i == PROC_MAX){
+	if(i == PROC_MAX){	// nothing is waiting, nothing to run
 		pcb[run_pid].state = WAIT;
 		run_pid = NONE;
 	} else {
@@ -220,16 +214,25 @@ void SysSleep(void) {
 
 
 void SysWrite(void) {
-
+	
+	unsigned short *old;	// jaja
 	char *str= (char *)pcb[run_pid].tf_p->ebx;
     while( *str != (char) 0 ) {
+		
 		if(*str == '\r') {
-			sys_cursor = ((((sys_cursor-VIDEO_START)/80)+1)*80)+VIDEO_START;	// this just skips a line, fix this
+			sys_cursor = ((((sys_cursor-VIDEO_START)/80)+1)*80)+VIDEO_START;
 			break;
-		} else *sys_cursor++ = (*str++)+VGA_MASK_VAL;
-		if(sys_cursor >= VIDEO_END)	while(sys_cursor>VIDEO_START) { *sys_cursor-- = ' '+VGA_MASK_VAL; }
+		} else {
+			*sys_cursor = (*str)+VGA_MASK_VAL;
+			sys_cursor++;
+			str++;
+		}
+		if(sys_cursor > VIDEO_END) {
+			old = VIDEO_START;
+			sys_cursor = VIDEO_START;
+			while(old != VIDEO_END) { *old++ = ' ' + VGA_MASK_VAL; }
+		}
 	}
-	
 }
 
 
@@ -249,7 +252,6 @@ void SysLockMutex(void) {
 		cons_printf("Panic: no such mutex ID!\n");
 		breakpoint();
 	}
-	
 }
 
 
@@ -268,16 +270,6 @@ void SysUnlockMutex(void) {
 		cons_printf("Panic: no such mutex ID!\n");
 		breakpoint();
 	}
-	
-}
-
-
-void SysSetCursor(void) { 
-	
-	int row, col;
-	row = pcb[run_pid].tf_p->ebx;
-	col = pcb[run_pid].tf_p->edx;
-	sys_cursor = VIDEO_START + (row * 80) + col; 
 	
 }
 
@@ -312,3 +304,7 @@ void SysFork(void) {
 		pcb[pidF].tf_p->ebx = 0;
 	}		
 }
+
+void SysSignal(void){ pcb[run_pid].signal_handler[pcb[run_pid].tf_p->ebx] = (func_p_t)pcb[run_pid].tf_p->edx; }
+
+void SysSetCursor(void) { sys_cursor = VIDEO_START + ((pcb[run_pid].tf_p->ebx) * 80) + (pcb[run_pid].tf_p->edx); }

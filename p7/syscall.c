@@ -90,30 +90,14 @@ void sys_read(char *str) {	//142
 		*str = ch;
 		str++;
 	}
-	*str = '\0';
-	return;
+	*str = '\0';	// This ia always added at the end.
+	return;	// Am I taking the instructions too litterally?
 
 }
-/*
-6. add a new syscall sys_read():
-   void sys_read(char *str) {  // the string
-      ...
-      Apply a loop for the following logic:
-         Call asm("... issue an 'int ?' to do SYS_READ);
-         and get a character at a time.
 
-         'Echo' back the character to the console video:
-         build a small string with it and call sys_write().
 
-         Add the character to the string until it is the RETURN key
-         ('\r') in which a null character ('\0') is added instead.
+void sys_signal(int signal_name, func_p_t p){	// 140
 
-         The whole string should not exceed STR_MAX bytes. (After
-         getting STR_MAX-1 characters, append NUL and return.)
-*/
-
-void sys_signal(int signal_name, func_p_t p){	// 140	// for a process to 'register' a function p as the handler for a certain signal
-	
 		asm("movl %0, %%eax;          // # for kernel to identify service
 		movl %1, %%ebx;
 		movl %2, %%edx;
@@ -127,8 +111,8 @@ void sys_signal(int signal_name, func_p_t p){	// 140	// for a process to 'regist
 
 
 
-void sys_kill(int signal_name, int pid){	// 141	// for a process to send a signal to a process (or all in the same process group)
-	
+void sys_kill(int signal_name, int pid){	// 141	
+
 		asm("movl %0, %%eax;          // # for kernel to identify service
 		movl %1, %%ebx;
 		movl %2, %%edx;
