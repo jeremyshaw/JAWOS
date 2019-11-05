@@ -13,7 +13,7 @@
 #include <spede/stdio.h>
 
 void Idle(void);
-
 void Login(void);
+void Shell(void);
 
 #endif

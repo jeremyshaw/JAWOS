@@ -36,10 +36,25 @@ void Login(void) {
 		sys_write("passwd: ");
 		sys_read(passwd_str);
 		if(StrCmp(login_str, passwd_str) == 0) sys_write("prompt: login failed!\r");
-		else sys_write("prompt: login sucessful!\r");	// break;
+		else {
+			sys_write("prompt: login sucessful!\r");
+			break;
+		}
 		
 	}
 	
-	// sys_vfork(Shell); phase 8
+	sys_vfork(Shell);
+	sys_exit(0);
 }
 
+
+void Shell(void){
+	
+	//JAWOS> shellcmd
+	//dir/cal/roll
+	//StrCmp(dir)
+		// if true, sys_fork(ShellDir/ShellCal/ShellRoll)
+		// else display help message, valid commands
+	
+	
+}

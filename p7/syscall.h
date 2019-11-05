@@ -20,6 +20,5 @@ void sys_signal(int signal_name, func_p_t p);
 void sys_kill(int pid, int signal_name);
 
 void sys_read(char *str);
-int StrCmp(char *a, char *b);
 
 #endif
