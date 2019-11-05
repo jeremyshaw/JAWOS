@@ -18,13 +18,15 @@ que_t ready_que; //created/ready to run pid
 
 kb_t kb;
 
+page_t page[PAGE_MAX];
+
 pcb_t pcb[PROC_MAX];
 
-unsigned int sys_time_count;
+unsigned int sys_time_count, sys_rand_count;
 struct i386_gate *idt;
 
 unsigned short *sys_cursor;
-unsigned sys_rand_count;
+unsigned KDir;
 mutex_t video_mutex;
 
 char ch;
@@ -41,6 +43,10 @@ void BootStrap(void) {
 	sys_cursor = VIDEO_START;
 	
 	Bzero((char *) &kb, sizeof(kb_t));
+	
+	KDir = get_cr3();
+	for(i=0; i<PAGE_MAX; i++) page[i].pid = NONE;
+	
 
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);
@@ -76,24 +82,6 @@ void Scheduler(void) {
 	pcb[run_pid].time_count = 0;
 	pcb[run_pid].state = RUN;
 	
-}
-
-
-void KBSR(void) {
-	
-	int pidKB;
-	if (cons_kbhit()) {
-		ch = cons_getchar();
-		if(ch == '$') breakpoint();	
-		if(QueEmpty(&kb.wait_que)) EnQue(&kb.buffer, (int)ch);
-		else {
-			pidKB = DeQue(&kb.wait_que);
-			pcb[pidKB].state = READY;
-			EnQue(&ready_que, pidKB);
-			pcb[pidKB].tf_p->ebx = ch;
-		}
-	}
-	return;
 }
 
 

@@ -17,6 +17,14 @@
 #define QUE_MAX 20              // capacity of a process queue
 // #define CHR_ARY 20				// max charcter array length
 #define STR_MAX 20				// "official" max char arry len. Keeping old one for JiC purposes
+#define PAGE_MAX 100
+#define PAGE_SIZE 4096
+
+#define G1 0x40000000
+#define G2 0x80000000
+#define PRESET 0x01
+#define RW 0x02
+#define RO 0x00
 
 #define NONE -1                 // to indicate none
 #define IDLE 0                  // Idle thread PID 0
@@ -38,6 +46,7 @@
 #define SYS_SIGNAL 140
 #define SYS_KILL 141
 #define SYS_READ 142
+#define SYS_VFORK 143
 
 #define VIDEO_MUTEX 0
 #define LOCKED 1
@@ -65,6 +74,16 @@ typedef enum {AVAIL, READY, RUN, SLEEP, SUSPEND, WAIT, ZOMBIE, IO_WAIT} state_t;
 
 
 typedef struct {
+	int pid;	// the process that uses the page (initially NONE)
+	union {
+		unsigned addr;	// its byte addr (start DRAM 0xe00000)
+		char *content;	// addr as ptr to content (in bytes)
+		unsigned *entry;	// addr as an 'entry' array 
+	} u;
+} page_t;
+
+
+typedef struct {
 	int tail;
 	int que[QUE_MAX];
 } que_t;
@@ -86,7 +105,7 @@ typedef struct {
 typedef struct {
 	state_t state;
 	tf_t *tf_p;
-	unsigned int time_count, total_time, wake_time, ppid;
+	unsigned int time_count, total_time, wake_time, ppid, Dir;
 	func_p_t signal_handler[32];
 } pcb_t;
 

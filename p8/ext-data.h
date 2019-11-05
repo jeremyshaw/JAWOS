@@ -13,7 +13,9 @@ extern unsigned int sys_time_count, sys_rand_count;
 extern int run_pid, pid;
 extern struct i386_gate *idt;   
 extern unsigned short * sys_cursor;
+extern unsigned Kdir;
 extern mutex_t video_mutex;
 extern kb_t kb;
+extern page_t page[PAGE_MAX];
 
 #endif

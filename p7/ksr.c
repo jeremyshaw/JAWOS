@@ -63,6 +63,25 @@ void TimerSR(void) {
 }
 
 
+void KBSR(void) {
+	
+	int pidKB;
+	char ch;
+	if (cons_kbhit()) {
+		ch = cons_getchar();
+		if(ch == '$') breakpoint();	
+		if(QueEmpty(&kb.wait_que)) EnQue(&kb.buffer, (int)ch);
+		else {
+			pidKB = DeQue(&kb.wait_que);
+			pcb[pidKB].state = READY;
+			EnQue(&ready_que, pidKB);
+			pcb[pidKB].tf_p->ebx = ch;
+		}
+	}
+	return;
+}
+
+
 void SyscallSR(void) {
 
 	switch (pcb[run_pid].tf_p->eax) {

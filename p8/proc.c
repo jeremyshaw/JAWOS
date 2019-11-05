@@ -38,13 +38,13 @@ void Login(void) {
 		if(StrCmp(login_str, passwd_str) == 0) sys_write("prompt: login failed!\r");
 		else {
 			sys_write("prompt: login sucessful!\r");
-			break;
+			// break;
 		}
 		
 	}
 	
-	sys_vfork(Shell);
-	sys_exit(0);
+	// sys_vfork(Shell);
+	// sys_exit(0);
 }
 
 
@@ -55,6 +55,9 @@ void Shell(void){
 	//StrCmp(dir)
 		// if true, sys_fork(ShellDir/ShellCal/ShellRoll)
 		// else display help message, valid commands
-	
+	// (child) fork() - >execl(), execv(), ...
+		// prompt
+	// exit_pid = sys_wait(&exit_code);
+		// disp the 2 #'s in str
 	
 }

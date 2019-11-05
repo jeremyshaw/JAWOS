@@ -7,9 +7,10 @@
 #include "tools.h"
 #include "ksr.h"
 #include "syscall.h"
-#include "proc.h"	// remove this if uneccsary, only use for Init in SysExit AlterStack call
 
 
+// SpawnSR/ForkSR
+   // mark down the occupant of the DRAM page allocated
 void SpawnSR(func_p_t p) {
 	
 	int pid;
@@ -147,6 +148,10 @@ void SysKill(void){
 	}
 }
 
+// Certain SR's (functions in ksr.c) need to switch MMU to use
+// the process' Dir in order to access its virtual space
+   // ExitSR, WaitSR, AlterStack, and KBSR
+
 
 void AlterStack(int pid, func_p_t p){
 	
@@ -200,6 +205,25 @@ void SysWait(void) {
 		EnQue(&avail_que, i);
 	}
 	
+}
+
+
+void KBSR(void) {
+	
+	int pidKB;
+	char ch;
+	if (cons_kbhit()) {
+		ch = cons_getchar();
+		if(ch == '$') breakpoint();	
+		if(QueEmpty(&kb.wait_que)) EnQue(&kb.buffer, (int)ch);
+		else {
+			pidKB = DeQue(&kb.wait_que);
+			pcb[pidKB].state = READY;
+			EnQue(&ready_que, pidKB);
+			pcb[pidKB].tf_p->ebx = ch;
+		}
+	}
+	return;
 }
 
 

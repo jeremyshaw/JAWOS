@@ -27,8 +27,8 @@ unsigned short *sys_cursor;
 unsigned sys_rand_count;
 mutex_t video_mutex;
 
-char ch;
 int i;
+
 
 void BootStrap(void) {
 
@@ -76,24 +76,6 @@ void Scheduler(void) {
 	pcb[run_pid].time_count = 0;
 	pcb[run_pid].state = RUN;
 	
-}
-
-
-void KBSR(void) {
-	
-	int pidKB;
-	if (cons_kbhit()) {
-		ch = cons_getchar();
-		if(ch == '$') breakpoint();	
-		if(QueEmpty(&kb.wait_que)) EnQue(&kb.buffer, (int)ch);
-		else {
-			pidKB = DeQue(&kb.wait_que);
-			pcb[pidKB].state = READY;
-			EnQue(&ready_que, pidKB);
-			pcb[pidKB].tf_p->ebx = ch;
-		}
-	}
-	return;
 }
 
 
