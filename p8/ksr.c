@@ -11,8 +11,6 @@
 
 void SpawnSR(func_p_t p) {
 	
-	
-	
 	int pid;
 	
 	if(QueEmpty(&avail_que)){
@@ -37,6 +35,12 @@ void SpawnSR(func_p_t p) {
 	// SpawnSR/ForkSR
 	// mark down the occupant of the DRAM page allocated
 	// 0/1 --> page[newpid].pid = newpid;
+	
+	// SpawnSR/ForkSR
+		// set Dir in PCB to KDir for the new process (so it'll use real memory),
+		// mark down the equivalent DRAM page to be occupied by the new process
+		// (e.g., Idle and Login), so the page array can skip these already used
+	page[pid].pid = pid;
 	
 }
 
@@ -70,7 +74,6 @@ void TimerSR(void) {
 
 
 void KBSR(void) {
-	
 	
 	// Certain SR's (functions in ksr.c) need to switch MMU to use
 	// the process' Dir in order to access its virtual space
@@ -161,43 +164,59 @@ void SyscallSR(void) {
 
 
 void SysVFork(void) {
+	
 	// for the 5 page indices: int Dir, IT, DT, IP, DP
+	unsigned int Dir;
+	int IT, DT, IP, DP, pidF;
+	if(QueEmpty(&avail_que)) pcb[run_pid].tf_p->ebx = NONE;
+	else {
+		// allocate a new pid
+		// queue it to ready_que
+		pidF = DeQue(&avail_que);
+		EnQue(&ready_que, pidF);
+		// do we have to set to READY?
+		// do we have to handle DeQue failure states?
+		
+		// copy PCB from parent process but change 5 places:
+			// state, ppid, two time counts, and tf_p (see below) [virtual, set to 2G-sizeof tf_t)
+		MemCpy(char*)&pcb[pidF], (char*)&pcb[run_pid], sizeof(pcb_t));
+		pcb[pidF].state = READY;
+		pcb[pidF].time_count = 0;
+		pcb[pidF].total_time = 0;
+		pcb[pidF].ppid = run_pid;
+		pcb[pidF].tf_p = G2 - sizeof(tf_t);
 
-	// allocate a new pid
-	// queue it to ready_que
-	// copy PCB from parent process but change 5 places:
-		// state, ppid, two time counts, and tf_p (see below) [virtual, set to 2G-sizeof tf_t)
+		// look into all pages to allocate 5 pages: 
+			// if it's not used by any process, copy its array index
+			// if we got enough (5) indices -> break the loop
 
-	// look into all pages to allocate 5 pages: 
-		// if it's not used by any process, copy its array index
-		// if we got enough (5) indices -> break the loop
+		// if less than 5 indices obtained:
+			// show panic msg: don't have enough pages, breakpoint()
 
-	// if less than 5 indices obtained:
-		// show panic msg: don't have enough pages, breakpoint()
+		// set the five pages to be occupied by the new pid
+		// clear the content part of the five pages
 
-	// set the five pages to be occupied by the new pid
-	// clear the content part of the five pages
-
-	// build Dir page
-		// copy the first 16 entries from KDir to Dir
-		// set entry 256 to the address of IT page (bitwise-or-ed
-		// with the present and read/writable flags)
-		// set entry 511 to the address of DT page (bitwise-or-ed
-		// with the present and read/writable flags)
-	// build IT page
-		// set entry 0 to the address of IP page (bitwise-or-ed
-		// with the present and read-only flags)
-		// set entry 1023 to the address of DP page (bitwise-or-ed
-		// with the present and read/writable flags)
-	// build IP
-		// copy instructions to IP (src addr is ebx of TF)
-	// build DP
-		// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
-		// 2nd to last in u.entry[] is cs = get_cs()
-		// 3rd to last in u.entry[] is eip = G1
-	  
-	// copy u.addr of Dir page to Dir in PCB of the new process
-	// tf_p in PCB of new process = G2 minus the size of a trapframe
+		// build Dir page
+			// copy the first 16 entries from KDir to Dir
+			// set entry 256 to the address of IT page (bitwise-or-ed
+			// with the present and read/writable flags)
+			// set entry 511 to the address of DT page (bitwise-or-ed
+			// with the present and read/writable flags)
+		// build IT page
+			// set entry 0 to the address of IP page (bitwise-or-ed
+			// with the present and read-only flags)
+			// set entry 1023 to the address of DP page (bitwise-or-ed
+			// with the present and read/writable flags)
+		// build IP
+			// copy instructions to IP (src addr is ebx of TF)
+		// build DP
+			// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
+			// 2nd to last in u.entry[] is cs = get_cs()
+			// 3rd to last in u.entry[] is eip = G1
+		  
+		// copy u.addr of Dir page to Dir in PCB of the new process
+		// tf_p in PCB of new process = G2 minus the size of a trapframe
+	}
 	
 	
 }
@@ -269,7 +288,9 @@ void SysExit(void) {
 		// if parent doesn't have SIGCHLD handler, add it back!
 		if(pcb[ppid].signal_handler[SIGCHLD] != 0) AlterStack(ppid, pcb[ppid].signal_handler[SIGCHLD]);
 	} 
+	page[run_pid].pid = NONE;	// is this enough to release the page?
 	run_pid = NONE;
+	
 	
 	
 	
@@ -281,8 +302,6 @@ void SysExit(void) {
 
 
 void SysWait(void) {
-	
-	
 	
 	// Certain SR's (functions in ksr.c) need to switch MMU to use
 	// the process' Dir in order to access its virtual space
@@ -299,13 +318,8 @@ void SysWait(void) {
 		*((int *)pcb[run_pid].tf_p->ebx) = pcb[i].tf_p->ebx;
 		pcb[i].state = AVAIL;
 		EnQue(&avail_que, i);
+		page[run_pid].pid = NONE;	// is this enough to release the page?
 	}
-	
-
-	// SysExit/SysWait
-	// remember to recycle the pages used by the exiting process
-	// and since the translation information in them are no longer,
-	// switch MMU to use the kernel directory
 	
 }
 
@@ -344,8 +358,7 @@ void SysWrite(void) {
 
 void SysLockMutex(void) {
 	
-	int mutex_id;
-	mutex_id = pcb[run_pid].tf_p->ebx;
+	int mutex_id = pcb[run_pid].tf_p->ebx;
 	
 	if(mutex_id == VIDEO_MUTEX) {
 		if(video_mutex.lock == UNLOCKED) video_mutex.lock = LOCKED;
@@ -382,12 +395,8 @@ void SysUnlockMutex(void) {
 
 void SysFork(void) {
 	
-	
-	// SpawnSR/ForkSR
-	// mark down the occupant of the DRAM page allocated
-
 	int pidF, distance, *bpEbp;
-
+	
 	if(QueEmpty(&avail_que)) pcb[run_pid].tf_p->ebx = NONE;
 	else {
 		pidF = DeQue(&avail_que);
@@ -412,7 +421,14 @@ void SysFork(void) {
 		
 		pcb[run_pid].tf_p->ebx = pidF;
 		pcb[pidF].tf_p->ebx = 0;
-	}		
+		
+		page[pidF].pid = pidF;	// mark down the occupant of the DRAM page allocated
+		// SpawnSR/ForkSR
+			// set Dir in PCB to KDir for the new process (so it'll use real memory),
+			// mark down the equivalent DRAM page to be occupied by the new process
+			// (e.g., Idle and Login), so the page array can skip these already used
+	}	
+	
 }
 
 void SysSignal(void){ pcb[run_pid].signal_handler[pcb[run_pid].tf_p->ebx] = (func_p_t)pcb[run_pid].tf_p->edx; }

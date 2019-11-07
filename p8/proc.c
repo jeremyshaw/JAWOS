@@ -47,12 +47,22 @@ void Login(void) {
 
 
 void Shell(void) {
-	// loops to prompt for command input and execute:
-		// show a prompt (see demo runs)
-		// get a command input
-		// compare input with one of the valid commands
-		// to execute the command via sys_vfork() call
-		// on input mismatch a valid-command list is shown
+	
+	char prompt_str[STR_MAX];
+	
+	while(1) {
+	
+		sys_write("JAWOS>");
+		sys_read(prompt_str);
+		if(StrCmp(prompt_str, "Dir")) sys_vfork(ShellDir);
+		else if(StrCmp(prompt_str, "Cal")) sys_vfork(ShellCal);
+		else if(StrCmp(prompt_str, "Roll")) sys_vfork(ShellRoll);
+		else {
+			sys_write("list of valid commands\r");
+			sys_write("Dir\r");
+			//	etc
+		}
+	}
 }
 
    
@@ -69,7 +79,6 @@ void ShellDir(void) {
 
 
 void ShellCal(void) {
-   // show the calendar of the month
    sys_write("       MONTH        \r");
    sys_write(" 1  2  3  4  5  6  7\r");
    sys_write(" 8  9 10 11 12 13 14\r");
@@ -80,11 +89,6 @@ void ShellCal(void) {
 
 
 void ShellRoll(void) {
-   // Roll two dices and call sys_exit() with their sum.
-   // To roll a dice is to call sys_get_rand and modulus
-   // its return with 6 (for a six-faced dice); and after
-   // plus 1 in order to get a number between 1 and 6
-   // inclusively.
 	int d1 = sys_get_rand() % 6 + 1;
 	int d2 = sys_get_rand() % 6 + 1;
 	sys_exit(d1 + d2);	// you know what the optimization is...

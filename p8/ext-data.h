@@ -15,5 +15,6 @@ extern struct i386_gate *idt;
 extern unsigned short * sys_cursor;
 extern mutex_t video_mutex;
 extern kb_t kb;
+extern page_t page[PAGE_MAX];
 
 #endif

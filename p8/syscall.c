@@ -2,6 +2,8 @@
 // system service calls for kernel services
 
 #include "syscall.h"     // for SYS_GET_PID, etc., below
+#include "tools.h"	// for sys_read's DeQue and QueEmpty
+#include "ext-data.h"	// for sys_read's kb
 
 
 int sys_fork(void) {
@@ -13,21 +15,6 @@ int sys_fork(void) {
 		movl %%ebx, %0"     // after, copy ebx to return
 	   : "=g" (fork)         // output from asm()
 	   : "g" (SYS_FORK)  // input to asm()
-	   : "eax", "ebx"       // clobbered registers
-	);
-
-	return fork;
-}
-
-int sys_vfork(void) {
-	
-	int fork;
-
-	asm("movl %1, %%eax;     // # for kernel to identify service
-		int $128;           // interrupt!
-		movl %%ebx, %0"     // after, copy ebx to return
-	   : "=g" (fork)         // output from asm()
-	   : "g" (SYS_VFORK)  // input to asm()
 	   : "eax", "ebx"       // clobbered registers
 	);
 
@@ -128,6 +115,22 @@ void sys_signal(int signal_name, func_p_t p){	// 140
 	
 }
 
+
+int sys_vfork(func_p_t p) {	// 143
+	
+	int fork;
+
+	asm("movl %1, %%eax;	// # for kernel to identify service
+		movl %2, %%edx;
+		int $128;	// interrupt!
+		movl %%ebx, %0"	// after, copy ebx to return
+	   : "=g" (fork)	// output from asm()
+	   : "g" (SYS_VFORK), "g" (p)	// input to asm()
+	   : "eax", "ebx", "edx"	// clobbered registers
+	);
+
+	return fork;
+}
 
 
 void sys_kill(int signal_name, int pid){	// 141	
