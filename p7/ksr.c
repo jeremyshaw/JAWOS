@@ -236,21 +236,20 @@ void SysWrite(void) {
 	
 	unsigned short *old;	// jaja
 	char *str= (char *)pcb[run_pid].tf_p->ebx;
-    while( *str != (char) 0 ) {
+    while( *str != '\0' ) {
 		
 		if(*str == '\r') {
 			sys_cursor = ((((sys_cursor-VIDEO_START)/80)+1)*80)+VIDEO_START;
-			break;
 		} else {
 			*sys_cursor = (*str)+VGA_MASK_VAL;
 			sys_cursor++;
-			str++;
 		}
-		if(sys_cursor > VIDEO_END) {
+		if(sys_cursor >= VIDEO_END) {
 			old = VIDEO_START;
 			sys_cursor = VIDEO_START;
 			while(old != VIDEO_END) { *old++ = ' ' + VGA_MASK_VAL; }
 		}
+		str++;
 	}
 }
 

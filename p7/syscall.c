@@ -74,9 +74,9 @@ void sys_read(char *str) {	//142
 
 	char ch;
 	char chSt[2];
-	int index = STR_MAX-1;
+	int index = 0;
 	chSt[1] = '\0';
-	while(index--) {
+	while(index != STR_MAX-1) {
 		asm("movl %1, %%eax;
 			int $128;
 			movl %%ebx, %0"
@@ -84,11 +84,11 @@ void sys_read(char *str) {	//142
 			:"g"(SYS_READ)
 			:"eax", "ebx"
 		);
-		chSt[0] = ch;
+		chSt[0] = (char)ch;
 		sys_write(chSt);
 		if(ch == '\r') break;
-		*str = ch;
-		str++;
+		*(str++) = ch;
+		index++;
 	}
 	*str = '\0';	// This ia always added at the end.
 	return;	// Am I taking the instructions too litterally?
