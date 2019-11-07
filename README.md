@@ -59,7 +59,7 @@ Virtual Memory - in progress as of 5NOV19
 ## Who?
 * Jeremy Shaw [jeremyshaw](https://github.com/jeremyshaw)
 * Alex Leones [aleo101](https://github.com/aleo101)
-* Will Guo  [williamguo908](https://github.com/willaimguo908)
+* Will Guo  [williamguo908](https://github.com/williamguo908)
 
 ## Professor
 Weide Chang [CSUS](http://athena.ecs.csus.edu/~changw/)
