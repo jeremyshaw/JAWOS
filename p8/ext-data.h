@@ -9,13 +9,11 @@
 
 extern que_t avail_que, ready_que;
 extern pcb_t pcb[PROC_MAX];
-extern unsigned int sys_time_count, sys_rand_count;
+extern unsigned int sys_time_count, sys_rand_count, Kdir;
 extern int run_pid, pid;
 extern struct i386_gate *idt;   
 extern unsigned short * sys_cursor;
-extern unsigned Kdir;
 extern mutex_t video_mutex;
 extern kb_t kb;
-extern page_t page[PAGE_MAX];
 
 #endif

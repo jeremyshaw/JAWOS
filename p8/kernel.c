@@ -18,19 +18,19 @@ que_t ready_que; //created/ready to run pid
 
 kb_t kb;
 
-page_t page[PAGE_MAX];
-
 pcb_t pcb[PROC_MAX];
 
-unsigned int sys_time_count, sys_rand_count;
+unsigned int sys_time_count, Kdir, sys_rand_count;
 struct i386_gate *idt;
 
 unsigned short *sys_cursor;
-unsigned KDir;
+
 mutex_t video_mutex;
 
-char ch;
+page_t page[PAGE_MAX];
+
 int i;
+
 
 void BootStrap(void) {
 
@@ -44,9 +44,8 @@ void BootStrap(void) {
 	
 	Bzero((char *) &kb, sizeof(kb_t));
 	
-	KDir = get_cr3();
-	for(i=0; i<PAGE_MAX; i++) page[i].pid = NONE;
-	
+	Kdir = get_cr3();	// check how this is acctually used
+	for(i = 0; i < PAGE_MAX; i++) page[i].pid = NONE;
 
 	idt = get_idt_base();
 	fill_gate(&idt[TIMER_EVENT], (int)TimerEntry, get_cs(), ACC_INTR_GATE, 0);

@@ -7,10 +7,9 @@
 #include "tools.h"
 #include "ksr.h"
 #include "syscall.h"
+#include "proc.h"	// remove this if uneccsary, only use for Init in SysExit AlterStack call
 
 
-// SpawnSR/ForkSR
-   // mark down the occupant of the DRAM page allocated
 void SpawnSR(func_p_t p) {
 	
 	int pid;
@@ -61,6 +60,25 @@ void TimerSR(void) {
 		run_pid = NONE;
     }
 	
+}
+
+
+void KBSR(void) {
+	
+	int pidKB;
+	char ch;
+	if (cons_kbhit()) {
+		ch = cons_getchar();
+		if(ch == '$') breakpoint();	
+		if(QueEmpty(&kb.wait_que)) EnQue(&kb.buffer, (int)ch);
+		else {
+			pidKB = DeQue(&kb.wait_que);
+			pcb[pidKB].state = READY;
+			EnQue(&ready_que, pidKB);
+			pcb[pidKB].tf_p->ebx = ch;
+		}
+	}
+	return;
 }
 
 
@@ -148,10 +166,6 @@ void SysKill(void){
 	}
 }
 
-// Certain SR's (functions in ksr.c) need to switch MMU to use
-// the process' Dir in order to access its virtual space
-   // ExitSR, WaitSR, AlterStack, and KBSR
-
 
 void AlterStack(int pid, func_p_t p){
 	
@@ -208,25 +222,6 @@ void SysWait(void) {
 }
 
 
-void KBSR(void) {
-	
-	int pidKB;
-	char ch;
-	if (cons_kbhit()) {
-		ch = cons_getchar();
-		if(ch == '$') breakpoint();	
-		if(QueEmpty(&kb.wait_que)) EnQue(&kb.buffer, (int)ch);
-		else {
-			pidKB = DeQue(&kb.wait_que);
-			pcb[pidKB].state = READY;
-			EnQue(&ready_que, pidKB);
-			pcb[pidKB].tf_p->ebx = ch;
-		}
-	}
-	return;
-}
-
-
 void SysSleep(void) {
 	
 	int sleep_sec = pcb[run_pid].tf_p->ebx;
@@ -241,21 +236,20 @@ void SysWrite(void) {
 	
 	unsigned short *old;	// jaja
 	char *str= (char *)pcb[run_pid].tf_p->ebx;
-    while( *str != (char) 0 ) {
+    while( *str != '\0' ) {
 		
 		if(*str == '\r') {
 			sys_cursor = ((((sys_cursor-VIDEO_START)/80)+1)*80)+VIDEO_START;
-			break;
 		} else {
 			*sys_cursor = (*str)+VGA_MASK_VAL;
 			sys_cursor++;
-			str++;
 		}
-		if(sys_cursor > VIDEO_END) {
+		if(sys_cursor >= VIDEO_END) {
 			old = VIDEO_START;
 			sys_cursor = VIDEO_START;
 			while(old != VIDEO_END) { *old++ = ' ' + VGA_MASK_VAL; }
 		}
+		str++;
 	}
 }
 

@@ -11,15 +11,15 @@ int k, l;
 
 
 int StrCmp (char *a, char *b){
-	// classic strcmp would return difference, iirc. But all we need is 1 for sucess, 0 for fail
+
 	while(1) {
 		if(*a == '\0' && *b == '\0') return 1;	// if still good, return 1
-		if(*b != *a) break;	// if no good at any point, break.
+		if(*b != *a) break;
 		a++;
 		b++;
 	}
-	return 0;	// I suppose this could be put inside of the forever loop,
-	// but placing it here "guarentees" a loop failure will return 0;	
+	return 0;	// "guarantees" loop failure will return 0
+	
 }
 
 
