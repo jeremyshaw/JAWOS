@@ -11,8 +11,7 @@
 
 void SpawnSR(func_p_t p) {
 	
-	// SpawnSR/ForkSR
-	// mark down the occupant of the DRAM page allocated
+	
 	
 	int pid;
 	
@@ -33,6 +32,11 @@ void SpawnSR(func_p_t p) {
 	pcb[pid].tf_p -> efl = EF_DEFAULT_VALUE|EF_INTR; //handle intr
 	pcb[pid].tf_p -> cs = get_cs();
 	pcb[pid].tf_p -> eip = (DRAM_START + (pid*STACK_MAX));
+	
+	
+	// SpawnSR/ForkSR
+	// mark down the occupant of the DRAM page allocated
+	// 0/1 --> page[newpid].pid = newpid;
 	
 }
 
@@ -70,7 +74,7 @@ void KBSR(void) {
 	
 	// Certain SR's (functions in ksr.c) need to switch MMU to use
 	// the process' Dir in order to access its virtual space
-	// ExitSR, WaitSR, AlterStack, and KBSR
+	// ExitSR, WaitSR, AlterStack, and KBSR - use set_cr3(something) instead of run_pid?
 	
 	int pidKB;
 	char ch;
@@ -162,7 +166,7 @@ void SysVFork(void) {
 	// allocate a new pid
 	// queue it to ready_que
 	// copy PCB from parent process but change 5 places:
-		// state, ppid, two time counts, and tf_p (see below)
+		// state, ppid, two time counts, and tf_p (see below) [virtual, set to 2G-sizeof tf_t)
 
 	// look into all pages to allocate 5 pages: 
 		// if it's not used by any process, copy its array index
