@@ -23,4 +23,6 @@ void AlterStack(int pid, func_p_t p);
 void SysRead(void);
 void KBSR(void);
 
+void SysVFork(void);
+
 #endif

@@ -19,6 +19,21 @@ int sys_fork(void) {
 	return fork;
 }
 
+int sys_vfork(void) {
+	
+	int fork;
+
+	asm("movl %1, %%eax;     // # for kernel to identify service
+		int $128;           // interrupt!
+		movl %%ebx, %0"     // after, copy ebx to return
+	   : "=g" (fork)         // output from asm()
+	   : "g" (SYS_VFORK)  // input to asm()
+	   : "eax", "ebx"       // clobbered registers
+	);
+
+	return fork;
+}
+
 
 int sys_get_pid(void) {
 
@@ -77,6 +92,7 @@ void sys_read(char *str) {	//142
 	int index = 0;
 	chSt[1] = '\0';
 	while(index != STR_MAX-1) {
+		/*
 		asm("movl %1, %%eax;
 			int $128;
 			movl %%ebx, %0"
@@ -84,6 +100,9 @@ void sys_read(char *str) {	//142
 			:"g"(SYS_READ)
 			:"eax", "ebx"
 		);
+		*/
+		while (QueEmpty(&kb.buffer)) sys_sleep(1);
+		ch = DeQue(&kb.buffer);
 		chSt[0] = (char)ch;
 		sys_write(chSt);
 		if(ch == '\r') break;
