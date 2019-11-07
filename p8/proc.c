@@ -57,15 +57,36 @@ void Login(void) {
       // to execute the command via sys_vfork() call
       // on input mismatch a valid-command list is shown
 
-// ShellDir
-   // show a faked directory listing
 
-// ShellCal
+   
+void ShellDir(void) {
+	// show a faked directory listing
+	sys_write("dir stuff\r");
+	sys_write(".\r");
+	sys_write("..\r");
+	sys_write("folder.exe     awrxgwrxuwrx\r");
+	sys_write("a.out          a---g---uwrx\r");
+	sys_exit(0);
+	
+}
+
+void ShellCal(void) {
    // show the calendar of the month
+   sys_write("       MONTH        \r");
+   sys_write(" 1  2  3  4  5  6  7\r");
+   sys_write(" 8  9 10 11 12 13 14\r");
+   sys_write("15 16 17 18 19 20 21\r");
+   sys_write("22 23 24 25 26 27 28\r");
+   sys_exit(0);
+}
 
-// ShellRoll
+void ShellRoll(void) {
    // Roll two dices and call sys_exit() with their sum.
    // To roll a dice is to call sys_get_rand and modulus
    // its return with 6 (for a six-faced dice); and after
    // plus 1 in order to get a number between 1 and 6
    // inclusively.
+	int d1 = sys_get_rand() % 6 + 1;
+	int d2 = sys_get_rand() % 6 + 1;
+	sys_exit(d1 + d2);	// you know what the optimization is...
+}
