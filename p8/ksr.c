@@ -7,13 +7,12 @@
 #include "tools.h"
 #include "ksr.h"
 #include "syscall.h"
-#include "proc.h"	// remove this if uneccsary, only use for Init in SysExit AlterStack call
 
 
 void SpawnSR(func_p_t p) {
 	
 	// SpawnSR/ForkSR
-   // mark down the occupant of the DRAM page allocated
+	// mark down the occupant of the DRAM page allocated
 	
 	int pid;
 	
@@ -70,8 +69,8 @@ void KBSR(void) {
 	
 	
 	// Certain SR's (functions in ksr.c) need to switch MMU to use
-// the process' Dir in order to access its virtual space
-   // ExitSR, WaitSR, AlterStack, and KBSR
+	// the process' Dir in order to access its virtual space
+	// ExitSR, WaitSR, AlterStack, and KBSR
 	
 	int pidKB;
 	char ch;
@@ -151,50 +150,50 @@ void SyscallSR(void) {
 	
 	
 	// SyscallSR
-   // switch MMU to use KDir at the end of code, unconditionally
+	// switch MMU to use KDir at the end of code, unconditionally
 	
 	
 }
 
 
 void SysVFork(void) {
-	   // for the 5 page indices: int Dir, IT, DT, IP, DP
+	// for the 5 page indices: int Dir, IT, DT, IP, DP
 
-   // allocate a new pid
-   // queue it to ready_que
-   // copy PCB from parent process but change 5 places:
-      // state, ppid, two time counts, and tf_p (see below)
+	// allocate a new pid
+	// queue it to ready_que
+	// copy PCB from parent process but change 5 places:
+		// state, ppid, two time counts, and tf_p (see below)
 
-   // look into all pages to allocate 5 pages: 
-      // if it's not used by any process, copy its array index
-      // if we got enough (5) indices -> break the loop
+	// look into all pages to allocate 5 pages: 
+		// if it's not used by any process, copy its array index
+		// if we got enough (5) indices -> break the loop
 
-   // if less than 5 indices obtained:
-      // show panic msg: don't have enough pages, breakpoint()
+	// if less than 5 indices obtained:
+		// show panic msg: don't have enough pages, breakpoint()
 
-   // set the five pages to be occupied by the new pid
-   // clear the content part of the five pages
+	// set the five pages to be occupied by the new pid
+	// clear the content part of the five pages
 
-   // build Dir page
-      // copy the first 16 entries from KDir to Dir
-      // set entry 256 to the address of IT page (bitwise-or-ed
-      // with the present and read/writable flags)
-      // set entry 511 to the address of DT page (bitwise-or-ed
-      // with the present and read/writable flags)
-   // build IT page
-      // set entry 0 to the address of IP page (bitwise-or-ed
-      // with the present and read-only flags)
-      // set entry 1023 to the address of DP page (bitwise-or-ed
-      // with the present and read/writable flags)
-   // build IP
-      // copy instructions to IP (src addr is ebx of TF)
-   // build DP
-      // the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
-      // 2nd to last in u.entry[] is cs = get_cs()
-      // 3rd to last in u.entry[] is eip = G1
-      
-   // copy u.addr of Dir page to Dir in PCB of the new process
-   // tf_p in PCB of new process = G2 minus the size of a trapframe
+	// build Dir page
+		// copy the first 16 entries from KDir to Dir
+		// set entry 256 to the address of IT page (bitwise-or-ed
+		// with the present and read/writable flags)
+		// set entry 511 to the address of DT page (bitwise-or-ed
+		// with the present and read/writable flags)
+	// build IT page
+		// set entry 0 to the address of IP page (bitwise-or-ed
+		// with the present and read-only flags)
+		// set entry 1023 to the address of DP page (bitwise-or-ed
+		// with the present and read/writable flags)
+	// build IP
+		// copy instructions to IP (src addr is ebx of TF)
+	// build DP
+		// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
+		// 2nd to last in u.entry[] is cs = get_cs()
+		// 3rd to last in u.entry[] is eip = G1
+	  
+	// copy u.addr of Dir page to Dir in PCB of the new process
+	// tf_p in PCB of new process = G2 minus the size of a trapframe
 	
 	
 }
@@ -228,8 +227,8 @@ void SysKill(void){
 void AlterStack(int pid, func_p_t p){
 	
 	// Certain SR's (functions in ksr.c) need to switch MMU to use
-// the process' Dir in order to access its virtual space
-   // ExitSR, WaitSR, AlterStack, and KBSR
+	// the process' Dir in order to access its virtual space
+	// ExitSR, WaitSR, AlterStack, and KBSR
 	
 	int *local;
 	unsigned eip;
@@ -246,12 +245,11 @@ void AlterStack(int pid, func_p_t p){
 }
 
 
-void SysExit(void) {	
-	
+void SysExit(void) {
 	
 	// Certain SR's (functions in ksr.c) need to switch MMU to use
-// the process' Dir in order to access its virtual space
-   // ExitSR, WaitSR, AlterStack, and KBSR
+	// the process' Dir in order to access its virtual space
+	// ExitSR, WaitSR, AlterStack, and KBSR
 	
 	int ppid = pcb[run_pid].ppid;
 	
@@ -272,9 +270,9 @@ void SysExit(void) {
 	
 	
 	// SysExit/SysWait
-   // remember to recycle the pages used by the exiting process
-   // and since the translation information in them are no longer,
-   // switch MMU to use the kernel directory
+	// remember to recycle the pages used by the exiting process
+	// and since the translation information in them are no longer,
+	// switch MMU to use the kernel directory
 }
 
 
@@ -283,8 +281,8 @@ void SysWait(void) {
 	
 	
 	// Certain SR's (functions in ksr.c) need to switch MMU to use
-// the process' Dir in order to access its virtual space
-   // ExitSR, WaitSR, AlterStack, and KBSR
+	// the process' Dir in order to access its virtual space
+	// ExitSR, WaitSR, AlterStack, and KBSR
 	
 	int i;	
 	for(i = 0; i < PROC_MAX; i++) { if(pcb[i].state == ZOMBIE && pcb[i].ppid == run_pid) break; }
@@ -299,11 +297,11 @@ void SysWait(void) {
 		EnQue(&avail_que, i);
 	}
 	
-	
+
 	// SysExit/SysWait
-   // remember to recycle the pages used by the exiting process
-   // and since the translation information in them are no longer,
-   // switch MMU to use the kernel directory
+	// remember to recycle the pages used by the exiting process
+	// and since the translation information in them are no longer,
+	// switch MMU to use the kernel directory
 	
 }
 
@@ -382,7 +380,7 @@ void SysFork(void) {
 	
 	
 	// SpawnSR/ForkSR
-   // mark down the occupant of the DRAM page allocated
+	// mark down the occupant of the DRAM page allocated
 
 	int pidF, distance, *bpEbp;
 

@@ -45,18 +45,15 @@ void Login(void) {
 	// sys_vfork(Shell); phase 8
 }
 
-// Login
-   // a successful login calls for the creation of a Shell process
-   // via the sys_vfork() call
 
-// Shell
-   // loops to prompt for command input and execute:
-      // show a prompt (see demo runs)
-      // get a command input
-      // compare input with one of the valid commands
-      // to execute the command via sys_vfork() call
-      // on input mismatch a valid-command list is shown
-
+void Shell(void) {
+	// loops to prompt for command input and execute:
+		// show a prompt (see demo runs)
+		// get a command input
+		// compare input with one of the valid commands
+		// to execute the command via sys_vfork() call
+		// on input mismatch a valid-command list is shown
+}
 
    
 void ShellDir(void) {
@@ -70,6 +67,7 @@ void ShellDir(void) {
 	
 }
 
+
 void ShellCal(void) {
    // show the calendar of the month
    sys_write("       MONTH        \r");
@@ -79,6 +77,7 @@ void ShellCal(void) {
    sys_write("22 23 24 25 26 27 28\r");
    sys_exit(0);
 }
+
 
 void ShellRoll(void) {
    // Roll two dices and call sys_exit() with their sum.

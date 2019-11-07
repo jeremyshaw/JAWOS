@@ -1,6 +1,6 @@
 # JAWOS (Jeremy, Alex, & Will Operating System)
 CSU Sacramento CSC159/CpE159 Operating System Pragmatics
-
+Fall 2019
 
 ## What are Phases?
 Steps from which the OS is constructed, piece by piece.
@@ -48,10 +48,14 @@ sys_kill()
 Kernel input "driver" (for reading text from KB)
 ```
 sys_read()
+StrCmp()
 ```
 
 ### Phase 8
 Virtual Memory - in progress as of 5NOV19
+```
+sys_vfork();
+```
 
 ### Phase 9
 
