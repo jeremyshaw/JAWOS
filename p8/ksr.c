@@ -33,14 +33,12 @@ void SpawnSR(func_p_t p) {
 	
 	
 	// SpawnSR/ForkSR
-	// mark down the occupant of the DRAM page allocated
-	// 0/1 --> page[newpid].pid = newpid;
-	
-	// SpawnSR/ForkSR
+		// 0/1 --> page[newpid].pid = newpid;
 		// set Dir in PCB to KDir for the new process (so it'll use real memory),
 		// mark down the equivalent DRAM page to be occupied by the new process
 		// (e.g., Idle and Login), so the page array can skip these already used
 	page[pid].pid = pid;
+	pcb[pid].Dir = KDir;
 	
 }
 
@@ -81,6 +79,7 @@ void KBSR(void) {
 	
 	int pidKB;
 	char ch;
+	
 	if (cons_kbhit()) {
 		ch = cons_getchar();
 		if(ch == '$') breakpoint();	
@@ -93,6 +92,7 @@ void KBSR(void) {
 		}
 	}
 	return;
+	
 }
 
 
@@ -167,7 +167,7 @@ void SysVFork(void) {
 	
 	// for the 5 page indices: int Dir, IT, DT, IP, DP
 	unsigned int Dir;
-	int IT, DT, IP, DP, pidF;
+	int IT, DT, IP, DP, pidF, i;
 	if(QueEmpty(&avail_que)) pcb[run_pid].tf_p->ebx = NONE;
 	else {
 		// allocate a new pid
@@ -179,19 +179,24 @@ void SysVFork(void) {
 		
 		// copy PCB from parent process but change 5 places:
 			// state, ppid, two time counts, and tf_p (see below) [virtual, set to 2G-sizeof tf_t)
-		MemCpy(char*)&pcb[pidF], (char*)&pcb[run_pid], sizeof(pcb_t));
+		MemCpy((char*)&pcb[pidF], (char*)&pcb[run_pid], sizeof(pcb_t));
 		pcb[pidF].state = READY;
 		pcb[pidF].time_count = 0;
 		pcb[pidF].total_time = 0;
 		pcb[pidF].ppid = run_pid;
-		pcb[pidF].tf_p = G2 - sizeof(tf_t);
+		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));
 
 		// look into all pages to allocate 5 pages: 
 			// if it's not used by any process, copy its array index
 			// if we got enough (5) indices -> break the loop
-
+		for (i = 0; i < PAGE_MAX; i++) {
+			page[i];	// not done
+		}
+		
+		
 		// if less than 5 indices obtained:
 			// show panic msg: don't have enough pages, breakpoint()
+		
 
 		// set the five pages to be occupied by the new pid
 		// clear the content part of the five pages
@@ -395,7 +400,7 @@ void SysUnlockMutex(void) {
 
 void SysFork(void) {
 	
-	int pidF, distance, *bpEbp;
+	int pidF, distance, *bpEbp, pgI;
 	
 	if(QueEmpty(&avail_que)) pcb[run_pid].tf_p->ebx = NONE;
 	else {
@@ -422,11 +427,15 @@ void SysFork(void) {
 		pcb[run_pid].tf_p->ebx = pidF;
 		pcb[pidF].tf_p->ebx = 0;
 		
-		page[pidF].pid = pidF;	// mark down the occupant of the DRAM page allocated
 		// SpawnSR/ForkSR
+			// 0/1 --> page[newpid].pid = newpid;
 			// set Dir in PCB to KDir for the new process (so it'll use real memory),
 			// mark down the equivalent DRAM page to be occupied by the new process
 			// (e.g., Idle and Login), so the page array can skip these already used
+		
+		for (pgI = 0; pgI<PAGE_MAX; pgI++) { if(page[pgI].pid == NONE) break; }
+		page[pgI].pid = pidF;
+		pcb[pidF].Dir = KDir;
 	}	
 	
 }

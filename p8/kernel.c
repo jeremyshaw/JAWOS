@@ -20,7 +20,7 @@ kb_t kb;
 
 pcb_t pcb[PROC_MAX];
 
-unsigned int sys_time_count, Kdir, sys_rand_count;
+unsigned int sys_time_count, KDir, sys_rand_count;
 struct i386_gate *idt;
 
 unsigned short *sys_cursor;
@@ -44,7 +44,7 @@ void BootStrap(void) {
 	
 	Bzero((char *) &kb, sizeof(kb_t));
 	
-	Kdir = get_cr3();	// check how this is acctually used
+	KDir = get_cr3();	// check how this is acctually used
 	for(i = 0; i < PAGE_MAX; i++) {
 		page[i].pid = NONE;
 		page[i].u.addr = DRAM_START + (i * PAGE_SIZE);
