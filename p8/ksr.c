@@ -37,6 +37,7 @@ void SpawnSR(func_p_t p) {
 		// set Dir in PCB to KDir for the new process (so it'll use real memory),
 		// mark down the equivalent DRAM page to be occupied by the new process
 		// (e.g., Idle and Login), so the page array can skip these already used
+	pcb[pid].Dir = KDir; //this works? - Alex
 	page[pid].pid = pid;
 	pcb[pid].Dir = KDir;
 	
@@ -158,7 +159,7 @@ void SyscallSR(void) {
 	
 	// SyscallSR
 	// switch MMU to use KDir at the end of code, unconditionally
-	
+	// my best guess: set_cr3(pcb[run_pid].Dir);  //Alex 
 	
 }
 
