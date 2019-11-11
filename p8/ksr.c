@@ -214,7 +214,7 @@ void SysVFork(void) {
 			Bzero((char *)&page[pageIndex[i]], sizeof(page_t));
 		}
 
-		// build Dir page	// duh. We don't call it Dir, lol. We just know it is.
+		// build Dir page
 			// copy the first 16 entries from KDir to Dir
 			// set entry 256 to the address of IT page (bitwise-or-ed
 			// with the present and read/writable flags)
@@ -230,20 +230,21 @@ void SysVFork(void) {
 			// with the present and read-only flags)
 			// set entry 1023 to the address of DP page (bitwise-or-ed
 			// with the present and read/writable flags)
-			
+		page[pageIndex[1]] = pcb[pidF].tf_p->eip;
 		
 		// build IP
 			// copy instructions to IP (src addr is ebx of TF)
-			
+		page[pageIndex[2]] = pcb[pidF].tf_p->ebx;
 		
 		// build DP
 			// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
 			// 2nd to last in u.entry[] is cs = get_cs()
 			// 3rd to last in u.entry[] is eip = G1
-		  
 		
 		// copy u.addr of Dir page to Dir in PCB of the new process
 		// tf_p in PCB of new process = G2 minus the size of a trapframe
+		pcb[pidF].Dir = page[pageIndex[0]].u.addr;
+		pcb[pidF].tf_p = G2 - sizeof(tf_t);
 	}
 	
 	
