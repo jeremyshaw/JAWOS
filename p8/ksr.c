@@ -37,9 +37,8 @@ void SpawnSR(func_p_t p) {
 		// set Dir in PCB to KDir for the new process (so it'll use real memory),
 		// mark down the equivalent DRAM page to be occupied by the new process
 		// (e.g., Idle and Login), so the page array can skip these already used
-	pcb[pid].Dir = KDir; //this works? - Alex
+	pcb[pid].Dir = KDir; //this works? - Alex	// yes, also need the other.
 	page[pid].pid = pid;
-	pcb[pid].Dir = KDir;
 	
 }
 
@@ -281,6 +280,7 @@ void SysExit(void) {
 	// ExitSR, WaitSR, AlterStack, and KBSR
 	
 	int ppid = pcb[run_pid].ppid;
+	int i;
 	
 	if(pcb[ppid].state == WAIT) {
 		pcb[ppid].state = READY;
@@ -294,7 +294,8 @@ void SysExit(void) {
 		// if parent doesn't have SIGCHLD handler, add it back!
 		if(pcb[ppid].signal_handler[SIGCHLD] != 0) AlterStack(ppid, pcb[ppid].signal_handler[SIGCHLD]);
 	} 
-	page[run_pid].pid = NONE;	// is this enough to release the page?
+	for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
+	// page[run_pid].pid = NONE;	// is this enough to release the page?
 	run_pid = NONE;
 	
 	
@@ -324,7 +325,8 @@ void SysWait(void) {
 		*((int *)pcb[run_pid].tf_p->ebx) = pcb[i].tf_p->ebx;
 		pcb[i].state = AVAIL;
 		EnQue(&avail_que, i);
-		page[run_pid].pid = NONE;	// is this enough to release the page?
+		// page[run_pid].pid = NONE;	// is this enough to release the page? No, many more pages per pid.
+		for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
 	}
 	
 }

@@ -71,7 +71,7 @@ void ShellDir(void) {
 	sys_write("dir stuff\r");
 	sys_write(".\r");
 	sys_write("..\r");
-	sys_write("folder.exe     awrxgwrxuwrx\r");
+	sys_write("folder.exe     awrxgwrxuwrx\r");	// We may lose points here.
 	sys_write("a.out          a---g---uwrx\r");
 	sys_exit(0);
 	
