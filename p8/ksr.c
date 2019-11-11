@@ -77,6 +77,7 @@ void KBSR(void) {
 	// the process' Dir in order to access its virtual space
 	// ExitSR, WaitSR, AlterStack, and KBSR - use set_cr3(something) instead of run_pid?
 	
+	// I don't see anywhere that we have to change?
 	int pidKB;
 	char ch;
 	
@@ -167,7 +168,8 @@ void SysVFork(void) {
 	
 	// for the 5 page indices: int Dir, IT, DT, IP, DP
 	unsigned int Dir;
-	int IT, DT, IP, DP, pidF, i;
+	int IT, DT, IP, DP, pidF, i, pageNum, pageIndex[5];
+	pageNum = 0;
 	if(QueEmpty(&avail_que)) pcb[run_pid].tf_p->ebx = NONE;
 	else {
 		// allocate a new pid
@@ -190,35 +192,56 @@ void SysVFork(void) {
 			// if it's not used by any process, copy its array index
 			// if we got enough (5) indices -> break the loop
 		for (i = 0; i < PAGE_MAX; i++) {
-			page[i];	// not done
+			if(page[i].pid == NONE){
+				pageIndex[pageNum] = i;
+				pageNum++;
+			}
+			if(pageNum == 5) break;
 		}
-		
-		
+			
 		// if less than 5 indices obtained:
 			// show panic msg: don't have enough pages, breakpoint()
-		
+		if(pageNum < 5) {
+			cons_printf("Not enough pages!");
+			breakpoint();
+		}
 
 		// set the five pages to be occupied by the new pid
 		// clear the content part of the five pages
+		
+		for(i = 0; i < 5; i ++) {
+			page[pageIndex[i]].pid = pidF;
+			Bzero((char *)&page[pageIndex[i]], sizeof(page_t));
+		}
 
-		// build Dir page
+		// build Dir page	// duh. We don't call it Dir, lol. We just know it is.
 			// copy the first 16 entries from KDir to Dir
 			// set entry 256 to the address of IT page (bitwise-or-ed
 			// with the present and read/writable flags)
 			// set entry 511 to the address of DT page (bitwise-or-ed
 			// with the present and read/writable flags)
+		Dir = (int)&page[pageIndex[0]];
+		for (i = 0; i < 16; i++ ) {
+			page[pageIndex[0]].u.??? = KDir[i];	// ?
+		}
+		
 		// build IT page
 			// set entry 0 to the address of IP page (bitwise-or-ed
 			// with the present and read-only flags)
 			// set entry 1023 to the address of DP page (bitwise-or-ed
 			// with the present and read/writable flags)
+			
+		
 		// build IP
 			// copy instructions to IP (src addr is ebx of TF)
+			
+		
 		// build DP
 			// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
 			// 2nd to last in u.entry[] is cs = get_cs()
 			// 3rd to last in u.entry[] is eip = G1
 		  
+		
 		// copy u.addr of Dir page to Dir in PCB of the new process
 		// tf_p in PCB of new process = G2 minus the size of a trapframe
 	}
@@ -257,6 +280,9 @@ void AlterStack(int pid, func_p_t p){
 	// Certain SR's (functions in ksr.c) need to switch MMU to use
 	// the process' Dir in order to access its virtual space
 	// ExitSR, WaitSR, AlterStack, and KBSR
+	
+	
+	// I don't see anywhere that we need to adjust here, either.
 	
 	int *local;
 	unsigned eip;

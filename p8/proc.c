@@ -38,11 +38,11 @@ void Login(void) {
 		if(StrCmp(login_str, passwd_str) == 0) sys_write("prompt: login failed!\r");
 		else {
 			sys_write("prompt: login sucessful!\r");	
-			// break;	phase 8;
+			break;	// phase 8;
 		}
 	}
 	
-	// sys_vfork(Shell); phase 8
+	sys_vfork(Shell);	// phase 8
 }
 
 
