@@ -211,7 +211,7 @@ void SysVFork(void) {
 		
 		for(i = 0; i < 5; i ++) {
 			page[pageIndex[i]].pid = pidF;
-			Bzero((char *)&page[pageIndex[i]], sizeof(page_t));
+			Bzero(page[pageIndex[i]].u.content, PAGE_SIZE);
 		}
 
 		// build Dir page
@@ -220,9 +220,9 @@ void SysVFork(void) {
 			// with the present and read/writable flags)
 			// set entry 511 to the address of DT page (bitwise-or-ed
 			// with the present and read/writable flags)
-		Dir = (int)&page[pageIndex[0]];
+		// Dir = (int)&page[pageIndex[0]];
 		for (i = 0; i < 16; i++ ) {
-			page[pageIndex[0]].u.??? = KDir[i];	// ?
+			// (page[pageIndex[0]]).u.entry[i] = (KDir)[i];	// ?
 		}
 		
 		// build IT page
@@ -230,21 +230,22 @@ void SysVFork(void) {
 			// with the present and read-only flags)
 			// set entry 1023 to the address of DP page (bitwise-or-ed
 			// with the present and read/writable flags)
-		page[pageIndex[1]] = pcb[pidF].tf_p->eip;
+		(page[pageIndex[1]]).u.entry[0] = pcb[pidF].tf_p->eip;
 		
 		// build IP
 			// copy instructions to IP (src addr is ebx of TF)
-		page[pageIndex[2]] = pcb[pidF].tf_p->ebx;
+		// MemCpy((char *) page[pageIndex[2]].u.
 		
 		// build DP
 			// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
 			// 2nd to last in u.entry[] is cs = get_cs()
 			// 3rd to last in u.entry[] is eip = G1
 		
+		
 		// copy u.addr of Dir page to Dir in PCB of the new process
 		// tf_p in PCB of new process = G2 minus the size of a trapframe
-		pcb[pidF].Dir = page[pageIndex[0]].u.addr;
-		pcb[pidF].tf_p = G2 - sizeof(tf_t);
+		pcb[pidF].Dir = (page[pageIndex[0]]).u.addr;
+		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));
 	}
 	
 	
