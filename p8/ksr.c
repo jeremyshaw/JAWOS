@@ -157,9 +157,8 @@ void SyscallSR(void) {
 	}
 	
 	
-	// SyscallSR
-	// switch MMU to use KDir at the end of code, unconditionally
-	set_cr3(pcb[run_pid].Dir); //not super confident, but the right track -alex
+	// SyscallSR - switch MMU to use KDir at the end of code, unconditionally
+	set_cr3(KDir);	// run_pid was neutralized earlier
 	
 }
 
@@ -172,12 +171,9 @@ void SysVFork(void) {
 	pageNum = 0;
 	if(QueEmpty(&avail_que)) pcb[run_pid].tf_p->ebx = NONE;
 	else {
-		// allocate a new pid
-		// queue it to ready_que
 		pidF = DeQue(&avail_que);
 		EnQue(&ready_que, pidF);
 		// do we have to set to READY?
-		// do we have to handle DeQue failure states?
 		
 		// copy PCB from parent process but change 5 places:
 			// state, ppid, two time counts, and tf_p (see below) [virtual, set to 2G-sizeof tf_t)
@@ -188,10 +184,8 @@ void SysVFork(void) {
 		pcb[pidF].ppid = run_pid;
 		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));
 
-		// look into all pages to allocate 5 pages: 
-			// if it's not used by any process, copy its array index
-			// if we got enough (5) indices -> break the loop
-		for (i = 0; i < PAGE_MAX; i++) {
+		
+		for (i = 0; i < PAGE_MAX; i++) {	// "allocate" 5 pages
 			if(page[i].pid == NONE){
 				pageIndex[pageNum] = i;
 				pageNum++;
@@ -199,8 +193,6 @@ void SysVFork(void) {
 			if(pageNum == 5) break;
 		}
 			
-		// if less than 5 indices obtained:
-			// show panic msg: don't have enough pages, breakpoint()
 		if(pageNum < 5) {
 			cons_printf("Not enough pages!");
 			breakpoint();
@@ -208,7 +200,6 @@ void SysVFork(void) {
 
 		// set the five pages to be occupied by the new pid
 		// clear the content part of the five pages
-		
 		for(i = 0; i < 5; i ++) {
 			page[pageIndex[i]].pid = pidF;
 			Bzero(page[pageIndex[i]].u.content, PAGE_SIZE);
@@ -219,7 +210,6 @@ void SysVFork(void) {
 		IP = pageIndex[3];
 		DP = pageIndex[4];
 		
-
 		// build Dir page
 			// copy the first 16 entries from KDir to Dir
 			// set entry 256 to the address of IT page (bitwise-or-ed
@@ -228,17 +218,17 @@ void SysVFork(void) {
 			// with the present and read/writable flags)
 		// Dir = (int)&page[pageIndex[0]];
 		for (i = 0; i < 16; i++ ) {
-			// (page[pageIndex[0]]).u.entry[i] = (KDir)[i];	// ?
+			// (page[Dir]).u.entry[i] = (KDir)[i];	// ?
 		}
+		page[Dir].u.entry[256] = (page.[IT].u.addr|PRESENT|RW);
+		page[Dir].u.entry[511] = (page.[IT].u.addr|PRESENT|RW);
 		
 		// build IT page
-			// set entry 0 to the address of IP page (bitwise-or-ed
-			// with the present and read-only flags)
-			// set entry 1023 to the address of DP page (bitwise-or-ed
-			// with the present and read/writable flags)
+			// set entry 0 to the address of IP page (| w/ the present and RO flags)
+			// set entry 1023 to the address of DP page (| w/ the present & RW flags)
 		
-		page[IT].u.entry[0] = page[IP].u.addr | PRESENT | RO; //This is right or at least on the right track hopefully. 
-		page[IT].u.entry[1023] = page[DP].u.addr | PRESENT | RW; // See above comment.
+		page[IT].u.entry[0] = (page[IP].u.addr|PRESENT|RO); //This is right or at least on the right track hopefully. 
+		page[IT].u.entry[1023] = (page[DP].u.addr|PRESENT|RW); // See above comment.
 		
 
 		// build IP
@@ -246,11 +236,10 @@ void SysVFork(void) {
 		// MemCpy((char *) page[pageIndex[2]].u.
 		//whats wrong w/ 'page[IP] = pcb[pidF].tf_p->ebx;' ?
 		
-		// build DP
-			// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
-			// 2nd to last in u.entry[] is cs = get_cs()
-			// 3rd to last in u.entry[] is eip = G1
-		
+		// build DP - make sure 1023 is actually getting the right value	
+		page[DP].u.entry[1023] = EF_DEFAULT_VALUE|EF_INTR;	// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
+		page[DP].u.entry[1022] = get_cs();	// 2nd to last in u.entry[] is cs = get_cs()
+		page[DP].u.entry[1021] = G1;	// 3rd to last in u.entry[] is eip = G1
 		
 		// copy u.addr of Dir page to Dir in PCB of the new process
 		// tf_p in PCB of new process = G2 minus the size of a trapframe
@@ -293,8 +282,7 @@ void AlterStack(int pid, func_p_t p){
 	// the process' Dir in order to access its virtual space
 	// ExitSR, WaitSR, AlterStack, and KBSR
 	
-	
-	// I don't see anywhere that we need to adjust here, either.
+	set_cr3(pcb[pid].Dir);
 	
 	int *local;
 	unsigned eip;
@@ -307,6 +295,8 @@ void AlterStack(int pid, func_p_t p){
 	pcb[pid].tf_p = (tf_t*)((int)pcb[pid].tf_p - 4);	// shift down by 4
 	*pcb[pid].tf_p = tmp;
 	*local = eip;
+	
+	set_cr3(pcb[run_pid].Dir);
 	
 }
 
@@ -333,7 +323,6 @@ void SysExit(void) {
 		if(pcb[ppid].signal_handler[SIGCHLD] != 0) AlterStack(ppid, pcb[ppid].signal_handler[SIGCHLD]);
 	} 
 	for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
-	// page[run_pid].pid = NONE;	// is this enough to release the page?
 	run_pid = NONE;
 	
 	
@@ -363,7 +352,6 @@ void SysWait(void) {
 		*((int *)pcb[run_pid].tf_p->ebx) = pcb[i].tf_p->ebx;
 		pcb[i].state = AVAIL;
 		EnQue(&avail_que, i);
-		// page[run_pid].pid = NONE;	// is this enough to release the page? No, many more pages per pid.
 		for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
 	}
 	
@@ -372,8 +360,7 @@ void SysWait(void) {
 
 void SysSleep(void) {
 	
-	int sleep_sec = pcb[run_pid].tf_p->ebx;
-	pcb[run_pid].wake_time = (sys_time_count + (sleep_sec * 10));
+	pcb[run_pid].wake_time = (sys_time_count + ((pcb[run_pid].tf_p->ebx) * 10));
 	pcb[run_pid].state = SLEEP;
 	run_pid = NONE;
 	
