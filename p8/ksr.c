@@ -244,7 +244,7 @@ void SysVFork(void) {
 		// build IP
 			// copy instructions to IP (src addr is ebx of TF)
 		// MemCpy((char *) page[pageIndex[2]].u.
-
+		//whats wrong w/ 'page[IP] = pcb[pidF].tf_p->ebx;' ?
 		
 		// build DP
 			// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
