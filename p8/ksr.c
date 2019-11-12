@@ -213,6 +213,12 @@ void SysVFork(void) {
 			page[pageIndex[i]].pid = pidF;
 			Bzero(page[pageIndex[i]].u.content, PAGE_SIZE);
 		}
+		Dir = pageIndex[0];
+		IT = pageIndex[1];
+		DT = pageIndex[2]
+		IP = pageIndex[3];
+		DP = pageIndex[4];
+		
 
 		// build Dir page
 			// copy the first 16 entries from KDir to Dir
@@ -230,9 +236,9 @@ void SysVFork(void) {
 			// with the present and read-only flags)
 			// set entry 1023 to the address of DP page (bitwise-or-ed
 			// with the present and read/writable flags)
-
-		page[IT].u.entry[0] = pageIndex[IP] | PRESENT | RO //This is right or at least on the right track hopefully. 
-		page[IT].u.entry[0] = pageIndex[IP] | PRESENT | RW // See above comment.
+		
+		page[IT].u.entry[0] = page[IP].u.addr | PRESENT | RO //This is right or at least on the right track hopefully. 
+		page[IT].u.entry[1023] = page[DP].u.addr | PRESENT | RW // See above comment.
 		
 
 		// build IP
