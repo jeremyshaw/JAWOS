@@ -159,7 +159,7 @@ void SyscallSR(void) {
 	
 	// SyscallSR
 	// switch MMU to use KDir at the end of code, unconditionally
-	// my best guess: set_cr3(pcb[run_pid].Dir);  //Alex 
+	set_cr3(pcb[run_pid].Dir); //not super confident, but the right track -alex
 	
 }
 
