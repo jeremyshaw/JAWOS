@@ -230,11 +230,12 @@ void SysVFork(void) {
 			// with the present and read-only flags)
 			// set entry 1023 to the address of DP page (bitwise-or-ed
 			// with the present and read/writable flags)
-		page[pageIndex[1]] = pcb[pidF].tf_p->eip;
+		page[IT].u.entry[0] = pageIndex[IP] | PRESENT | RO //This is right or at least on the right track hopefully. 
+		page[IT].u.entry[0] = pageIndex[IP] | PRESENT | RW // See above comment.
 		
 		// build IP
 			// copy instructions to IP (src addr is ebx of TF)
-		page[pageIndex[2]] = pcb[pidF].tf_p->ebx;
+		page[IP] = pcb[pidF].tf_p->ebx; //Not sure what should be within brackets of 'page[]'. 
 		
 		// build DP
 			// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
