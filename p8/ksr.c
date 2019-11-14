@@ -77,19 +77,21 @@ void KBSR(void) {
 	// the process' Dir in order to access its virtual space
 	// ExitSR, WaitSR, AlterStack, and KBSR - use set_cr3(something) instead of run_pid?
 	
-	// I don't see anywhere that we have to change?
 	int pidKB;
 	char ch;
+	
 	
 	if (cons_kbhit()) {
 		ch = cons_getchar();
 		if(ch == '$') breakpoint();	
 		if(QueEmpty(&kb.wait_que)) EnQue(&kb.buffer, (int)ch);
 		else {
+			set_cr3(pcb[pidKB].Dir);
 			pidKB = DeQue(&kb.wait_que);
 			pcb[pidKB].state = READY;
 			EnQue(&ready_que, pidKB);
 			pcb[pidKB].tf_p->ebx = ch;
+			set_cr3(pcb[run_pid].Dir);
 		}
 	}
 	return;
@@ -217,34 +219,28 @@ void SysVFork(void) {
 			// set entry 511 to the address of DT page (bitwise-or-ed
 			// with the present and read/writable flags)
 		// Dir = (int)&page[pageIndex[0]];
-		for (i = 0; i < 16; i++ ) {
-			// (page[Dir]).u.entry[i] = (KDir)[i];	// ?
-		}
-		page[Dir].u.entry[256] = (page.[IT].u.addr|PRESENT|RW);
-		page[Dir].u.entry[511] = (page.[IT].u.addr|PRESENT|RW);
+		MemCpy((char*) &page[Dir], (char*)&KDir, 16);
+		page[Dir].u.entry[256] = (page[IT].u.addr|PRESENT|RW);
+		page[Dir].u.entry[511] = (page[IT].u.addr|PRESENT|RW);
 		
 		// build IT page
 			// set entry 0 to the address of IP page (| w/ the present and RO flags)
 			// set entry 1023 to the address of DP page (| w/ the present & RW flags)
-		
 		page[IT].u.entry[0] = (page[IP].u.addr|PRESENT|RO); //This is right or at least on the right track hopefully. 
 		page[IT].u.entry[1023] = (page[DP].u.addr|PRESENT|RW); // See above comment.
 		
 
-		// build IP
-			// copy instructions to IP (src addr is ebx of TF)
-		MemCpy((char *) page[pageIndex[2]], pcb[run_pid].tf_p->ebx, PAGE_SIZE);
+		// build IP - copy instructions to IP (src addr is ebx of TF)
+		MemCpy((char *) &page[pageIndex[2]], (char *)(pcb[run_pid].tf_p->ebx), PAGE_SIZE);
 		//whats wrong w/ 'page[IP] = pcb[pidF].tf_p->ebx;' ? - see above
 		
 		// build DP - make sure 1023 is actually getting the right value	
 		page[DP].u.entry[1023] = EF_DEFAULT_VALUE|EF_INTR;	// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
 		page[DP].u.entry[1022] = get_cs();	// 2nd to last in u.entry[] is cs = get_cs()
 		page[DP].u.entry[1021] = G1;	// 3rd to last in u.entry[] is eip = G1
-		
-		// copy u.addr of Dir page to Dir in PCB of the new process
-		// tf_p in PCB of new process = G2 minus the size of a trapframe
-		pcb[pidF].Dir = (page[pageIndex[0]]).u.addr;
-		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));
+	
+		pcb[pidF].Dir = (page[pageIndex[0]]).u.addr;	// copy u.addr of Dir page to Dir in PCB of the new process
+		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));	// tf_p in PCB of new process = G2 - size_of trapframe
 	}
 	
 	
@@ -282,12 +278,12 @@ void AlterStack(int pid, func_p_t p){
 	// the process' Dir in order to access its virtual space
 	// ExitSR, WaitSR, AlterStack, and KBSR
 	
-	set_cr3(pcb[pid].Dir);
-	
 	int *local;
 	unsigned eip;
 	tf_t tmp;
 
+	set_cr3((pcb[pid].Dir));
+	
 	tmp = *pcb[pid].tf_p;
 	eip = pcb[pid].tf_p->eip;		
 	local = &pcb[pid].tf_p->efl;	// efl is at top of stack, address is where we insert later
@@ -307,8 +303,11 @@ void SysExit(void) {
 	// the process' Dir in order to access its virtual space
 	// ExitSR, WaitSR, AlterStack, and KBSR
 	
-	int ppid = pcb[run_pid].ppid;
+	int ppid;
 	int i;
+	
+	ppid = pcb[run_pid].ppid;
+	set_cr3(pcb[ppid].Dir);
 	
 	if(pcb[ppid].state == WAIT) {
 		pcb[ppid].state = READY;
@@ -324,9 +323,6 @@ void SysExit(void) {
 	} 
 	for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
 	run_pid = NONE;
-	
-	
-	
 	
 	// SysExit/SysWait
 	// remember to recycle the pages used by the exiting process
@@ -349,12 +345,15 @@ void SysWait(void) {
 		pcb[run_pid].state = WAIT;
 		run_pid = NONE;
 	} else {
+		set_cr3(pcb[run_pid].Dir);
 		pcb[run_pid].tf_p->edx = i;
 		*((int *)pcb[run_pid].tf_p->ebx) = pcb[i].tf_p->ebx;
 		pcb[i].state = AVAIL;
 		EnQue(&avail_que, i);
 		for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
 	}
+	
+	set_cr3(KDir);
 	
 }
 
