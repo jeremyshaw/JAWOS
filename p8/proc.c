@@ -30,7 +30,6 @@ void Login(void) {
 	char login_str[STR_MAX], passwd_str[STR_MAX];
 	
 	while(1) {
-		
 		sys_write("login: ");
 		sys_read(login_str);
 		sys_write("passwd: ");
@@ -38,11 +37,10 @@ void Login(void) {
 		if(StrCmp(login_str, passwd_str) == 0) sys_write("prompt: login failed!\r");
 		else {
 			sys_write("prompt: login sucessful!\r");	
-			break;	// phase 8;
+			break;
 		}
 	}
-	
-	sys_vfork(Shell);	// phase 8
+	sys_vfork(Shell);
 }
 
 
@@ -60,7 +58,8 @@ void Shell(void) {
 		else {
 			sys_write("list of valid commands\r");
 			sys_write("Dir\r");
-			//	etc
+			sys_write("Cal\r");
+			sys_write("Roll\r");
 		}
 	}
 }

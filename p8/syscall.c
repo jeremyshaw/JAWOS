@@ -96,8 +96,8 @@ void sys_read(char *str) {	//142
 		*(str++) = ch;
 		index++;
 	}
-	*str = '\0';	// This ia always added at the end.
-	return;	// Am I taking the instructions too litterally?
+	*str = '\0';
+	return;
 
 }
 

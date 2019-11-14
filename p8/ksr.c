@@ -233,8 +233,8 @@ void SysVFork(void) {
 
 		// build IP
 			// copy instructions to IP (src addr is ebx of TF)
-		// MemCpy((char *) page[pageIndex[2]].u.
-		//whats wrong w/ 'page[IP] = pcb[pidF].tf_p->ebx;' ?
+		MemCpy((char *) page[pageIndex[2]], pcb[run_pid].tf_p->ebx, PAGE_SIZE);
+		//whats wrong w/ 'page[IP] = pcb[pidF].tf_p->ebx;' ? - see above
 		
 		// build DP - make sure 1023 is actually getting the right value	
 		page[DP].u.entry[1023] = EF_DEFAULT_VALUE|EF_INTR;	// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
@@ -332,6 +332,7 @@ void SysExit(void) {
 	// remember to recycle the pages used by the exiting process
 	// and since the translation information in them are no longer,
 	// switch MMU to use the kernel directory
+	set_cr3(KDir);
 }
 
 
