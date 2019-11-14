@@ -47,7 +47,7 @@ void BootStrap(void) {
 	KDir = get_cr3();
 	for(i = 0; i < PAGE_MAX; i++) {
 		page[i].pid = NONE;
-		page[i].u.addr = (int*)(DRAM_START + (i * PAGE_SIZE));
+		page[i].u.addr = (unsigned int)(DRAM_START + (i * PAGE_SIZE));
 	}
 
 	idt = get_idt_base();

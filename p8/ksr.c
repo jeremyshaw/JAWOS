@@ -170,6 +170,7 @@ void SysVFork(void) {
 	// for the 5 page indices: int Dir, IT, DT, IP, DP
 	unsigned int Dir;
 	int IT, DT, IP, DP, pidF, i, pageNum, pageIndex[5];
+	unsigned int *KKDir;
 	pageNum = 0;
 	if(QueEmpty(&avail_que)) pcb[run_pid].tf_p->ebx = NONE;
 	else {
@@ -185,6 +186,7 @@ void SysVFork(void) {
 		pcb[pidF].total_time = 0;
 		pcb[pidF].ppid = run_pid;
 		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));
+		// don't forget to set pcb Dir to a page address page[Dir].addr
 
 		
 		for (i = 0; i < PAGE_MAX; i++) {	// "allocate" 5 pages
@@ -219,19 +221,21 @@ void SysVFork(void) {
 			// set entry 511 to the address of DT page (bitwise-or-ed
 			// with the present and read/writable flags)
 		// Dir = (int)&page[pageIndex[0]];
-		MemCpy((char*) &page[Dir], (char*)&KDir, 16);
-		page[Dir].u.entry[256] = (page[IT].u.addr|PRESENT|RW);
-		page[Dir].u.entry[511] = (page[IT].u.addr|PRESENT|RW);
+		// MemCpy((char*) &page[Dir], (char*)&KDir, 16);
+		KKDir = KDir;
+		for (i = 0; i < 16; i++) {
+			page[Dir].u.entry[i] = KKDir[i];
+		}
+		page[Dir].u.entry[256] = ((page[IT].u.addr)|PRESENT|RW);
+		page[Dir].u.entry[511] = ((page[IT].u.addr)|PRESENT|RW);
 		
-		// build IT page
-			// set entry 0 to the address of IP page (| w/ the present and RO flags)
-			// set entry 1023 to the address of DP page (| w/ the present & RW flags)
+		// build IT page - set entry 0 to the address of IP page (| w/ the present and RO flags)
+		// build DT page - set entry 1023 to the address of DP page (| w/ the present & RW flags)
 		page[IT].u.entry[0] = (page[IP].u.addr|PRESENT|RO); //This is right or at least on the right track hopefully. 
-		page[IT].u.entry[1023] = (page[DP].u.addr|PRESENT|RW); // See above comment.
+		page[DT].u.entry[1023] = (page[DP].u.addr|PRESENT|RW); // See above comment.
 		
-
 		// build IP - copy instructions to IP (src addr is ebx of TF)
-		MemCpy((char *) &page[pageIndex[2]], (char *)(pcb[run_pid].tf_p->ebx), PAGE_SIZE);
+		MemCpy((char *)page[IP].u.addr, (char *)(pcb[run_pid].tf_p->ebx), PAGE_SIZE);
 		//whats wrong w/ 'page[IP] = pcb[pidF].tf_p->ebx;' ? - see above
 		
 		// build DP - make sure 1023 is actually getting the right value	

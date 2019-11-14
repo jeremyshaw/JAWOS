@@ -21,6 +21,8 @@ There's a new page_t that has
       unsigned *entry;      // use its addr as an 'entry' array
    } u;
 
+ex: page[i].u.addr, content, entry[256]
+
 Kernel's new data
    unsigned KDir   Kernel's redundant 'real' address-translation directory
    use page_t to declare a 'page' array of 100 pages
