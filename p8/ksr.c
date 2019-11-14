@@ -222,7 +222,7 @@ void SysVFork(void) {
 			// with the present and read/writable flags)
 		// Dir = (int)&page[pageIndex[0]];
 		// MemCpy((char*) &page[Dir], (char*)&KDir, 16);
-		KKDir = KDir;
+		KKDir = (int *)KDir;
 		for (i = 0; i < 16; i++) {
 			page[Dir].u.entry[i] = KKDir[i];
 		}
@@ -235,7 +235,7 @@ void SysVFork(void) {
 		page[DT].u.entry[1023] = (page[DP].u.addr|PRESENT|RW); // See above comment.
 		
 		// build IP - copy instructions to IP (src addr is ebx of TF)
-		MemCpy((char *)page[IP].u.addr, (char *)(pcb[run_pid].tf_p->ebx), PAGE_SIZE);
+		MemCpy((char *)page[IP].u.addr, (char *)(pcb[run_pid].tf_p->edx), PAGE_SIZE);
 		//whats wrong w/ 'page[IP] = pcb[pidF].tf_p->ebx;' ? - see above
 		
 		// build DP - make sure 1023 is actually getting the right value	
