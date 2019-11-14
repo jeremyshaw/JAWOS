@@ -26,9 +26,7 @@ void Idle(void) {   // Idle thread, flashing a dot on the upper-left corner
 
 
 void Login(void) {
-	
 	char login_str[STR_MAX], passwd_str[STR_MAX];
-	
 	while(1) {
 		sys_write("login: ");
 		sys_read(login_str);
@@ -45,11 +43,8 @@ void Login(void) {
 
 
 void Shell(void) {
-	
 	char prompt_str[STR_MAX];
-	
 	while(1) {
-	
 		sys_write("JAWOS>");
 		sys_read(prompt_str);
 		if(StrCmp(prompt_str, "Dir")) sys_vfork(ShellDir);
@@ -73,7 +68,6 @@ void ShellDir(void) {
 	sys_write("folder.exe     awrxgwrxuwrx\r");	// We may lose points here.
 	sys_write("a.out          a---g---uwrx\r");
 	sys_exit(0);
-	
 }
 
 
