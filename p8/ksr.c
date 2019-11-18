@@ -31,13 +31,7 @@ void SpawnSR(func_p_t p) {
 	pcb[pid].tf_p -> cs = get_cs();
 	pcb[pid].tf_p -> eip = (DRAM_START + (pid*STACK_MAX));
 	
-	
-	// SpawnSR/ForkSR
-		// 0/1 --> page[newpid].pid = newpid;
-		// set Dir in PCB to KDir for the new process (so it'll use real memory),
-		// mark down the equivalent DRAM page to be occupied by the new process
-		// (e.g., Idle and Login), so the page array can skip these already used
-	pcb[pid].Dir = KDir; //this works? - Alex	// yes, also need the other.
+	pcb[pid].Dir = KDir; 
 	page[pid].pid = pid;
 	
 }
@@ -158,9 +152,7 @@ void SyscallSR(void) {
 		run_pid = NONE;
 	}
 	
-	
-	// SyscallSR - switch MMU to use KDir at the end of code, unconditionally
-	set_cr3(KDir);	// run_pid was neutralized earlier
+	set_cr3(KDir);
 	
 }
 
@@ -185,7 +177,7 @@ void SysVFork(void) {
 		pcb[pidF].time_count = 0;
 		pcb[pidF].total_time = 0;
 		pcb[pidF].ppid = run_pid;
-		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));
+		// pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));
 		// don't forget to set pcb Dir to a page address page[Dir].addr
 
 		
@@ -227,12 +219,12 @@ void SysVFork(void) {
 			page[Dir].u.entry[i] = KKDir[i];
 		}
 		page[Dir].u.entry[256] = ((page[IT].u.addr)|PRESENT|RW);
-		page[Dir].u.entry[511] = ((page[IT].u.addr)|PRESENT|RW);
+		page[Dir].u.entry[511] = ((page[DT].u.addr)|PRESENT|RW);
 		
 		// build IT page - set entry 0 to the address of IP page (| w/ the present and RO flags)
 		// build DT page - set entry 1023 to the address of DP page (| w/ the present & RW flags)
-		page[IT].u.entry[0] = (page[IP].u.addr|PRESENT|RO); //This is right or at least on the right track hopefully. 
-		page[DT].u.entry[1023] = (page[DP].u.addr|PRESENT|RW); // See above comment.
+		page[IT].u.entry[0] = ((page[IP].u.addr)|PRESENT|RO);
+		page[DT].u.entry[1023] = ((page[DP].u.addr)|PRESENT|RW);
 		
 		// build IP - copy instructions to IP (src addr is ebx of TF)
 		MemCpy((char *)page[IP].u.addr, (char *)(pcb[run_pid].tf_p->edx), PAGE_SIZE);
@@ -245,6 +237,9 @@ void SysVFork(void) {
 	
 		pcb[pidF].Dir = (page[pageIndex[0]]).u.addr;	// copy u.addr of Dir page to Dir in PCB of the new process
 		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));	// tf_p in PCB of new process = G2 - size_of trapframe
+		cons_printf("done");
+		
+		breakpoint();
 	}
 	
 	
@@ -327,11 +322,6 @@ void SysExit(void) {
 	} 
 	for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
 	run_pid = NONE;
-	
-	// SysExit/SysWait
-	// remember to recycle the pages used by the exiting process
-	// and since the translation information in them are no longer,
-	// switch MMU to use the kernel directory
 	set_cr3(KDir);
 }
 
@@ -458,12 +448,6 @@ void SysFork(void) {
 		
 		pcb[run_pid].tf_p->ebx = pidF;
 		pcb[pidF].tf_p->ebx = 0;
-		
-		// SpawnSR/ForkSR
-			// 0/1 --> page[newpid].pid = newpid;
-			// set Dir in PCB to KDir for the new process (so it'll use real memory),
-			// mark down the equivalent DRAM page to be occupied by the new process
-			// (e.g., Idle and Login), so the page array can skip these already used
 		
 		for (pgI = 0; pgI<PAGE_MAX; pgI++) { if(page[pgI].pid == NONE) break; }
 		page[pgI].pid = pidF;

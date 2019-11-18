@@ -19,5 +19,6 @@ void Shell(void);
 void ShellDir(void);
 void ShellCal(void);
 void ShellRoll(void);
+void ShellCmds(void);
 
 #endif

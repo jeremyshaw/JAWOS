@@ -43,21 +43,35 @@ void Login(void) {
 
 void Shell(void) {
 	char prompt_str[STR_MAX];
+	int exit_pid, exit_code;
 	while(1) {
-		sys_write("JAWOS>");
-		sys_read(prompt_str);
-		if(StrCmp(prompt_str, "Dir")) sys_vfork(ShellDir);
-		else if(StrCmp(prompt_str, "Cal")) sys_vfork(ShellCal);
-		else if(StrCmp(prompt_str, "Roll")) sys_vfork(ShellRoll);
-		else {
-			sys_write("list of valid commands\r");
-			sys_write("Dir\r");
-			sys_write("Cal\r");
-			sys_write("Roll\r");
+		while(1) {
+			sys_write("JAWOS>");
+			sys_read(prompt_str);
+			if(StrCmp(prompt_str, "Dir")) {
+				sys_vfork(ShellDir);
+				exit_pid = sys_wait(&exit_code);
+				break;
+			}
+			if(StrCmp(prompt_str, "Cal")) {
+				sys_vfork(ShellCal);
+				break;
+			}
+			if(StrCmp(prompt_str, "Roll")) {
+				sys_vfork(ShellRoll);
+				break;
+			}
+			ShellCmds();
 		}
 	}
 }
 
+void ShellCmds(void) {
+	sys_write("list of valid commands\r");
+	sys_write("Dir\r");
+	sys_write("Cal\r");
+	sys_write("Roll\r");
+}
    
 void ShellDir(void) {
 	// show a faked directory listing
