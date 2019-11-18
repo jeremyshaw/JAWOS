@@ -235,10 +235,14 @@ void SysVFork(void) {
 		page[DP].u.entry[1022] = get_cs();	// 2nd to last in u.entry[] is cs = get_cs()
 		page[DP].u.entry[1021] = G1;	// 3rd to last in u.entry[] is eip = G1
 	
-		pcb[pidF].Dir = (page[pageIndex[0]]).u.addr;	// copy u.addr of Dir page to Dir in PCB of the new process
+		pcb[pidF].Dir = (page[Dir]).u.addr;	// copy u.addr of Dir page to Dir in PCB of the new process
 		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));	// tf_p in PCB of new process = G2 - size_of trapframe
-		cons_printf("done");
-		
+		cons_printf("done  ");
+		cons_printf("p[Dir]a = %u  ", page[Dir].u.addr);
+		cons_printf("p[Dir].u.entry[256] = %u  ", page[Dir].u.entry[256]);
+		cons_printf("p[Dir].u.entry[511] = %u  ", page[Dir].u.entry[511]);
+		cons_printf("page[IT].u.entry[0] = %u  ", page[IT].u.entry[0]);
+		cons_printf("page[DT].u.entry[1023] = %u  ", page[DT].u.entry[1023]);
 		breakpoint();
 	}
 	
