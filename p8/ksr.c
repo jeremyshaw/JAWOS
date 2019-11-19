@@ -164,11 +164,12 @@ void SysVFork(void) {
 	int IT, DT, IP, DP, pidF, i, pageNum, pageIndex[5];
 	unsigned int *KKDir;
 	pageNum = 0;
-	if(QueEmpty(&avail_que)) pcb[run_pid].tf_p->ebx = NONE;
-	else {
+	if(QueEmpty(&avail_que)) {
+		cons_printf("Not enough PID\n");
+		breakpoint();		
+	} else {
 		pidF = DeQue(&avail_que);
 		EnQue(&ready_que, pidF);
-		// do we have to set to READY?
 		
 		// copy PCB from parent process but change 5 places:
 			// state, ppid, two time counts, and tf_p (see below) [virtual, set to 2G-sizeof tf_t)
@@ -177,9 +178,6 @@ void SysVFork(void) {
 		pcb[pidF].time_count = 0;
 		pcb[pidF].total_time = 0;
 		pcb[pidF].ppid = run_pid;
-		// pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));
-		// don't forget to set pcb Dir to a page address page[Dir].addr
-
 		
 		for (i = 0; i < PAGE_MAX; i++) {	// "allocate" 5 pages
 			if(page[i].pid == NONE){
@@ -194,8 +192,7 @@ void SysVFork(void) {
 			breakpoint();
 		}
 
-		// set the five pages to be occupied by the new pid
-		// clear the content part of the five pages
+		// set the five pages to be occupied by the new pid & clear the content part of the five pages
 		for(i = 0; i < 5; i ++) {
 			page[pageIndex[i]].pid = pidF;
 			Bzero(page[pageIndex[i]].u.content, PAGE_SIZE);
@@ -208,16 +205,10 @@ void SysVFork(void) {
 		
 		// build Dir page
 			// copy the first 16 entries from KDir to Dir
-			// set entry 256 to the address of IT page (bitwise-or-ed
-			// with the present and read/writable flags)
-			// set entry 511 to the address of DT page (bitwise-or-ed
-			// with the present and read/writable flags)
-		// Dir = (int)&page[pageIndex[0]];
-		// MemCpy((char*) &page[Dir], (char*)&KDir, 16);
+			// set entry 256 to the address of IT page (|-ed w/ the present and R/W flags)
+			// set entry 511 to the address of DT page (|-ed w/ the present and R/W flags)
 		KKDir = (int *)KDir;
-		for (i = 0; i < 16; i++) {
-			page[Dir].u.entry[i] = KKDir[i];
-		}
+		for (i = 0; i < 16; i++) page[Dir].u.entry[i] = KKDir[i];
 		page[Dir].u.entry[256] = ((page[IT].u.addr)|PRESENT|RW);
 		page[Dir].u.entry[511] = ((page[DT].u.addr)|PRESENT|RW);
 		
@@ -227,14 +218,13 @@ void SysVFork(void) {
 		page[DT].u.entry[1023] = ((page[DP].u.addr)|PRESENT|RW);
 		
 		// build IP - copy instructions to IP (src addr is ebx of TF)
-		MemCpy((char *)page[IP].u.addr, (char *)(pcb[run_pid].tf_p->edx), PAGE_SIZE);
-		//whats wrong w/ 'page[IP] = pcb[pidF].tf_p->ebx;' ? - see above
+		MemCpy((char *)page[IP].u.addr, (char *)(pcb[run_pid].tf_p->ebx), PAGE_SIZE);
 		
 		// build DP - make sure 1023 is actually getting the right value	
-		page[DP].u.entry[1023] = EF_DEFAULT_VALUE|EF_INTR;	// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
-		page[DP].u.entry[1022] = get_cs();	// 2nd to last in u.entry[] is cs = get_cs()
 		page[DP].u.entry[1021] = G1;	// 3rd to last in u.entry[] is eip = G1
-	
+		page[DP].u.entry[1022] = get_cs();	// 2nd to last in u.entry[] is cs = get_cs()
+		page[DP].u.entry[1023] = EF_DEFAULT_VALUE|EF_INTR;	// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
+		
 		pcb[pidF].Dir = (page[Dir]).u.addr;	// copy u.addr of Dir page to Dir in PCB of the new process
 		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));	// tf_p in PCB of new process = G2 - size_of trapframe
 		cons_printf("done  ");
@@ -243,7 +233,7 @@ void SysVFork(void) {
 		cons_printf("p[Dir].u.entry[511] = %u  ", page[Dir].u.entry[511]);
 		cons_printf("page[IT].u.entry[0] = %u  ", page[IT].u.entry[0]);
 		cons_printf("page[DT].u.entry[1023] = %u  ", page[DT].u.entry[1023]);
-		breakpoint();
+		// breakpoint();
 	}
 	
 	
@@ -336,7 +326,7 @@ void SysWait(void) {
 	// the process' Dir in order to access its virtual space
 	// ExitSR, WaitSR, AlterStack, and KBSR
 	
-	int i;	
+	int i, something;	
 	for(i = 0; i < PROC_MAX; i++) { if(pcb[i].state == ZOMBIE && pcb[i].ppid == run_pid) break; }
 	
 	if(i == PROC_MAX){	// nothing is waiting, nothing to run
@@ -345,12 +335,13 @@ void SysWait(void) {
 	} else {
 		set_cr3(pcb[run_pid].Dir);
 		pcb[run_pid].tf_p->edx = i;
-		*((int *)pcb[run_pid].tf_p->ebx) = pcb[i].tf_p->ebx;
+		*((int *)pcb[run_pid].tf_p->ebx) = something;
+		set_cr3(pcb[i].Dir);
+		pcb[i].tf_p->ebx = something;
 		pcb[i].state = AVAIL;
 		EnQue(&avail_que, i);
 		for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
 	}
-	
 	set_cr3(KDir);
 	
 }

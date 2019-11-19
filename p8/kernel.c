@@ -50,6 +50,7 @@ void BootStrap(void) {
 	outportb(PIC_MASK_REG, PIC_MASK_VAL);
 	
 	KDir = get_cr3();
+	
 	for(i = 0; i < PAGE_MAX; i++) {
 		page[i].pid = NONE;
 		page[i].u.addr = (unsigned int)(DRAM_START + (i * PAGE_SIZE));
@@ -64,6 +65,7 @@ int main(void) {
 	SpawnSR(&Idle);
 	SpawnSR(&Login);
 	run_pid = IDLE;
+	set_cr3(pcb[run_pid].Dir);
 	Loader(pcb[run_pid].tf_p);
 	
 	return 0; // never would actually reach here
@@ -88,7 +90,7 @@ void Scheduler(void) {
 
 
 void Kernel(tf_t *tf_p) {
-	set_cr3(pcb[run_pid].Dir);
+
 	pcb[run_pid].tf_p = tf_p;
 
 	switch(tf_p->event) {
