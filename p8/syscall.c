@@ -117,7 +117,7 @@ void sys_signal(int signal_name, func_p_t p){	// 140
 
 
 void sys_vfork(func_p_t p) {	// 143
-
+	
 	asm("movl %0, %%eax;
 	movl %1, %%ebx;	// # for kernel to identify service
 	int $128"	// after, copy ebx to return

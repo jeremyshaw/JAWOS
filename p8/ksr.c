@@ -74,7 +74,6 @@ void KBSR(void) {
 	int pidKB;
 	char ch;
 	
-	
 	if (cons_kbhit()) {
 		ch = cons_getchar();
 		if(ch == '$') breakpoint();	
@@ -160,9 +159,9 @@ void SyscallSR(void) {
 void SysVFork(void) {
 	
 	// for the 5 page indices: int Dir, IT, DT, IP, DP
-	unsigned int Dir;
+	unsigned int Dir, *KKDir;
 	int IT, DT, IP, DP, pidF, i, pageNum, pageIndex[5];
-	unsigned int *KKDir;
+
 	pageNum = 0;
 	if(QueEmpty(&avail_que)) {
 		cons_printf("Not enough PID\n");
@@ -209,8 +208,8 @@ void SysVFork(void) {
 			// set entry 511 to the address of DT page (|-ed w/ the present and R/W flags)
 		KKDir = (int *)KDir;
 		for (i = 0; i < 16; i++) page[Dir].u.entry[i] = KKDir[i];
-		page[Dir].u.entry[256] = ((page[IT].u.addr)|PRESENT|RW);
-		page[Dir].u.entry[511] = ((page[DT].u.addr)|PRESENT|RW);
+		page[Dir].u.entry[256] = (page[IT].u.addr|PRESENT|RW);
+		page[Dir].u.entry[511] = (page[DT].u.addr|PRESENT|RW);
 		
 		// build IT page - set entry 0 to the address of IP page (| w/ the present and RO flags)
 		// build DT page - set entry 1023 to the address of DP page (| w/ the present & RW flags)
@@ -225,7 +224,7 @@ void SysVFork(void) {
 		page[DP].u.entry[1022] = get_cs();	// 2nd to last in u.entry[] is cs = get_cs()
 		page[DP].u.entry[1023] = EF_DEFAULT_VALUE|EF_INTR;	// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
 		
-		pcb[pidF].Dir = (page[Dir]).u.addr;	// copy u.addr of Dir page to Dir in PCB of the new process
+		pcb[pidF].Dir = page[Dir].u.addr;	// copy u.addr of Dir page to Dir in PCB of the new process
 		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));	// tf_p in PCB of new process = G2 - size_of trapframe
 		cons_printf("done  ");
 		cons_printf("p[Dir]a = %u  ", page[Dir].u.addr);
@@ -233,10 +232,9 @@ void SysVFork(void) {
 		cons_printf("p[Dir].u.entry[511] = %u  ", page[Dir].u.entry[511]);
 		cons_printf("page[IT].u.entry[0] = %u  ", page[IT].u.entry[0]);
 		cons_printf("page[DT].u.entry[1023] = %u  ", page[DT].u.entry[1023]);
-		// breakpoint();
+		cons_printf("pcb[pidF].tf_p = %u  ", pcb[pidF].tf_p);
+		
 	}
-	
-	
 }
 
 void SysRead(void){
@@ -361,7 +359,6 @@ void SysWrite(void) {
 	unsigned short *old;	// jaja
 	char *str= (char *)pcb[run_pid].tf_p->ebx;
     while( *str != '\0' ) {
-		
 		if(*str == '\r') {
 			sys_cursor = ((((sys_cursor-VIDEO_START)/80)+1)*80)+VIDEO_START;
 		} else {

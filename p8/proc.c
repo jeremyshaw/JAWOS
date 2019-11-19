@@ -46,6 +46,7 @@ void Shell(void) {
 	int exit_pid, exit_code;
 	while(1) {
 		while(1) {
+			sys_write("JAWOS>\r");
 			sys_write("JAWOS>");
 			sys_read(prompt_str);
 			if(StrCmp(prompt_str, "Dir")) {
