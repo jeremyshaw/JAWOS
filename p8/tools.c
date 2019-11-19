@@ -27,19 +27,25 @@ void Number2Str(int x, char str[]) {
 	
 	int ni, temp, len;
 	
-	temp = x;
-	len = 0;
-	while(temp) {
-		temp = temp/10;
-		len++;
-	}
+	if (x != 0) {
 	
-	temp = x;
-	for (ni = 0; ni < len; ni++) {
-		str[len-(ni+1)] = ( temp % 10 ) + '0';	// put them in backwards!
-		temp = temp/10;
+		temp = x;
+		len = 0;
+		while(temp) {
+			temp = temp/10;
+			len++;
+		}
+		
+		temp = x;
+		for (ni = 0; ni < len; ni++) {
+			str[len-(ni+1)] = ( temp % 10 ) + '0';	// put them in backwards!
+			temp = temp/10;
+		}
+		str[len] = '\0';
+	} else {	// manual override for 0, until I figure out what's up
+		str[0] = 48;
+		str[1] = 0;
 	}
-	str[len] = '\0';
 	
 }
 

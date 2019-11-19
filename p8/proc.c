@@ -49,7 +49,7 @@ void Shell(void) {
 		while(1) {
 			sys_write("JAWOS>");
 			sys_read(prompt_str);
-			if(StrCmp(prompt_str, "Dir")) {
+			if(StrCmp(prompt_str, "dir")) {
 				sys_vfork(ShellDir);
 				exit_pid = sys_wait(&exit_code);
 				Number2Str(exit_pid, p_str);
@@ -62,7 +62,7 @@ void Shell(void) {
 				sys_write("\r");
 				break;
 			}
-			if(StrCmp(prompt_str, "Cal")) {
+			if(StrCmp(prompt_str, "cal")) {
 				sys_vfork(ShellCal);
 				exit_pid = sys_wait(&exit_code);
 				Number2Str(exit_pid, p_str);
@@ -75,7 +75,7 @@ void Shell(void) {
 				sys_write("\r");
 				break;
 			}
-			if(StrCmp(prompt_str, "Roll")) {
+			if(StrCmp(prompt_str, "roll")) {
 				sys_vfork(ShellRoll);
 				exit_pid = sys_wait(&exit_code);
 				Number2Str(exit_pid, p_str);
@@ -95,14 +95,13 @@ void Shell(void) {
 
 void ShellCmds(void) {
 	sys_write("list of valid commands\r");
-	sys_write("Dir\r");
-	sys_write("Cal\r");
-	sys_write("Roll\r");
+	sys_write("dir - directory listing\r");
+	sys_write("cal - fake calendar\r");
+	sys_write("roll - rolls 2 die\r");
 }
    
 void ShellDir(void) {
 	// show a faked directory listing
-	sys_write("dir stuff\r");
 	sys_write(".\r");
 	sys_write("..\r");
 	sys_write("folder.exe     awrxgwrxuwrx\r");	// We may lose points here.

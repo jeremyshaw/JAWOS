@@ -291,6 +291,9 @@ void SysExit(void) {
 	int something;
 	
 	ppid = pcb[run_pid].ppid;
+	
+	something = pcb[run_pid].tf_p->ebx;
+	
 	set_cr3(pcb[ppid].Dir);
 	
 	if(pcb[ppid].state == WAIT) {
@@ -299,14 +302,13 @@ void SysExit(void) {
 		pcb[ppid].tf_p->edx = run_pid;
 		*((int *)pcb[ppid].tf_p->ebx) = something;
 		set_cr3(pcb[run_pid].Dir);
-		pcb[run_pid].tf_p->ebx = something;
 		pcb[run_pid].state = AVAIL;
 		EnQue(&avail_que, run_pid);
 	} else { 
-		set_cr3(pcb[run_pid].Dir);
+		// set_cr3(pcb[run_pid].Dir);
 		pcb[run_pid].state = ZOMBIE;
 		// if parent doesn't have SIGCHLD handler, add it back!
-		set_cr3(pcb[ppid].Dir);
+		// set_cr3(pcb[ppid].Dir);
 		if(pcb[ppid].signal_handler[SIGCHLD] != 0) AlterStack(ppid, pcb[ppid].signal_handler[SIGCHLD]);
 	} 
 	for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
@@ -328,11 +330,12 @@ void SysWait(void) {
 		pcb[run_pid].state = WAIT;
 		run_pid = NONE;
 	} else {
+		set_cr3(pcb[i].Dir);
+		something = pcb[i].tf_p->ebx;
+		pcb[i].state = AVAIL;
+		set_cr3(pcb[run_pid].Dir);
 		pcb[run_pid].tf_p->edx = i;
 		*((int *)pcb[run_pid].tf_p->ebx) = something;
-		set_cr3(pcb[i].Dir);
-		pcb[i].tf_p->ebx = something;
-		pcb[i].state = AVAIL;
 		EnQue(&avail_que, i);
 		for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
 	}
