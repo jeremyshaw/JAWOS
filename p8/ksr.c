@@ -195,7 +195,6 @@ void SysVFork(void) {
 		for(i = 0; i < 5; i ++) {
 			page[pageIndex[i]].pid = pidF;
 			Bzero(page[pageIndex[i]].u.content, PAGE_SIZE);
-			cons_printf("%d ", pageIndex[i]);
 		}
 		Dir = pageIndex[0];
 		IT = pageIndex[1];
@@ -289,6 +288,7 @@ void SysExit(void) {
 	
 	int ppid;
 	int i;
+	int something;
 	
 	ppid = pcb[run_pid].ppid;
 	set_cr3(pcb[ppid].Dir);
@@ -297,12 +297,16 @@ void SysExit(void) {
 		pcb[ppid].state = READY;
 		EnQue(&ready_que, ppid);
 		pcb[ppid].tf_p->edx = run_pid;
-		*((int *)pcb[ppid].tf_p->ebx) = pcb[run_pid].tf_p->ebx;
+		*((int *)pcb[ppid].tf_p->ebx) = something;
+		set_cr3(pcb[run_pid].Dir);
+		pcb[run_pid].tf_p->ebx = something;
 		pcb[run_pid].state = AVAIL;
 		EnQue(&avail_que, run_pid);
 	} else { 
+		set_cr3(pcb[run_pid].Dir);
 		pcb[run_pid].state = ZOMBIE;
 		// if parent doesn't have SIGCHLD handler, add it back!
+		set_cr3(pcb[ppid].Dir);
 		if(pcb[ppid].signal_handler[SIGCHLD] != 0) AlterStack(ppid, pcb[ppid].signal_handler[SIGCHLD]);
 	} 
 	for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
@@ -324,7 +328,6 @@ void SysWait(void) {
 		pcb[run_pid].state = WAIT;
 		run_pid = NONE;
 	} else {
-		set_cr3(pcb[run_pid].Dir);
 		pcb[run_pid].tf_p->edx = i;
 		*((int *)pcb[run_pid].tf_p->ebx) = something;
 		set_cr3(pcb[i].Dir);

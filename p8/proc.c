@@ -43,24 +43,49 @@ void Login(void) {
 
 
 void Shell(void) {
-	char prompt_str[STR_MAX];
+	char prompt_str[STR_MAX], p_str[STR_MAX], e_str[STR_MAX];
 	int exit_pid, exit_code;
 	while(1) {
 		while(1) {
-			sys_write("JAWOS>\r");
 			sys_write("JAWOS>");
 			sys_read(prompt_str);
 			if(StrCmp(prompt_str, "Dir")) {
 				sys_vfork(ShellDir);
 				exit_pid = sys_wait(&exit_code);
+				Number2Str(exit_pid, p_str);
+				sys_write("Exit Pid: ");
+				sys_write(p_str);
+				sys_write("   ");
+				Number2Str(exit_code, e_str);
+				sys_write("Exit Code: ");
+				sys_write(e_str);
+				sys_write("\r");
 				break;
 			}
 			if(StrCmp(prompt_str, "Cal")) {
 				sys_vfork(ShellCal);
+				exit_pid = sys_wait(&exit_code);
+				Number2Str(exit_pid, p_str);
+				sys_write("Exit Pid: ");
+				sys_write(p_str);
+				sys_write("   ");
+				Number2Str(exit_code, e_str);
+				sys_write("Exit Code: ");
+				sys_write(e_str);
+				sys_write("\r");
 				break;
 			}
 			if(StrCmp(prompt_str, "Roll")) {
 				sys_vfork(ShellRoll);
+				exit_pid = sys_wait(&exit_code);
+				Number2Str(exit_pid, p_str);
+				sys_write("Exit Pid: ");
+				sys_write(p_str);
+				sys_write("   ");
+				Number2Str(exit_code, e_str);
+				sys_write("Exit Code: ");
+				sys_write(e_str);
+				sys_write("\r");
 				break;
 			}
 			ShellCmds();
