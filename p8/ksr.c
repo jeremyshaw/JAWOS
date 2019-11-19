@@ -195,6 +195,7 @@ void SysVFork(void) {
 		for(i = 0; i < 5; i ++) {
 			page[pageIndex[i]].pid = pidF;
 			Bzero(page[pageIndex[i]].u.content, PAGE_SIZE);
+			cons_printf("%d ", pageIndex[i]);
 		}
 		Dir = pageIndex[0];
 		IT = pageIndex[1];
@@ -208,13 +209,13 @@ void SysVFork(void) {
 			// set entry 511 to the address of DT page (|-ed w/ the present and R/W flags)
 		KKDir = (int *)KDir;
 		for (i = 0; i < 16; i++) page[Dir].u.entry[i] = KKDir[i];
-		page[Dir].u.entry[256] = (page[IT].u.addr|PRESENT|RW);
-		page[Dir].u.entry[511] = (page[DT].u.addr|PRESENT|RW);
+		page[Dir].u.entry[256] = page[IT].u.addr|PRESENT|RW;
+		page[Dir].u.entry[511] = page[DT].u.addr|PRESENT|RW;
 		
 		// build IT page - set entry 0 to the address of IP page (| w/ the present and RO flags)
 		// build DT page - set entry 1023 to the address of DP page (| w/ the present & RW flags)
-		page[IT].u.entry[0] = ((page[IP].u.addr)|PRESENT|RO);
-		page[DT].u.entry[1023] = ((page[DP].u.addr)|PRESENT|RW);
+		page[IT].u.entry[0] = page[IP].u.addr|PRESENT|RO;
+		page[DT].u.entry[1023] = page[DP].u.addr|PRESENT|RW;
 		
 		// build IP - copy instructions to IP (src addr is ebx of TF)
 		MemCpy((char *)page[IP].u.addr, (char *)(pcb[run_pid].tf_p->ebx), PAGE_SIZE);
@@ -225,15 +226,7 @@ void SysVFork(void) {
 		page[DP].u.entry[1023] = EF_DEFAULT_VALUE|EF_INTR;	// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
 		
 		pcb[pidF].Dir = page[Dir].u.addr;	// copy u.addr of Dir page to Dir in PCB of the new process
-		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));	// tf_p in PCB of new process = G2 - size_of trapframe
-		cons_printf("done  ");
-		cons_printf("p[Dir]a = %u  ", page[Dir].u.addr);
-		cons_printf("p[Dir].u.entry[256] = %u  ", page[Dir].u.entry[256]);
-		cons_printf("p[Dir].u.entry[511] = %u  ", page[Dir].u.entry[511]);
-		cons_printf("page[IT].u.entry[0] = %u  ", page[IT].u.entry[0]);
-		cons_printf("page[DT].u.entry[1023] = %u  ", page[DT].u.entry[1023]);
-		cons_printf("pcb[pidF].tf_p = %u  ", pcb[pidF].tf_p);
-		
+		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));	// tf_p in PCB of new process = G2 - size_of trapframe		
 	}
 }
 

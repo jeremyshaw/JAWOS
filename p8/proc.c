@@ -38,6 +38,7 @@ void Login(void) {
 		}
 	}
 	sys_vfork(Shell);
+	sys_exit(0);
 }
 
 
