@@ -7,11 +7,11 @@
 #define TIMER_EVENT 32         // timer interrupt signal code
 #define PIC_MASK_REG 0x21      // I/O loc # of PIC mask
 // #define PIC_MASK_VAL ~0x01     // mask code for PIC
-#define PIC_MASK_VAL ~0x39
+#define PIC_MASK_VAL ~0x09		// ~0...01001
 #define PIC_CONT_REG 0x20      // I/O loc # of PIc control
 #define TIMER_SERVED_VAL 0x60  // control code sent to PIC
 #define VGA_MASK_VAL 0x0f00    // bold face, white on black
-#define TTY_SERVED_VAL 0x63
+#define TTY_SERVED_VAL 0x63		// also for COM4; 0x64 for COM3
 
 
 #define TIME_MAX 310            // max timer count, then rotate process
@@ -59,7 +59,7 @@
 
 #define CONSOLE 100
 #define TTY 200
-#define TTY_EVENT 35
+#define TTY_EVENT 35	// TTY0/2; use 36 for TTY1
 #define TTY0 0x2F8	// TTY1 0x3e8, TTY2 0x2e8
 
 

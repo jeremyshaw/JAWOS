@@ -21,7 +21,9 @@ void SpawnSR(func_p_t p) {
 	pid = DeQue(&avail_que);
 	Bzero((char *)&pcb[pid], sizeof(pcb_t));
 	pcb[pid].state = READY;
-	(pid == 0) ? (pcb[pid].STDOUT = CONSOLE) : (pcb[pid].STDOUT = TTY)	// finally get to use one of these!
+	// pcb[pid].STDOUT = ((pid == 0) ? (CONSOLE) : (TTY));	// finally get to use one of these!
+	if(pid == 0) pcb[pid].STDOUT = CONSOLE;
+	else (pcb[pid].STDOUT = TTY);
 	if(pid != IDLE) EnQue(&ready_que, pid);
 	
 	MemCpy( (char *) (DRAM_START + ( pid * STACK_MAX )), (char *)p, STACK_MAX );
@@ -67,19 +69,29 @@ void TimerSR(void) {
 
 
 
-   // TTYSR
-      // notify PIC TTY_SERVED_VAL (similar to how timer did its)
+void TTYSR(void){
 
-      // if no waiting process in 'tty,' just return
+	int pid;
+	char ttych;
+	
+	outportb(PIC_CONT_REG, TTY_SERVED_VAL);
+	if(QueEmpty(&tty.wait_que)) return;
 
-      // read in the PID # of the 1st process in the wait queue
-      // (virtual memory switching, in order to use string addr)
-      // get the char from the string
-      // if the char is NOT NUL
-         // 1. prints it out (how, see in TTYinit below)
-         // 2. advance the pointer
-      // else
-         // release the waiting process (1-2-3)
+	pid = DeQue(&tty.wait_que);
+	set_cr3(pcb[pid].Dir);
+	
+	ttych = *(tty.str);
+	if( ttych != '\0' ) {
+		outportb(tty.port, ttych);
+		tty.str++;
+	} else {
+		pcb[pid].state = READY;
+		EnQue(&ready_que, pid);
+		set_cr3(pcb[run_pid].Dir);
+	}
+
+	
+}
 
 
 void KBSR(void) {
@@ -360,17 +372,15 @@ void SysWrite(void) {
 			}
 			str++;
 		}
+	} else if(pcb[run_pid].STDOUT == TTY) {
+         tty.str = str;	// 1. copy the string address to the 'str' in 'tty'
+         EnQue(&tty.wait_que, run_pid);	// 2. suspend the process in the wait queue of 'tty'
+         pcb[run_pid].state = IO_WAIT;
+         run_pid = NONE;
+		 TTYSR();
 	} else {
-		// else if it's TTY:
-         // 1. copy the string address to the 'str' in 'tty'
-         // 2. suspend the process in the wait queue of 'tty'
-         // 3. demote its state to IO_WAIT
-         // 4. run_pid is NONE
-         // 5. call TTYSR()
-      // else
-         // panic: no such device!
-		
-		
+		cons_printf("no such device!");
+		breakpoint();
 	}
 }
 

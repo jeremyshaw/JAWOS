@@ -104,13 +104,13 @@ void sys_read(char *str) {	//142
 
 void sys_signal(int signal_name, func_p_t p){	// 140
 
-		asm("movl %0, %%eax;          // # for kernel to identify service
-		movl %1, %%ebx;
-		movl %2, %%edx;
-		int $128"                // interrupt!
-	   :	// no output from asm()
-	   : "g" (SYS_SIGNAL), "g" (signal_name), "g" (p)	// 3 inputs to asm()
-	   : "eax", "ebx", "edx"	// clobbered registers
+	asm("movl %0, %%eax;          // # for kernel to identify service
+	movl %1, %%ebx;
+	movl %2, %%edx;
+	int $128"                // interrupt!
+	:	// no output from asm()
+	: "g" (SYS_SIGNAL), "g" (signal_name), "g" (p)	// 3 inputs to asm()
+	: "eax", "ebx", "edx"	// clobbered registers
 	);
 	
 }
