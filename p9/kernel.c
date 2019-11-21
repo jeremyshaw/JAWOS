@@ -31,10 +31,9 @@ mutex_t video_mutex;
 
 page_t page[PAGE_MAX];
 
-int i, j;
-
-
 void BootStrap(void) {
+	
+	int i;
 
 	sys_time_count = 0;
 	Bzero((char *) &avail_que, sizeof(que_t));
@@ -63,12 +62,15 @@ void BootStrap(void) {
 
 
 void TTYinit(void) {	// given code for phase 9
+
+	int i, j;
 	
 	Bzero((char *)&tty, sizeof(tty_t));
 	tty.port = TTY0;
 	
 	outportb(tty.port+CFCR, CFCR_DLAB);				// CFCR_DLAB is 0x80
 	outportb(tty.port+BAUDLO, LOBYTE(115200/9600));	// period of each of 9600 bauds
+	outportb(tty.port+BAUDHI, HIBYTE(115200/9600));
 	outportb(tty.port+CFCR, CFCR_PEVEN|CFCR_PENAB|CFCR_7BITS);
 
 	outportb(tty.port+IER, 0);

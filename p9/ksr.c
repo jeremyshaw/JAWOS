@@ -89,7 +89,6 @@ void TTYSR(void){
 		EnQue(&ready_que, pid);
 		set_cr3(pcb[run_pid].Dir);
 	}
-
 	
 }
 
@@ -355,7 +354,7 @@ void SysSleep(void) {
 
 void SysWrite(void) {
 	
-	unsigned short *old;	// jaja
+	unsigned short *old;
 	char *str= (char *)pcb[run_pid].tf_p->ebx;
 	if (pcb[run_pid].STDOUT == CONSOLE) {
 		while( *str != '\0' ) {
@@ -373,8 +372,8 @@ void SysWrite(void) {
 			str++;
 		}
 	} else if(pcb[run_pid].STDOUT == TTY) {
-         tty.str = str;	// 1. copy the string address to the 'str' in 'tty'
-         EnQue(&tty.wait_que, run_pid);	// 2. suspend the process in the wait queue of 'tty'
+         tty.str = str;	
+         EnQue(&tty.wait_que, run_pid);
          pcb[run_pid].state = IO_WAIT;
          run_pid = NONE;
 		 TTYSR();
