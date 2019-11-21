@@ -52,13 +52,19 @@ StrCmp()
 ```
 
 ### Phase 8
-Virtual Memory - in progress as of 5NOV19
+Virtual Memory
 ```
-sys_vfork();
+sys_vfork(); - more like a v-spawnSR with some basis on a "simple" fork
 ```
 
 ### Phase 9
+TTY (simple, one way)
+```
+TTYSR();
+```
 
+### Phase A
+Will we have one? I'd guess it would be a bidirectional TTY
 
 ## Who?
 * Jeremy Shaw [jeremyshaw](https://github.com/jeremyshaw)

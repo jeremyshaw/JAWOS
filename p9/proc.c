@@ -101,17 +101,17 @@ void ShellCmds(void) {
 }
    
 void ShellDir(void) {
-	// show a faked directory listing
 	sys_write(".\r");
 	sys_write("..\r");
-	sys_write("folder.exe     awrxgwrxuwrx\r");	// We may lose points here.
+	sys_write("folder.exe     awrxgwrxuwrx\r");
 	sys_write("a.out          a---g---uwrx\r");
 	sys_exit(0);
 }
 
 
 void ShellCal(void) {
-   sys_write("       MONTH        \r");
+   sys_write("       MONTH!       \r");
+   sys_write("Su Mo Tu We Th Fr Sa\r");
    sys_write(" 1  2  3  4  5  6  7\r");
    sys_write(" 8  9 10 11 12 13 14\r");
    sys_write("15 16 17 18 19 20 21\r");
@@ -121,7 +121,9 @@ void ShellCal(void) {
 
 
 void ShellRoll(void) {
-	int d1 = sys_get_rand() % 6 + 1;
-	int d2 = sys_get_rand() % 6 + 1;
-	sys_exit(d1 + d2);	// you know what the optimization is...
+	int d1, d2;
+	d1 = sys_get_rand() % 6 + 1;
+	sys_sleep(1);
+	d2 = sys_get_rand() % 6 + 1;
+	sys_exit(d1 + d2);
 }
