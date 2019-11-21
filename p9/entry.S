@@ -39,14 +39,15 @@ ENTRY(SyscallEntry)         // similar to TimerEntry
    cld
    call CNAME(Kernel)
    
-ENTRY(TTYEntry)				// similar to TimerEntry
-   pushl $35				// push event identifier
-   pusha
-   movl %esp, %ecx
-   movw $0x10, %ax
-   mov %ax, %ds
-   mov %ax, %es
-   leal kstack+KSTACK_MAX, %esp
-   push %ecx
-   cld
-   call CNAME(Kernel)
+ENTRY(TTYEntry)           // push efl, cs, eip by hardware
+   pushl $35                // push event identifier
+   pusha                    // push all: eax ecx edx ebx esp ebp esi edi
+   movl %esp, %ecx          // copy esp
+   movw $0x10, %ax          // put 16 to ax
+   mov %ax, %ds             // set kernel data segment registers ds
+   mov %ax, %es             // set kernel data segment registers es
+   leal kstack+KSTACK_MAX, %esp  // so esp points to top of kernel stack
+   push %ecx                // push (proc trapframe addr) there
+   cld                      // clear direction flag bit
+   call CNAME(Kernel)       // call C function: void Kernel(given ecx value) { 
+   

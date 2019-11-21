@@ -50,6 +50,7 @@ void BootStrap(void) {
 	fill_gate(&idt[SYSCALL_EVENT], (int)SyscallEntry, get_cs(), ACC_INTR_GATE, 0);
 	fill_gate(&idt[TTY_EVENT], (int)TTYEntry, get_cs(), ACC_INTR_GATE, 0);
 	outportb(PIC_MASK_REG, PIC_MASK_VAL);
+
 	
 	KDir = get_cr3();
 	

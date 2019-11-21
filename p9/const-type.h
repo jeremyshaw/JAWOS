@@ -13,6 +13,11 @@
 #define VGA_MASK_VAL 0x0f00    // bold face, white on black
 #define TTY_SERVED_VAL 0x63		// also for COM4; 0x64 for COM3
 
+#define CONSOLE 100
+#define TTY 200
+#define TTY_EVENT 35	// TTY0/2; use 36 for TTY1
+#define TTY0 0x2F8	// TTY1 0x3e8, TTY2 0x2e8
+
 
 #define TIME_MAX 310            // max timer count, then rotate process
 #define PROC_MAX 20             // max number of processes
@@ -57,10 +62,7 @@
 #define VIDEO_START (unsigned short *) 0xb8000 //uns short is 2 byte pointer in this case
 #define VIDEO_END (unsigned short *) 0xb8000 + 25 * 80
 
-#define CONSOLE 100
-#define TTY 200
-#define TTY_EVENT 35	// TTY0/2; use 36 for TTY1
-#define TTY0 0x2F8	// TTY1 0x3e8, TTY2 0x2e8
+
 
 
 

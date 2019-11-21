@@ -21,9 +21,9 @@ void SpawnSR(func_p_t p) {
 	pid = DeQue(&avail_que);
 	Bzero((char *)&pcb[pid], sizeof(pcb_t));
 	pcb[pid].state = READY;
-	// pcb[pid].STDOUT = ((pid == 0) ? (CONSOLE) : (TTY));	// finally get to use one of these!
-	if(pid == 0) pcb[pid].STDOUT = CONSOLE;
-	else (pcb[pid].STDOUT = TTY);
+	pcb[pid].STDOUT = ((pid == 0) ? (CONSOLE) : (TTY));	// finally get to use one of these!
+	// if(pid == 0) pcb[pid].STDOUT = CONSOLE;
+	// else (pcb[pid].STDOUT = TTY);
 	if(pid != IDLE) EnQue(&ready_que, pid);
 	
 	MemCpy( (char *) (DRAM_START + ( pid * STACK_MAX )), (char *)p, STACK_MAX );
@@ -71,20 +71,24 @@ void TimerSR(void) {
 
 void TTYSR(void){
 
-	int pid;
+	int pid, i;
 	char ttych;
-	
 	outportb(PIC_CONT_REG, TTY_SERVED_VAL);
+	
 	if(QueEmpty(&tty.wait_que)) return;
-
-	pid = DeQue(&tty.wait_que);
+	pid = tty.wait_que.que[0];
+	
 	set_cr3(pcb[pid].Dir);
 	
 	ttych = *(tty.str);
-	if( ttych != '\0' ) {
+	if( ttych != 0 ) {
+		if(ttych == '\r') outportb(tty.port, '\n');
+		for(i=0; i<3333; i++)asm("inb $0x80");	// 83333
 		outportb(tty.port, ttych);
 		tty.str++;
+		
 	} else {
+		pid = DeQue(&tty.wait_que);
 		pcb[pid].state = READY;
 		EnQue(&ready_que, pid);
 		set_cr3(pcb[run_pid].Dir);
