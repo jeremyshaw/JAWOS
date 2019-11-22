@@ -18,7 +18,6 @@
 #define TTY_EVENT 35	// TTY0/2; use 36 for TTY1
 #define TTY0 0x2F8	// TTY1 0x3e8, TTY2 0x2e8
 
-
 #define TIME_MAX 310            // max timer count, then rotate process
 #define PROC_MAX 20             // max number of processes
 #define STACK_MAX 4096          // process stack in bytes
@@ -61,9 +60,6 @@
 
 #define VIDEO_START (unsigned short *) 0xb8000 //uns short is 2 byte pointer in this case
 #define VIDEO_END (unsigned short *) 0xb8000 + 25 * 80
-
-
-
 
 
 typedef void(*func_p_t)(void);

@@ -82,7 +82,7 @@ void TTYinit(void) {	// given code for phase 9
 
 	for(j=0; j<3; j++) {							// clear 3 lines
 		outportb(tty.port, 'V');
-		for(i=0; i<83333; i++)asm("inb $0x80");		// wait .5 sec should do
+		for(i=0; i<83333; i++)asm("inb $0x80");		// wait .5 sec should do - this is half of the ".1" sec up above...
 		outportb(tty.port, '\n');
 		for(i=0; i<83333; i++)asm("inb $0x80");
 		outportb(tty.port, '\r');
@@ -90,6 +90,7 @@ void TTYinit(void) {	// given code for phase 9
 	}
 	inportb(tty.port);								// get 1st key PROCOMM logo
 	for(i=0; i<83333; i++)asm("inb $0x80");			// wait .5 sec
+	
 }
 
 
@@ -117,7 +118,7 @@ void Scheduler(void) {
 		pcb[IDLE].state = READY;
 		run_pid = DeQue(&ready_que);
 	}
-
+	
 	pcb[run_pid].time_count = 0;
 	pcb[run_pid].state = RUN;
 	

@@ -237,7 +237,7 @@ void SysVFork(void) {
 		page[DP].u.entry[1023] = EF_DEFAULT_VALUE|EF_INTR;	// the last in u.entry[] is efl, = EF_DEF... (like SpawnSR)
 		
 		pcb[pidF].Dir = page[Dir].u.addr;
-		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));	// tf_p in PCB of new process = G2 - size_of trapframe		
+		pcb[pidF].tf_p = (tf_t*)(G2 - sizeof(tf_t));	// tf_p in PCB of new process has VA = G2 - size_of trapframe	
 	}
 }
 
@@ -253,9 +253,11 @@ void SysRead(void){
 
 
 void SysKill(void){
-	int i;
-	int pid = pcb[run_pid].tf_p->edx;
-	int signal_name = pcb[run_pid].tf_p->ebx;
+	
+	int i, pid, signal_name;
+	
+	pid = pcb[run_pid].tf_p->edx;
+	signal_name = pcb[run_pid].tf_p->ebx;
 	if(pid == 0 && signal_name == SIGCONT){	// if pid=0 and sig=SIGCONT: 
 		for(i = 0; i<PROC_MAX; i++) {	// wake up sleeping children of run_pid
 			if(pcb[i].ppid == run_pid  && pcb[i].state == SLEEP){
@@ -264,6 +266,7 @@ void SysKill(void){
 			}
 		}
 	}
+	
 }
 
 
@@ -290,14 +293,10 @@ void AlterStack(int pid, func_p_t p){
 
 void SysExit(void) {
 	
-	int ppid;
-	int i;
-	int something;
+	int ppid, i, something;
 	
 	ppid = pcb[run_pid].ppid;
-	
 	something = pcb[run_pid].tf_p->ebx;
-	
 	set_cr3(pcb[ppid].Dir);
 	
 	if(pcb[ppid].state == WAIT) {
@@ -316,6 +315,7 @@ void SysExit(void) {
 	for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
 	run_pid = NONE;
 	set_cr3(KDir);
+	
 }
 
 
@@ -456,6 +456,8 @@ void SysFork(void) {
 	
 }
 
+
 void SysSignal(void){ pcb[run_pid].signal_handler[pcb[run_pid].tf_p->ebx] = (func_p_t)pcb[run_pid].tf_p->edx; }
+
 
 void SysSetCursor(void) { sys_cursor = VIDEO_START + ((pcb[run_pid].tf_p->ebx) * 80) + (pcb[run_pid].tf_p->edx); }
