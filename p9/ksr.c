@@ -321,7 +321,7 @@ void SysExit(void) {
 
 void SysWait(void) {
 	
-	int i, something;	
+	int i, something, j;	// we are using i as the "found pid" for this function	
 	for(i = 0; i < PROC_MAX; i++) { if(pcb[i].state == ZOMBIE && pcb[i].ppid == run_pid) break; }
 	
 	if(i == PROC_MAX){	// nothing is waiting, nothing to run
@@ -335,7 +335,7 @@ void SysWait(void) {
 		pcb[run_pid].tf_p->edx = i;
 		*((int *)pcb[run_pid].tf_p->ebx) = something;
 		EnQue(&avail_que, i);
-		for (i = 0; i < PAGE_MAX ; i++) if(page[i].pid == run_pid) page[i].pid = NONE;
+		for (j = 0; j < PAGE_MAX ; j++) if(page[j].pid == i) page[j].pid = NONE;	// reclaim pages; updated from phase8 grading comment
 	}
 	set_cr3(KDir);
 	
