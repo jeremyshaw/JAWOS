@@ -81,7 +81,7 @@ void TTYSR(void){
 	ttych = *(tty.str);
 	if( ttych != 0 ) {
 		if(ttych == '\r') outportb(tty.port, '\n');
-		for(i=0; i<333; i++)asm("inb $0x80");	// 83333
+		for(i=0; i<3333; i++)asm("inb $0x80");	// 83333
 		outportb(tty.port, ttych);
 		tty.str++;
 	} else {
