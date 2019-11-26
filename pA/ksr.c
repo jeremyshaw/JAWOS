@@ -69,17 +69,22 @@ void TimerSR(void) {
 
 void TTYSR(void){
 
-	int pid, i;
-	char ttych;
+	// int pid, i;
+	// char ttych;
+	unsigned int status;
 	outportb(PIC_CONT_REG, TTY_SERVED_VAL);
+	cons_printf("%u=RX ", IIR_RXRDY);
+	cons_printf("%u=RX ", IIR_TXRDY);
 	
-	inportb(tty.port+IIR);
+	status = inportb(tty.port+IIR);
 	
-	if( IIR_TXRDY ) {	// terminal display
+	if(status == IIR_TXRDY) {	// terminal display
 		TTYdspSR();
-	} else if ( IIR_RXRDY) {	// terminal KB
+	} else if (status == IIR_RXRDY) {	// terminal KB
+		cons_printf("k");
 		TTYkbSR();
 		TTYdspSR();
+		cons_printf("k ");
 	} else {
 		// (do nothing. This syntax enforces 'status' be either above.)
 	}
@@ -105,30 +110,28 @@ void TTYSR(void){
 
 void TTYdspSR(void) {
 	
-	char echoChar;
+	char echoChar, ttych;
 	int pid, i;
 	
-	if (QueEmpty(&tty.echo)) { 
-		return; 
-	} else {
+	if (QueEmpty(&tty.echo) == 0) { 
 		echoChar = DeQue(&tty.echo);
 		outportb(tty.port, echoChar);
 		return;
 	}
 	
-	if(QueEmpty(&tty.wait_que)) return;
-	pid = tty.wait_que.que[0];
+	if(QueEmpty(&tty.dsp_wait_que)) return;
+	pid = tty.dsp_wait_que.que[0];
 	
 	set_cr3(pcb[pid].Dir);
 	
-	ttych = *(tty.str);
+	ttych = *(tty.dsp_str);
 	if( ttych != 0 ) {
 		if(ttych == '\r') outportb(tty.port, '\n');
 		for(i=0; i<3333; i++)asm("inb $0x80");	// 83333
 		outportb(tty.port, ttych);
-		tty.str++;
+		tty.dsp_str++;
 	} else {
-		pid = DeQue(&tty.wait_que);
+		pid = DeQue(&tty.dsp_wait_que);
 		pcb[pid].state = READY;
 		EnQue(&ready_que, pid);
 	}
@@ -139,27 +142,29 @@ void TTYdspSR(void) {
 void TTYkbSR(void) {
 	
 	int kbpid;
+	char kbKey;
 	
-	inportb(tty.port);
+	kbKey = (char) inportb(tty.port);
 	
 	if (QueEmpty(&tty.kb_wait_que)) return;
 	
 	// 3. enqueue the read character to the 'buffer' of 'tty'
-	EnQue(&tty.buffer, tty.port);
+	EnQue(&tty.echo, kbKey);
 	
 	// 4. switch to the virtual space of the 1st process in TTY keyboard wait queue
-	set_cr3(pcb[kb_wait_que.que[0]].Dir);
+	set_cr3(pcb[tty.kb_wait_que.que[0]].Dir);
 	
 	// 5. if the character read is NOT '\r:'
 		// a. add it to where TTY keyboard string pointer points to
 		// b. advance the pointer
-	if ( != '\r') {
-		*tty.kb_str = tty.port;
+	if ( kbKey != '\r') {
+		*tty.kb_str = kbKey;
 		tty.kb_str++;
 
 	} else {
 			EnQue( &tty.echo, '\n');
 			*tty.kb_str = '\0';
+			
 			kbpid = DeQue(&tty.kb_wait_que);
 			pcb[kbpid].state = READY;
 			EnQue(&ready_que, kbpid);
@@ -369,6 +374,7 @@ void SysRead(void){
 		tty.kb_str = str;
 		pcb[run_pid].state = IO_WAIT;
 		EnQue(&tty.kb_wait_que, run_pid);
+		run_pid = NONE;
 	} else {
 		cons_printf("SysRead: no such device!");
 		breakpoint();
