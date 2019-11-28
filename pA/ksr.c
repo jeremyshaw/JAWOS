@@ -69,14 +69,11 @@ void TimerSR(void) {
 
 void TTYSR(void){
 
-	// int pid, i;
-	// char ttych;
 	unsigned int status;
 	outportb(PIC_CONT_REG, TTY_SERVED_VAL);
-	cons_printf("%u=RX ", IIR_RXRDY);
-	cons_printf("%u=RX ", IIR_TXRDY);
 	
 	status = inportb(tty.port+IIR);
+	cons_printf("%u status ", status);
 	
 	if(status == IIR_TXRDY) {	// terminal display
 		TTYdspSR();

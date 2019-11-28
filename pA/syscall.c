@@ -77,11 +77,11 @@ unsigned sys_get_rand(void) {	// 135
 void sys_read(char *str) {	//142
 	
 	asm("movl %0, %%eax;          // # for kernel to identify service
-	movl %1, %%ebx;
-	int $128"                // interrupt!
-	:
-	: "g" (SYS_READ), "g" (*str)
-	: "eax", "ebx"
+		movl %1, %%ebx;
+		int $128"                // interrupt!
+		:
+		: "g" (SYS_READ), "g" ((int)str)
+		: "eax", "ebx"
 	);
 	
 	// char ch;
@@ -115,12 +115,12 @@ void sys_read(char *str) {	//142
 void sys_signal(int signal_name, func_p_t p){	// 140
 
 	asm("movl %0, %%eax;          // # for kernel to identify service
-	movl %1, %%ebx;
-	movl %2, %%edx;
-	int $128"                // interrupt!
-	:	// no output from asm()
-	: "g" (SYS_SIGNAL), "g" (signal_name), "g" (p)	// 3 inputs to asm()
-	: "eax", "ebx", "edx"	// clobbered registers
+		movl %1, %%ebx;
+		movl %2, %%edx;
+		int $128"                // interrupt!
+		:	// no output from asm()
+		: "g" (SYS_SIGNAL), "g" (signal_name), "g" (p)	// 3 inputs to asm()
+		: "eax", "ebx", "edx"	// clobbered registers
 	);
 	
 }
@@ -129,11 +129,11 @@ void sys_signal(int signal_name, func_p_t p){	// 140
 void sys_vfork(func_p_t p) {	// 143
 	
 	asm("movl %0, %%eax;
-	movl %1, %%ebx;	// # for kernel to identify service
-	int $128"	// after, copy ebx to return
-	: 
-	: "g" (SYS_VFORK), "g" (p)	// input to asm()
-	: "eax", "ebx"	// clobbered registers
+		movl %1, %%ebx;	// # for kernel to identify service
+		int $128"	// after, copy ebx to return
+		: 
+		: "g" (SYS_VFORK), "g" (p)	// input to asm()
+		: "eax", "ebx"	// clobbered registers
 	);
 
 }
@@ -142,12 +142,12 @@ void sys_vfork(func_p_t p) {	// 143
 void sys_kill(int signal_name, int pid){	// 141	
 
 	asm("movl %0, %%eax;          // # for kernel to identify service
-	movl %1, %%ebx;
-	movl %2, %%edx;
-	int $128"                // interrupt!
-	:	// no output from asm()
-	: "g" (SYS_KILL), "g" (signal_name), "g" (pid)	// 3 inputs to asm()
-	: "eax", "ebx", "edx"	// clobbered registers
+		movl %1, %%ebx;
+		movl %2, %%edx;
+		int $128"                // interrupt!
+		:	// no output from asm()
+		: "g" (SYS_KILL), "g" (signal_name), "g" (pid)	// 3 inputs to asm()
+		: "eax", "ebx", "edx"	// clobbered registers
 	);
 	
 }
