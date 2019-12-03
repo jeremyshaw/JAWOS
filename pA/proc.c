@@ -29,11 +29,11 @@ void Login(void) {
 	while(1) {
 		sys_write("login: ");
 		sys_read(login_str);
-		sys_write("passwd: ");
+		sys_write("\n\rpasswd: ");
 		sys_read(passwd_str);
-		if(StrCmp(login_str, passwd_str) == 0) sys_write("prompt: login failed!\n\r");
+		if(StrCmp(login_str, passwd_str) == 0) sys_write("\n\rprompt: login failed!\n\r");
 		else {
-			sys_write("prompt: login sucessful!\n\r");	
+			sys_write("\n\rprompt: login sucessful!\n\r");	
 			break;
 		}
 	}
