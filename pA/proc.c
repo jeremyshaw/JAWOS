@@ -31,9 +31,9 @@ void Login(void) {
 		sys_read(login_str);
 		sys_write("passwd: ");
 		sys_read(passwd_str);
-		if(StrCmp(login_str, passwd_str) == 0) sys_write("prompt: login failed!\r");
+		if(StrCmp(login_str, passwd_str) == 0) sys_write("prompt: login failed!\n\r");
 		else {
-			sys_write("prompt: login sucessful!\r");	
+			sys_write("prompt: login sucessful!\n\r");	
 			break;
 		}
 	}
@@ -63,25 +63,25 @@ void Shell(void) {
 		Number2Str(exit_code, e_str);
 		sys_write("Exit Code: ");
 		sys_write(e_str);
-		sys_write("\r");
+		sys_write("\n\r");
 	}
 }
 
 void ShellCmds(void) {
 	
-	sys_write("list of valid commands\r");
-	sys_write("dir - directory listing\r");
-	sys_write("cal - fake calendar\r");
-	sys_write("roll - rolls 2 die\r");
+	sys_write("list of valid commands\n\r");
+	sys_write("dir - directory listing\n\r");
+	sys_write("cal - fake calendar\n\r");
+	sys_write("roll - rolls 2 die\n\r");
 	
 }
    
 void ShellDir(void) {
 	
-	sys_write(".\r");
-	sys_write("..\r");
-	sys_write("folder.exe     awrxgwrxuwrx\r");
-	sys_write("a.out          a---g---uwrx\r");
+	sys_write(".\n\r");
+	sys_write("..\n\r");
+	sys_write("folder.exe     awrxgwrxuwrx\n\r");
+	sys_write("a.out          a---g---uwrx\n\r");
 	sys_exit(0);
 	
 }
@@ -89,12 +89,12 @@ void ShellDir(void) {
 
 void ShellCal(void) {
 	
-   sys_write("       MONTH!       \r");
-   sys_write("Su Mo Tu We Th Fr Sa\r");
-   sys_write(" 1  2  3  4  5  6  7\r");
-   sys_write(" 8  9 10 11 12 13 14\r");
-   sys_write("15 16 17 18 19 20 21\r");
-   sys_write("22 23 24 25 26 27 28\r");
+   sys_write("       MONTH!       \n\r");
+   sys_write("Su Mo Tu We Th Fr Sa\n\r");
+   sys_write(" 1  2  3  4  5  6  7\n\r");
+   sys_write(" 8  9 10 11 12 13 14\n\r");
+   sys_write("15 16 17 18 19 20 21\n\r");
+   sys_write("22 23 24 25 26 27 28\n\r");
    sys_exit(0);
    
 }
