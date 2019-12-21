@@ -12,8 +12,8 @@ Prep, individual. The one here is Jeremy's.
 Setting up the structure of the OS that we will create.
 Team is formed here, with Jeremy Shaw, Alex Leones, and William Guo
 ```C
-fill_gate(); - setup an entry in the IDT
-get_idt_base(); - find where the IDT itself is located in address space (AFAIK)
+fill_gate();	\\ setup an entry in the IDT
+get_idt_base();	\\ find where the IDT itself is located in address space (AFAIK)
 ```
 
 ### Phase 2
