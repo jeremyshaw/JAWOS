@@ -12,28 +12,28 @@ Prep, individual. The one here is Jeremy's.
 Setting up the structure of the OS that we will create.
 Team is formed here, with Jeremy Shaw, Alex Leones, and William Guo
 ```C
-fill_gate() - setup an entry in the IDT
-get_idt_base() - find where the IDT itself is located in address space (AFAIK)
+fill_gate(); - setup an entry in the IDT
+get_idt_base(); - find where the IDT itself is located in address space (AFAIK)
 ```
 
 ### Phase 2
 Create a second process that shares CPU time
 ```C
-Idle()	\\ system Idle process - PID 0
-Init()	\\ new process
+Idle();	\\ system Idle process - PID 0
+Init();	\\ new process
 ```
 
 ### Phase 3
 Implemented forking.
 ```C
-int sys_fork()	\\ returns child pid to parent, 0 to child
+int sys_fork();	\\ returns child pid to parent, 0 to child
 ```
 
 ### Phase 4
 mutex added; right now, for video output (text) only. Specifically, this means we only have one mutex, and we use it to control the video output text renderer.
 ```C
-sys_unlock_mutex(mutex_ID)	\\ Unlock
-sys_lock_mutex(mutex_ID)	\\ Lock
+sys_unlock_mutex(mutex_ID);	\\ Unlock
+sys_lock_mutex(mutex_ID);	\\ Lock
 ```
 Jeremy also added a matrix text scrawl. It's very basic, however. Lots of fun learning about the VGA control registers and the different VGA code pages (#437 in particular).
 
@@ -41,7 +41,7 @@ Jeremy also added a matrix text scrawl. It's very basic, however. Lots of fun le
 Wait (for parent)
 Exit (for children)
 ```C
-sys_exit(INT - pass to parent)	\\ for child to pass info to parent
+sys_exit(INT - pass to parent);	\\ for child to pass info to parent
 sys_wait();	\\ Used by parent to wait for a child to exit
 ```
 
@@ -75,8 +75,8 @@ TTYSR();	\\ This is called by the PIC automatically, via a set HW timer. Handles
 Bidirectional TTY
 ```C
 TTYSR()	\\ now serves as dispatcher for TTY in/out
-TTYdspSR()	\\ displays outputs to the Serial Terminal
-TTYkbSR()	\\ captures input from the Serial Terminal's KB
+TTYdspSR();	\\ displays outputs to the Serial Terminal
+TTYkbSR();	\\ captures input from the Serial Terminal's KB
 ```
 
 ## Who?
