@@ -5,6 +5,17 @@ Fall 2019
 ## What are Phases?
 Steps from which the OS is constructed, piece by piece.
 
+## Who?
+* Jeremy Shaw [jeremyshaw](https://github.com/jeremyshaw)
+* Alex Leones [aleo101](https://github.com/aleo101)
+* Will Guo  [williamguo908](https://github.com/williamguo908)
+
+## Professor
+Weide Chang [CSUS](http://athena.ecs.csus.edu/~changw/)
+
+## Phases 0 through A
+Attempted to preserve the psuedocode ("p-code") when possible and the READEME files (which assigned the work for each Phase and expected outcomes) as well.
+
 ### Phase 0
 Prep, individual. The one here is Jeremy's.
 
@@ -79,10 +90,4 @@ TTYdspSR();	\\ displays outputs to the Serial Terminal
 TTYkbSR();	\\ captures input from the Serial Terminal's KB
 ```
 
-## Who?
-* Jeremy Shaw [jeremyshaw](https://github.com/jeremyshaw)
-* Alex Leones [aleo101](https://github.com/aleo101)
-* Will Guo  [williamguo908](https://github.com/williamguo908)
 
-## Professor
-Weide Chang [CSUS](http://athena.ecs.csus.edu/~changw/)
