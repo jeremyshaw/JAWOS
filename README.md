@@ -74,7 +74,7 @@ TTYSR();	\\ This is called by the PIC automatically, via a set HW timer. Handles
 ### Phase A
 Bidirectional TTY
 ```C
-TTYSR()	\\ now serves as dispatcher for TTY in/out
+TTYSR();	\\ now serves as dispatcher for TTY in/out
 TTYdspSR();	\\ displays outputs to the Serial Terminal
 TTYkbSR();	\\ captures input from the Serial Terminal's KB
 ```
