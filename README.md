@@ -6,9 +6,9 @@ Fall 2019
 Steps from which the OS is constructed, piece by piece.
 
 ## Who?
-* Jeremy Shaw [jeremyshaw](https://github.com/jeremyshaw)
-* Alex Leones [aleo101](https://github.com/aleo101)
-* Will Guo  [williamguo908](https://github.com/williamguo908)
+* Jeremy Shaw [jeremyshaw](https://github.com/jeremyshaw), Computer Engineering
+* Alex Leones [aleo101](https://github.com/aleo101), Computer Engineering
+* Will Guo  [williamguo908](https://github.com/williamguo908), Computer Science
 
 ## Professor
 Weide Chang [CSUS](http://athena.ecs.csus.edu/~changw/)
