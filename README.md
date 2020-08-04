@@ -1,6 +1,15 @@
+Work in Progress (4 AUG 20), upgrading the documentation to become more clear and self evident, since this was initially written as a light reference for myself and was briefly expanded upon when I made the git repo public.
+Targets for improvement:
+* What is JAWOS
+* Reasons for specific design and implementation choices
+* High level overview of the architecture
+
 # JAWOS (Jeremy, Alex, & Will Operating System)
 CSU Sacramento CSC159/CpE159 Operating System Pragmatics
 Fall 2019
+
+## What is JAWOS?
+JAWOS (Jeremy, Alex, & Will Operating System) is an x86, ATX compatible OS, specifically targeting an ~386 era PC with an attached serial teletype console, VGA, and ANSI keyboard. It's largely written in C, with our own structures where neccessary, and x86 assembly.
 
 ## What are Phases?
 Steps from which the OS is constructed, piece by piece.
