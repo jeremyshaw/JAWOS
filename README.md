@@ -1,4 +1,4 @@
-Work in Progress (4 AUG 20), upgrading the documentation to become more clear and self evident, since this was initially written as a light reference for myself and was briefly expanded upon when I made the git repo public.
+There is currently a Work in Progress upgrade of the documentation (4 AUG 20 to 12 AUG 20). I am upgrading the documentation to become more clear and self evident, since this was initially written as a light reference for myself and was briefly expanded upon when I made the git repo public.
 Targets for improvement:
 * Create a new section: What is JAWOS
 * Within the phases: Reasons for specific design and implementation choices
@@ -9,7 +9,10 @@ CSU Sacramento CSC159/CpE159 Operating System Pragmatics
 Fall 2019
 
 ## What is JAWOS?
-JAWOS (Jeremy, Alex, & Will Operating System) is an x86, ATX compatible OS, specifically targeting an ~386 era PC with an attached serial teletype console, VGA, and ANSI keyboard. It's largely written in C, with our own structures where neccessary, and x86 assembly.
+JAWOS (Jeremy, Alex, & Will Operating System) is an x86, ATX compatible OS, specifically targeting an ~386 era PC with an attached serial teletype console, VGA-compatible video system, and ANSI keyboard. It's largely written in C, with our own structures where neccessary, and x86 assembly.
+
+## JAWOS Overview
+(WIP, block diagram)
 
 ## What are Phases?
 Steps from which the OS is constructed, piece by piece.
@@ -32,19 +35,19 @@ Prep, individual. The one here is Jeremy's.
 Setting up the structure of the OS that we will create.
 Team is formed here, with Jeremy Shaw, Alex Leones, and William Guo
 ```C
-fill_gate();	\\ setup an entry in the IDT
-get_idt_base();	\\ find where the IDT itself is located in address space (AFAIK)
+fill_gate();	\\ setup an entry in the Interrupt Descriptor Table (IDT), a hub for interrupt vectors.
+get_idt_base();	\\ find where the IDT itself is located in address space (AFAIK, since this is )
 ```
 
 ### Phase 2
 Create a second process that shares CPU time
 ```C
-Idle();	\\ system Idle process - PID 0
+Idle();	\\ system Idle process - PID 0.
 Init();	\\ new process
 ```
 
 ### Phase 3
-Implemented forking.
+Implemented process forking. This required analysis of the C program memory structure (TDHS - Text Data Heap Stack) and the various registers that are stored in the process control block (specifically, base pointers and return addresses for parent and children).
 ```C
 int sys_fork();	\\ returns child pid to parent, 0 to child
 ```
@@ -52,24 +55,24 @@ int sys_fork();	\\ returns child pid to parent, 0 to child
 ### Phase 4
 mutex added; right now, for video output (text) only. Specifically, this means we only have one mutex, and we use it to control the video output text renderer.
 ```C
-sys_unlock_mutex(mutex_ID);	\\ Unlock
-sys_lock_mutex(mutex_ID);	\\ Lock
+sys_unlock_mutex(mutex_ID);	\\ Unlock mutex
+sys_lock_mutex(mutex_ID);	\\ Lock mutex
 ```
-Jeremy also added a matrix text scrawl. It's very basic, however. Lots of fun learning about the VGA control registers and the different VGA code pages (#437 in particular).
+Jeremy also added a matrix text crawl. It's very basic, however. Lots of fun learning about the VGA control registers and the different VGA code pages (#437 in particular). This demo is in the attached "fun" subdirectory of this phase and is not a faithfully accurate rendition of the text crawl.
 
 ### Phase 5
-Wait (for parent)
 Exit (for children)
+Wait (for parent)
 ```C
 sys_exit(INT - pass to parent);	\\ for child to pass info to parent
 sys_wait();	\\ Used by parent to wait for a child to exit
 ```
 
 ### Phase 6
-System signalling. From midterm, a way somewhat synchronize processes.
+System signalling. This came from a question on the midterm, specifically asking for us to postulate about a way somewhat synchronize processes.
 ```C
 sys_signal();	\\ Used to setup signal handler
-sys_kill();	\\ Use to send signal, in p6, we use this to send a SIGCONT to skip a sys_sleep(massive INT) 
+sys_kill();	\\ Use to send signal, in p6, we use this to send a SIGCONT to skip a sys_sleep(large value INT). This sys_sleep was being used as a weak method for freezing/pausing a program/thread until the SIGCONT signal was received. 
 ```
 
 ### Phase 7
