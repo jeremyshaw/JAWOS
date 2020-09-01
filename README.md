@@ -1,9 +1,3 @@
-There is currently a Work in Progress upgrade of the documentation (4 AUG 20 to 12 AUG 20). I am upgrading the documentation to become more clear and self evident, since this was initially written as a light reference for myself and was briefly expanded upon when I made the git repo public.
-Targets for improvement:
-* Create a new section: What is JAWOS
-* Within the phases: Reasons for specific design and implementation choices
-* Create a new section: High level overview of the architecture
-
 # JAWOS (Jeremy, Alex, & Will Operating System)
 CSU Sacramento CSC159/CpE159 Operating System Pragmatics
 Fall 2019
